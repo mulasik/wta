@@ -1,6 +1,7 @@
 from .transforming_sequence import TransformingSequence
 from .sentence_tokenizer import SentenceTokenizer
 from .sentence_classifier import SentenceClassifier
+from .relevance_evaluator import RelevanceEvaluator
 
 
 class TpsfEcm:
@@ -12,7 +13,9 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering):
+
+        print('EDIT DISTANCE', edit_distance)
 
         self.revision_id = revision_id
         self.event_description = event_desc
@@ -62,7 +65,9 @@ class TpsfEcm:
         self.delta_current_previous = sentence_classifier.delta_current_previous
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
-        self.morphosyntactic_relevance = True  # TODO
+        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering)
+        self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
+        self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results
 
         # print(self)
 
@@ -134,11 +139,4 @@ class TpsfPcm:
         return f'''
 {self.result_text}
         '''
-
-    def tpsfs_dict(self):
-        tpsf_dict = {
-            "preceeding_pause": self.preceeding_pause,
-            "result_text": self.result_text,
-        }
-        return tpsf_dict
 

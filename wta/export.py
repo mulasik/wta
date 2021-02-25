@@ -19,7 +19,15 @@ def export_sentences_to_list(sens):
     return sentence_list
 
 
-def export_tpsf_to_dict(tpsf):
+def export_pcm_tpsf_to_dict(tpsf):
+    tpsf_dict = {
+        "preceeding_pause": tpsf.preceeding_pause,
+        "result_text": tpsf.result_text,
+    }
+    return tpsf_dict
+
+
+def export_ecm_tpsf_to_dict(tpsf):
     previous_sentence_list = export_sentences_to_list(tpsf.previous_sentence_list)
     sentence_list = export_sentences_to_list(tpsf.sentence_list)
     new_sentences = export_sentences_to_list(tpsf.new_sentences)
@@ -53,7 +61,7 @@ def export_tpsf_to_dict(tpsf):
             "deleted_sentences": deleted_sentences,
             "unchanged_sentences": unchanged_sentences,
         },
-        "morphosyn_relevance_evaluation": [],
+        "morphosyn_relevance_evaluation": tpsf.morphosyntactic_relevance_eval_results,
         "morphosyntactic_relevance": tpsf.morphosyntactic_relevance
     }
     return tpsf_dict
@@ -62,18 +70,21 @@ def export_tpsf_to_dict(tpsf):
 def output_tpsfs_to_console(tpsfs):
     tpsf_list = []
     for tpsf in tpsfs:
-        tpsf_list.append(export_tpsf_to_dict(tpsf))
+        tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
     print(json.dumps(tpsf_list, indent=5))
 
 
 def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: str, filtered=''):
-    tpsf_list = []
-    for tpsf in tpsfs:
-        tpsf_list.append(export_tpsf_to_dict(tpsf))
     if mode == 'Edit Capturing Mode':
+        tpsf_list = []
+        for tpsf in tpsfs:
+            tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
         json_file = f'{file_name}_output_ecm{filtered}.json'
         json_file_path = os.path.join(output_path, json_file)
     elif mode == 'Pause Capturing Mode':
+        tpsf_list = []
+        for tpsf in tpsfs:
+            tpsf_list.append(export_pcm_tpsf_to_dict(tpsf))
         json_file = f'{file_name}_output_pcm.json'
         json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
@@ -83,7 +94,7 @@ def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: st
 def export_tpsfs_to_txt(tpsfs: list, output_path: str, file_name: str, filtered=''):
     tpsf_list = []
     for tpsf in tpsfs:
-        tpsf_list.append(export_tpsf_to_dict(tpsf))
+        tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
     txt_file = f'{file_name}_output_ecm{filtered}.txt'
     txt_file_path = os.path.join(output_path, txt_file)
     with open(txt_file_path, 'w') as f:
@@ -116,4 +127,10 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
     json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
+
+
+def output_revisions_number(tpsf_list: list, mode: str, filtered: bool):
+    filtered = 'filtered' if filtered is True else 'all'
+    print(f'{mode}: {len(tpsf_list)} text revisions ({filtered}).')
+
 
