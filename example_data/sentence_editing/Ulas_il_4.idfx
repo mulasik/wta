@@ -1,0 +1,269 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<log>
+    <meta>
+        <entry>
+            <key>__LogProgramVersion</key>
+            <value>SCR_187</value>
+        </entry>
+        <entry>
+            <key>__LogCreationDate</key>
+            <value>21/02/06 14:39:10.008</value>
+        </entry>
+        <entry>
+            <key>__LogRelativeCreationDate</key>
+            <value>4127626518</value>
+        </entry>
+        <entry>
+            <key>__MainDocument</key>
+            <value>WordLog.docx</value>
+        </entry>
+    </meta>
+    <session>
+        <entry>
+            <key>Participant</key>
+            <value>Ulas_il_1</value>
+        </entry>
+        <entry>
+            <key>Text Language</key>
+            <value>Language</value>
+        </entry>
+    </session>
+    <event id="0" type="keyboard">
+        <part type="wordlog">
+            <position>0</position>
+            <documentLength>1</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127627057</startTime>
+            <endTime>4127627062</endTime>
+            <key>VK_V</key>
+            <value>Rente oder Kapital ist eine Frage der Persönlichkeit.</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="1" type="keyboard">
+        <part type="wordlog">
+            <position>53</position>
+            <documentLength>54</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127628403</startTime>
+            <endTime>4127628408</endTime>
+            <key>VK_SPACE</key>
+            <value> </value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="2" type="keyboard">
+        <part type="wordlog">
+            <position>54</position>
+            <documentLength>55</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127636514</startTime>
+            <endTime>4127636519</endTime>
+            <key>VK_V</key>
+            <value>Welche Variante sinnvoll ist, hängt davon ab, ob man für sich möglichst viel Sicherheit und Planbarkeit oder lieber mehr Freiheit wünscht.</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="3" type="keyboard">
+        <part type="wordlog">
+            <position>192</position>
+            <documentLength>193</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127643222</startTime>
+            <endTime>4127643227</endTime>
+            <key>VK_SPACE</key>
+            <value> </value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="4" type="keyboard">
+        <part type="wordlog">
+            <position>193</position>
+            <documentLength>194</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127643508</startTime>
+            <endTime>4127643513</endTime>
+            <key>VK_V</key>
+            <value>Und wie viel Risiko man tragen will.</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="5" type="keyboard">
+        <part type="wordlog">
+            <position>82</position>
+            <documentLength>230</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127648403</startTime>
+            <endTime>4127648408</endTime>
+            <key>NONE</key>
+            <value>?</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="6" type="keyboard">
+        <part type="wordlog">
+            <position>83</position>
+            <documentLength>231</documentLength>
+            <replay>False</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127649100</startTime>
+            <endTime>4127649105</endTime>
+            <key>VK_RIGHT</key>
+            <value></value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="7" type="keyboard">
+        <part type="wordlog">
+            <position>84</position>
+            <documentLength>231</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127649436</startTime>
+            <endTime>4127649441</endTime>
+            <key>VK_BACK</key>
+            <value>&#x8;</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="8" type="keyboard">
+        <part type="wordlog">
+            <position>83</position>
+            <documentLength>230</documentLength>
+            <replay>False</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127650681</startTime>
+            <endTime>4127650686</endTime>
+            <key>VK_RIGHT</key>
+            <value></value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="9" type="keyboard">
+        <part type="wordlog">
+            <position>84</position>
+            <documentLength>230</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127651358</startTime>
+            <endTime>4127651363</endTime>
+            <key>VK_E</key>
+            <value>E</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="10" type="keyboard">
+        <part type="wordlog">
+            <position>85</position>
+            <documentLength>231</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127651548</startTime>
+            <endTime>4127651553</endTime>
+            <key>VK_S</key>
+            <value>s</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="11" type="keyboard">
+        <part type="wordlog">
+            <position>86</position>
+            <documentLength>232</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127651641</startTime>
+            <endTime>4127651646</endTime>
+            <key>VK_SPACE</key>
+            <value> </value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="12" type="keyboard">
+        <part type="wordlog">
+            <position>197</position>
+            <documentLength>233</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127664213</startTime>
+            <endTime>4127664218</endTime>
+            <key>VK_BACK</key>
+            <value>&#x8;</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="13" type="keyboard">
+        <part type="wordlog">
+            <position>196</position>
+            <documentLength>232</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127664356</startTime>
+            <endTime>4127664361</endTime>
+            <key>VK_BACK</key>
+            <value>&#x8;</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="14" type="keyboard">
+        <part type="wordlog">
+            <position>195</position>
+            <documentLength>231</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127664648</startTime>
+            <endTime>4127664653</endTime>
+            <key>VK_BACK</key>
+            <value>&#x8;</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="15" type="keyboard">
+        <part type="wordlog">
+            <position>194</position>
+            <documentLength>230</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127665158</startTime>
+            <endTime>4127665163</endTime>
+            <key>VK_SPACE</key>
+            <value> </value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+    <event id="16" type="keyboard">
+        <part type="wordlog">
+            <position>195</position>
+            <documentLength>231</documentLength>
+            <replay>True</replay>
+        </part>
+        <part type="winlog">
+            <startTime>4127665378</startTime>
+            <endTime>4127665383</endTime>
+            <key>VK_U</key>
+            <value>u</value>
+            <keyboardstate></keyboardstate>
+        </part>
+    </event>
+</log>

@@ -1,0 +1,1 @@
+Ich möchte das Tool testen, das ich gerade implementiert habe. Mein Ziel ist es einen Test zu machen. Es handelt sich vor allem darum, ob neue und geänderte Sätze richtig erkannt werden. 
