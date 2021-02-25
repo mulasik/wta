@@ -507,6 +507,6 @@ The following chart presents the sentece-level operations in relation to the con
 
 Please note, that the transforming sequence is either included in the previous sentence version (for deletion operations) or in the current sentence versions (for insertion operations).
 
-![Sentence-Level Operations Diagramm](https://github.zhaw.ch/ulas/wta/blob/master/docs/charts/Sentence-Level_Operations.png)
+![Sentence-Level Operations Diagramm](https://github.com/mulasik/wta/blob/main/docs/charts/Sentence-Level_Operations.png)
 
 
