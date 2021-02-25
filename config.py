@@ -31,33 +31,47 @@ michael = [os.path.join(VIDEO_DATA_DIR, 'Michael_Piotrowski_il_1.idfx')]
 philipp = [os.path.join(VIDEO_DATA_DIR, 'Philipp_Dreesen_il_1.idfx')]
 andy = [os.path.join(VIDEO_DATA_DIR, 'Andy_Hediger_il_1.idfx')]
 
+DEFAULT_PAUSE_DURATION = 2
+DEFAULT_EDIT_DISTANCE = 3
+DEFAULT_FILTERING = True
+
 SINGLE_INI = {
     'xml': don,
     'output': initial_output_dir,
-    'pause_duration': 2
+    'pause_duration': DEFAULT_PAUSE_DURATION,
+    'edit_distance': DEFAULT_EDIT_DISTANCE,
+    'filtering': DEFAULT_FILTERING
 }
 
 SINGLE_VIDEO = {
     'xml': michael,
     'output': video_output_dir,
-    'pause_duration': 2
+    'pause_duration': DEFAULT_PAUSE_DURATION,
+    'edit_distance': DEFAULT_EDIT_DISTANCE,
+    'filtering': DEFAULT_FILTERING
 }
 
 INITIAL = {
     'xml': initial_xml_paths,
     'output': initial_output_dir,
-    'pause_duration': 2
+    'pause_duration': DEFAULT_PAUSE_DURATION,
+    'edit_distance': DEFAULT_EDIT_DISTANCE,
+    'filtering': DEFAULT_FILTERING
 }
 
 VIDEO = {
     'xml': video_xml_paths,
     'output': video_output_dir,
-    'pause_duration': 2
+    'pause_duration': DEFAULT_PAUSE_DURATION,
+    'edit_distance': DEFAULT_EDIT_DISTANCE,
+    'filtering': DEFAULT_FILTERING
 }
 
 SENTENCE_EDITING = {
     'xml': sentence_editing_xml_paths,
     'output': sentence_editing_output_dir,
-    'pause_duration': 2
+    'pause_duration': DEFAULT_PAUSE_DURATION,
+    'edit_distance': DEFAULT_EDIT_DISTANCE,
+    'filtering': DEFAULT_FILTERING
 }
 
