@@ -22,6 +22,7 @@ class SentenceTokenizer:
                     sentence_texts.append(ss)
             elif sentence_candidate.is_merge_candidate and sentence_candidate.merged_sens not in [s for s in sentence_texts]:
                 sentence_texts.append(sentence_candidate.merged_sens)
+                sentence_texts.remove(sentence_candidate.prev_sen)
             else:
                 sentence_texts.append(sen)
             prev_sentence = sen

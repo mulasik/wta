@@ -3,9 +3,9 @@ from .utils.nlp import retrieve_affected_tokens, analyse_affected_tokens
 
 class RelevanceEvaluator:
 
-    def __init__(self, tpsf, edit_distance, filtering):
+    def __init__(self, tpsf, edit_distance_margin, filtering):
         self.tpsf = tpsf
-        self.edit_distance = edit_distance
+        self.edit_distance_margin = edit_distance_margin
         self.filtering = filtering
         self.morphosyntactic_relevance = None
         self.morphosyntactic_relevance_eval_results = []
@@ -17,18 +17,18 @@ class RelevanceEvaluator:
             affected_tokens = retrieve_affected_tokens(sen)
             # edited_tokens = filter_out_irrelevant_tokens(affected_tokens)  # TODO consider if it might be useful
             if len(affected_tokens) > 0:
-                self.edit_distance, is_any_tok_oov, self.morphosyntactic_relevance = analyse_affected_tokens(affected_tokens, self.edit_distance)
+                edit_distance, is_any_tok_oov, self.morphosyntactic_relevance = analyse_affected_tokens(affected_tokens, self.edit_distance_margin)
             else:
                 # if no tokens are affected the TPSF is not relevant
                 self.morphosyntactic_relevance = False
                 is_any_tok_oov = None
-                self.edit_distance = None
+                edit_distance = None
             self.morphosyntactic_relevance_eval_results.append({
                 sen.pos_in_text: {
                     'number_affected_tokens': len(affected_tokens),
                     'affected_tokens': affected_tokens,
                     'is_any_tok_oov': is_any_tok_oov,
-                    'edit_distance': self.edit_distance,
+                    'edit_distance': edit_distance,
                 }
             })
 

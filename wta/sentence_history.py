@@ -14,7 +14,7 @@ class SentenceHistoryGenerator:
         for tpsf in self.tpsfs:
             revision_relevance = tpsf.morphosyntactic_relevance
             new_sens = tpsf.new_sentences
-            edited_sens = tpsf.modified_sentences
+            modified_sens = tpsf.modified_sentences
             del_sens = tpsf.deleted_sentences
             unchanged_sens = tpsf.unchanged_sentences
             for ns in new_sens:
@@ -32,7 +32,7 @@ class SentenceHistoryGenerator:
                     ns.set_revision_relevance(revision_relevance)
                     self.sentence_history[uid] = [ns]
                 global_new_sens.append(ns)
-            for es in edited_sens:
+            for es in modified_sens:
                 es.set_revision_relevance(revision_relevance)
                 for id, sens in self.sentence_history.items():
                     sens_texts = [sen.text for sen in sens]

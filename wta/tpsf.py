@@ -15,8 +15,6 @@ class TpsfEcm:
 
     def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering):
 
-        print('EDIT DISTANCE', edit_distance)
-
         self.revision_id = revision_id
         self.event_description = event_desc
         self.preceeding_pause = pause

@@ -11,6 +11,11 @@ def export_sentences_to_list(sens):
             'end_index': s.end_index,
             'pos_in_text': s.pos_in_text,
             'label': s.label,
+            'transforming_sequence': {
+                'text': None if s.transforming_sequence is None else s.transforming_sequence.text,
+                'label': None if s.transforming_sequence is None else s.transforming_sequence.label,
+                'tagged_tokens': None if s.transforming_sequence is None else s.transforming_sequence.tagged_tokens
+            },
             'previous_sentence': {
                 'text': None if s.previous_sentence is None else s.previous_sentence.text,
             }

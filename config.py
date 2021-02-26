@@ -27,6 +27,8 @@ don = [os.path.join(INITIAL_DATA_DIR, 'Don_il_1.idfx')]
 cerstin = [os.path.join(INITIAL_DATA_DIR, 'Cerstin_Mahlow_il_1.idfx')]
 ulas = [os.path.join(INITIAL_DATA_DIR, 'Ulas_il_1.idfx')]
 julia = [os.path.join(INITIAL_DATA_DIR, 'Julia_Krasselt_il_1.idfx')]
+
+cerstin_v = [os.path.join(VIDEO_DATA_DIR, 'Cerstin_Mahlow_il_1.idfx')]
 michael = [os.path.join(VIDEO_DATA_DIR, 'Michael_Piotrowski_il_1.idfx')]
 philipp = [os.path.join(VIDEO_DATA_DIR, 'Philipp_Dreesen_il_1.idfx')]
 andy = [os.path.join(VIDEO_DATA_DIR, 'Andy_Hediger_il_1.idfx')]
@@ -36,7 +38,7 @@ DEFAULT_EDIT_DISTANCE = 3
 DEFAULT_FILTERING = True
 
 SINGLE_INI = {
-    'xml': don,
+    'xml': cerstin,
     'output': initial_output_dir,
     'pause_duration': DEFAULT_PAUSE_DURATION,
     'edit_distance': DEFAULT_EDIT_DISTANCE,
@@ -44,7 +46,7 @@ SINGLE_INI = {
 }
 
 SINGLE_VIDEO = {
-    'xml': michael,
+    'xml': cerstin_v,
     'output': video_output_dir,
     'pause_duration': DEFAULT_PAUSE_DURATION,
     'edit_distance': DEFAULT_EDIT_DISTANCE,
