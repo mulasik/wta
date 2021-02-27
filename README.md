@@ -16,7 +16,7 @@ Several parameters related to TPSF generation are configurable. These are:
 * edit_distance: the maximum edit distance between two TPSFs which makes a TPSFs morphosyntactically irrelevant, default = 3
 * filtering: if set to True, a filtered TPSF list will be generated next to an unfiltered one, default = True
 
-The configuration file ```config.py``` is stored in tool root directory. You can define multiple configurations in the ```config.py```.
+The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
 
 The configuration structure:
 
