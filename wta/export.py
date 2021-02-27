@@ -134,6 +134,22 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
         json.dump(sentence_history, f)
 
 
+def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: str, filtered=''):
+    sentence_history = export_sentence_history_to_dict(sen_hist)
+    txt_file = f'{file_name}_sentence_history{filtered}.txt'
+    txt_file_path = os.path.join(output_path, txt_file)
+    with open(txt_file_path, 'w') as f:
+        for id, sens in sentence_history.items():
+            f.write(f'''
+******* {id} *******
+''')
+            for s in sens:
+                f.write(f'''
+{s['text']}
+({s['label']} * position {s['pos_in_text']})
+''')
+
+
 def output_revisions_number(tpsf_list: list, mode: str, filtered: bool):
     filtered = 'filtered' if filtered is True else 'all'
     print(f'{mode}: {len(tpsf_list)} text revisions ({filtered}).')

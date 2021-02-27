@@ -5,7 +5,8 @@ import os
 
 from .idfx_parser import IdfxParser
 from .sentence_history import SentenceHistoryGenerator
-from .export import export_tpsfs_to_json, export_tpsfs_to_txt, output_tpsfs_to_console, export_sentence_history_to_json, output_sentence_history_to_console, output_revisions_number
+from .export import (export_tpsfs_to_json, export_tpsfs_to_txt, output_tpsfs_to_console, export_sentence_history_to_json,
+                     output_sentence_history_to_console, output_revisions_number, export_sentence_history_to_txt)
 
 
 def load_path(dotted_path):
@@ -50,6 +51,8 @@ if __name__ == "__main__":
         filtered_sentence_history_wo_unchanged = sentence_history_generator.filter_sentence_history_wo_unchanged()
         export_sentence_history_to_json(sentence_history, config['output'], file_name)
         export_sentence_history_to_json(filtered_sentence_history_wo_unchanged, config['output'], file_name + '_filtered')
+        export_sentence_history_to_txt(sentence_history, config['output'], file_name)
+        export_sentence_history_to_txt(filtered_sentence_history_wo_unchanged, config['output'], file_name, '_filtered')
         output_sentence_history_to_console(filtered_sentence_history_wo_unchanged)
 
         if config['filtering'] is True:
