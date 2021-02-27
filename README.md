@@ -7,17 +7,43 @@ corresponding TPSF at any point of the production in two modes:
 
 It also generates a sentence history based on the sentence data collected upon each edit during the text production process.
 
+## WTA Configuration
+
+Several parameters related to TPSF generation are configurable. These are:
+* xml_paths: a list of paths to idfx files to be parsed
+* output_path: path to the directory where the all output files should be stored
+* pause_duration: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
+* edit_distance: the maximum edit distance between two TPSFs which makes a TPSFs morphosyntactically irrelevant, default = 3
+* filtering: if set to True, a filtered TPSF list will be generated next to an unfiltered one, default = True
+
+The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
+
+The configuration structure:
+
+```
+<YOUR CONFIGURATION NAME> = {
+    'xml_paths': [],
+    'output_path': '',
+    'pause_duration': int,
+    'edit_distance': int,
+    'filtering': int
+}
+```
+
 ## Running WTA
 
-* To install all dependencies run: 
+* To install all dependencies, run: 
+
 ```
 pip install -r requirements.txt
 ```
-* To run the tool, execute ```python wta.py --xml <xml-file-path> --pause <pause-duration> --output <output-path> --filtering <filter-activation-option: True or False> --edit_distance <edit-distance-value for TPSF filtering>```, for example:
+
+* To run the tool, execute:
+
 ```
-python wta.py --xml example_data/initial_data/Cerstin_Mahlow_eventlog.idfx --pause 2 --output wta/output --filtering False
+python -m wta config.<YOUR CONFIGURATION NAME>
 ```
-NOTE: The arguments are all optional. If you don't provide them, the tool will run for the XML files contained in the 'example_data/initial_data' directory with default pause duration of 2 and the output path set to 'wta/output_data/initial_data' in the User directory on your machine. The directory will be automatically created upon running the application. The filtering will be activated and the minimum edit distance used for filtering out irrelevant TPSFs will be set to 3.
+
 
 ## Text Produced So Far (TPSF)
 TPSF is the text produced up to the moment where either the author initializes an edit (ECM) or when the author makes a longer pause (PCM). The text is stored as a data structure called tpsf with the following structure:
