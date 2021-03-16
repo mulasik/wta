@@ -51,27 +51,15 @@ TPSF is the text produced up to the moment where either the author initializes a
 tpfs = {
 	'revision_id': int,
 	'preceeding_pause': int,
-	'event_description': '',
 	'prev_text_version': '',
 	'result_text': '',
 	'edit': {
 		'edit_start_position': int,
-		'edit_beginnging_of_edited_text': '',
-		'edit_beginnging_of_result_text': '',
-		'edit_operation': '',
-		'removed_sequence': {
+		'transforming_sequence': {
+			'label': "
 			'text': '',
 			'tags': []
 		},
-		'inserted_sequence': {
-			'text': '',
-			'tags': []
-		},
-		'entered_sequence': {
-			'text': '',
-			'tags': []
-		},
-		'edit_operation': '',
 	},
 	'sentences‘: {
 		'previous_sentence_list': [],
@@ -93,46 +81,60 @@ tpfs = {
 
 ```
 {
-	"revision_id": 3, 
-	"event_description": "after deletion", 
-	"prev_text_version": "Ich habe einen Hund. Er ist braun. Ich gehe mit ihn", 
-	"preceeding_pause": 0.257, 
-	"result_text": "Ich habe einen Hund. Er ist braun. Ich gehe mit ih", 
+	"revision_id": 5, 
+	"prev_text_version": "An edit operation is either removing or inserting a sequence in the beginning, mif without interruption.", 
+	"preceeding_pause": 0.45, 
+	"result_text": "An edit operation is either removing or inserting a sequence in the beginning, mi without interruption.", 
 	"edit": {
-		"edit_start_position": 50, 
-		"edit_beginnging_of_edited_text": "n", 
-		"edit_beginnging_of_result_text": "", 
-		"removed_sequence": {
-			"text": "n", 
-			"tags": [{"text": "n", "pos": "X", "pos_details": "XY", "dep": "ROOT", "lemma": "n", "oov": false, "is_punct": false, "is_space": false}]}, 
-		"inserted_sequence": {"text": null, "tags": null}, 
-		"edit_operation": "deletion",
-		"entered_sequence": {"text": null, "tags": null}}, 
+		"edit_start_position": 81, 
+		"transforming_sequence": {
+			"label": "deletion",
+			"text": "f", 
+			"tags": [{"text": "f", "pos": "X", "pos_details": "LS", "dep": "ROOT", "lemma": "f", "oov": false, "is_punct": false, "is_space": false}]}, 
 	"sentences": {
 		"previous_sentence_list": [
-			{"text": "Ich habe einen Hund.", "start_index": 0, "end_index": 19, "revision_id": 3, "pos_in_text": 0}, 
-			{"text": "Er ist braun.", "start_index": 21, "end_index": 33, "revision_id": 3, "pos_in_text": 1}, 
-			{"text": "Ich gehe mit ihn", "start_index": 35, "end_index": 50, "revision_id": 3, "pos_in_text": 2}], 
+			{
+				"text": "An edit operation is either removing or inserting a sequence in the beginning, mif without interruption.", 
+				"start_index": 0, 
+				"end_index": 103, 
+				"revision_id": 5, 
+				"pos_in_text": 0
+			}
+		], 
 		"current_sentence_list": [
-			{"text": "Ich habe einen Hund.", "start_index": 0, "end_index": 19, "revision_id": 3, "pos_in_text": 0, "flag": "unchanged", "revision_relevance": false}, 
-			{"text": "Er ist braun.", "start_index": 21, "end_index": 33, "revision_id": 3, "pos_in_text": 1, "flag": "unchanged", "revision_relevance": false}, 
-			{"text": "Ich gehe mit ih", "start_index": 35, "end_index": 49, "revision_id": 3, "pos_in_text": 2, "flag": "edit", "revision_relevance": false}], 
+			{
+				"text": "An edit operation is either removing or inserting a sequence in the beginning, mi without interruption.", 
+				"start_index": 0, 
+				"end_index": 19, 
+				"revision_id": 5, 
+				"pos_in_text": 0, 
+				"label": "modified"
+			}, 
 		"new_sentences": [], 
 		"edited_sentences": [
-			{"previous_sentence": {"text": "Ich gehe mit ihn", "start_index": 35, "end_index": 50, "revision_id": 3, "pos_in_text": 2}, 
-			"current_sentence": {"text": "Ich gehe mit ih", "start_index": 35, "end_index": 49, "revision_id": 3, "pos_in_text": 2, "flag": "edit", "revision_relevance": false}}], 
+			{
+				"previous_sentence": {
+					"text": "An edit operation is either removing or inserting a sequence in the beginning, mif without interruption.", 
+					"start_index": 0, 
+					"end_index": 103, 
+					"revision_id": 5, 
+					"pos_in_text": 0
+				}, 
+				"current_sentence": {
+					"text": "An edit operation is either removing or inserting a sequence in the beginning, mi without interruption.", 
+				"start_index": 0, 
+				"end_index": 19, 
+				"revision_id": 5, 
+				"pos_in_text": 0, 
+				"label": "modified"
+				}
+			}
+		], 
 		"deleted_sentences": [], 
-		"unchanged_sentences": [
-			{"text": "Ich habe einen Hund.", "start_index": 0, "end_index": 19, "revision_id": 3, "pos_in_text": 0, "flag": "unchanged", "revision_relevance": false}, 
-			{"text": "Er ist braun.", "start_index": 21, "end_index": 33, "revision_id": 3, "pos_in_text": 1, "flag": "unchanged", "revision_relevance": false}]}, 
-	"morphosyn_relevance_evaluation": [
-		{"2": {
-			"number_affected_tokens": 1, 
-			"affected_tokens": [{"prev_tok": ["ihn", 13, 15], "cur_tok": ["ih", 13, 14]}], 
-			"is_any_tok_oov": false, 
-			"edit_distance": 1
-		}}], 
-	"morphosyntactic_relevance": false
+		"unchanged_sentences": []
+	}, 
+	"morphosyn_relevance_evaluation": [], 
+	"morphosyntactic_relevance": true
 }
 ```
 
