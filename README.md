@@ -2,6 +2,10 @@
 
 An open-source application implemented in Python for parsing raw key stroke logging data, processing it, and generating text and sentence histories based on the collected data. The input file processed by WTA is an idfx file in XML format.
 
+## Processing Pipeline
+
+![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
+
 ## WTA Configuration
 
 Several parameters related to TPSF generation are configurable. These are:
