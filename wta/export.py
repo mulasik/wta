@@ -11,6 +11,8 @@ def export_sentences_to_list(sens):
             'end_index': s.end_index,
             'pos_in_text': s.pos_in_text,
             'label': s.label,
+            'revision_id': s.revision_id,
+            'sentence_morphosyntactic_relevance': s.sentence_morphosyntactic_relevance,
             'transforming_sequence': {
                 'text': None if s.transforming_sequence is None else s.transforming_sequence.text,
                 'label': None if s.transforming_sequence is None else s.transforming_sequence.label,
@@ -72,13 +74,6 @@ def export_ecm_tpsf_to_dict(tpsf):
     return tpsf_dict
 
 
-def output_tpsfs_to_console(tpsfs):
-    tpsf_list = []
-    for tpsf in tpsfs:
-        tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
-    print(json.dumps(tpsf_list, indent=5))
-
-
 def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: str, filtered=''):
     if mode == 'Edit Capturing Mode':
         tpsf_list = []
@@ -121,14 +116,9 @@ def export_sentence_history_to_dict(sentence_history):
     return sen_hist
 
 
-def output_sentence_history_to_console(sen_hist):
+def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name: str, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
-    print(json.dumps(sentence_history, indent=5))
-
-
-def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name: str):
-    sentence_history = export_sentence_history_to_dict(sen_hist)
-    json_file = f'{file_name}_sentence_history.json'
+    json_file = f'{file_name}_sentence_history{filtered}.json'
     json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
@@ -144,14 +134,9 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 ******* {id} *******
 ''')
             for s in sens:
+                relevance = 'morphosyntactically relevant' if s['sentence_morphosyntactic_relevance'] is True else 'morphosyntactically irrelevant'
                 f.write(f'''
 {s['text']}
-({s['label']} * position {s['pos_in_text']})
+({s['label']} * position {s['pos_in_text']} * {relevance} * TPSF {s['revision_id']})
 ''')
-
-
-def output_revisions_number(tpsf_list: list, mode: str, filtered: bool):
-    filtered = 'filtered' if filtered is True else 'all'
-    print(f'{mode}: {len(tpsf_list)} text revisions ({filtered}).')
-
 
