@@ -15,7 +15,7 @@ The main processing steps are:
 * Sentence histories generation
 * Filtering according to morphosyntactic relevancy
 
-Key concepts:
+Key concepts implemented in the tool are:
 * TPSF
 * Transforming sequence
 * Text history
