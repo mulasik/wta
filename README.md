@@ -4,6 +4,17 @@ An open-source application implemented in Python for parsing raw key stroke logg
 
 ## Processing Pipeline
 
+The tool operates in two modes:
+* Edit Capturing Mode (ECM)
+* Pause Capturing Mode (PCM)
+
+The main processing steps are:
+* Keystroke logging data processing
+* Sentence processing
+* Text history generation
+* Sentence histories generation
+* Filtering according to morphosyntactic relevancy
+
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
 ## WTA Configuration
