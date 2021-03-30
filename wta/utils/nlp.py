@@ -1,12 +1,15 @@
 from wta.models import SpacyModel
+import config
 import nltk
 import re
 import difflib
 import itertools
 
+model = SpacyModel(config.VIDEO['language'])
+
 
 def tag_words(text: str) -> list:
-    doc = SpacyModel.nlp(text)
+    doc = model.nlp(text)
     tags = []
     for token in doc:
         tags.append({
@@ -23,7 +26,7 @@ def tag_words(text: str) -> list:
 
 
 def segment_sentences(text: str) -> list:
-    doc = SpacyModel.nlp(text)
+    doc = model.nlp(text)
     sentences = []
     for sent in doc.sents:
         sent_text = sent.text.strip()
@@ -120,38 +123,47 @@ def retrieve_token_indices(prev_sen: str, cur_sen: str) -> tuple:
 def retrieve_affected_tokens(sentence: dict) -> list:
     affected_tokens = []
     cur_sen = sentence.text
-    prev_sen = sentence.previous_sentence.text
-    _, mismatch_range, _ = retrieve_mismatch_range_for_sentence_pair(prev_sen, cur_sen)
-    # as there is only one edit per TPSF (one sequence gets changed), there can always be only one mismatch range
-    # if more than one mismatch range exists, merge all consequtive mismatch ranges together
-    # multiple mismatch ranges occur if the inserted or deleted sequence is very short
-    # and can be found at another position in the sentence which hasn't been edited
-    mismatch_range = range(mismatch_range[0][0], mismatch_range[-1][-1]+1)
+    prev_sen = '' if sentence.previous_sentence is None else sentence.previous_sentence.text
     prev_toks_with_indices, cur_toks_with_indices = retrieve_token_indices(prev_sen, cur_sen)
-    for (pt, ct) in itertools.zip_longest(prev_toks_with_indices, cur_toks_with_indices):
-        if pt is not None and ct is not None:
-            if mismatch_range[0] <= pt[2] and pt[1] <= mismatch_range[-1] or mismatch_range[0] <= ct[2] and ct[1] <= mismatch_range[-1]:  # TODO to check
-                affected_token_pair = {
-                    'prev_tok': pt,
-                    'cur_tok': ct
-                }
-                affected_tokens.append(affected_token_pair)
-        elif pt is None:
+    _, mismatch_range, _ = retrieve_mismatch_range_for_sentence_pair(prev_sen, cur_sen)
+    if mismatch_range:
+        # as there is only one edit per TPSF (one sequence gets changed), there can always be only one mismatch range
+        # if more than one mismatch range exists, merge all consequtive mismatch ranges together
+        # multiple mismatch ranges occur if the inserted or deleted sequence is very short
+        # and can be found at another position in the sentence which hasn't been edited
+        mismatch_range = range(mismatch_range[0][0], mismatch_range[-1][-1]+1)
+        for (pt, ct) in itertools.zip_longest(prev_toks_with_indices, cur_toks_with_indices):
+            if pt is not None and ct is not None:
+                if mismatch_range[0] <= pt[2] and pt[1] <= mismatch_range[-1] or mismatch_range[0] <= ct[2] and ct[1] <= mismatch_range[-1]:  # TODO to test
+                    affected_token_pair = {
+                        'prev_tok': pt,
+                        'cur_tok': ct
+                    }
+                    affected_tokens.append(affected_token_pair)
+            elif pt is None:
+                pt = ('', None, None)
+                if mismatch_range[0] <= ct[2] and ct[1] <= mismatch_range[-1]:
+                    affected_token_pair = {
+                        'prev_tok': pt,
+                        'cur_tok': ct
+                    }
+                    affected_tokens.append(affected_token_pair)
+            elif ct is None:
+                ct = ('', None, None)
+                if mismatch_range[0] <= pt[2] and pt[1] <= mismatch_range[-1]:
+                    affected_token_pair = {
+                        'prev_tok': pt,
+                        'cur_tok': ct
+                    }
+                    affected_tokens.append(affected_token_pair)
+    else:
+        for ct in cur_toks_with_indices:
             pt = ('', None, None)
-            if mismatch_range[0] <= ct[2] and ct[1] <= mismatch_range[-1]:
-                affected_token_pair = {
-                    'prev_tok': pt,
-                    'cur_tok': ct
-                }
-                affected_tokens.append(affected_token_pair)
-        elif ct is None:
-            ct = ('', None, None)
-            if mismatch_range[0] <= pt[2] and pt[1] <= mismatch_range[-1]:
-                affected_token_pair = {
-                    'prev_tok': pt,
-                    'cur_tok': ct
-                }
-                affected_tokens.append(affected_token_pair)
+            affected_token_pair = {
+                'prev_tok': pt,
+                'cur_tok': ct
+            }
+            affected_tokens.append(affected_token_pair)
     return affected_tokens
 
 
@@ -174,14 +186,14 @@ def check_if_any_oov(tokens: list) -> bool:
         ct = t['cur_tok']
         if pt[0] != '':
             pt = pt[0]
-            pt = SpacyModel.nlp(pt)
+            pt = model.nlp(pt)
             pt = pt[0]
             pt_oov = pt.is_oov
         else:
             pt_oov = None
         if ct[0] != '':
             ct = ct[0]
-            ct = SpacyModel.nlp(ct)
+            ct = model.nlp(ct)
             ct = ct[0]
             ct_oov = ct.is_oov
         else:
@@ -192,15 +204,15 @@ def check_if_any_oov(tokens: list) -> bool:
 
 
 def collect_additional_tokens_tags(text: str) -> tuple:
-    doc = SpacyModel.nlp(text)
+    doc = model.nlp(text)
     for token in doc:
         return token.text, token.shape_, token.is_alpha, token.is_stop, token.has_vector, token.vector_norm
 
 
 def check_if_same_words(editted_word: str, result_word: str) -> bool:
     if editted_word and result_word:
-        editted_word = SpacyModel.nlp(editted_word)
-        result_word = SpacyModel.nlp(result_word)
+        editted_word = model.nlp(editted_word)
+        result_word = model.nlp(result_word)
         if editted_word.pos_ != result_word.pos_ or editted_word.lemma_ != result_word.lemma_ or editted_word.dep_ != result_word.dep_:
             return False
         else:
