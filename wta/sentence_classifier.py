@@ -126,13 +126,13 @@ class SentenceClassifier:
                     for s in self.delta_current_previous:
                         # If the previous sentence is contained in the current sentence,
                         # the current sentence is a modification of the previous one.
-                        if previous_sentence.text.strip('.!?') in s.text.strip():
+                        if previous_sentence.text.strip('.!?\n') in s.text.strip():
                             s.set_previous_text_version(previous_sentence)
                             s.set_label('modified')
                             self.modified_sentences.append(s)
                         # If the current sentence is contained in the previous sentence,
                         # the current sentence must be a result of a split.
-                        elif s.text.strip('.!?') in previous_sentence.text.strip():
+                        elif s.text.strip('.!?\n') in previous_sentence.text.strip():
                             if previous_sentence_set is False:
                                 s.set_previous_text_version(previous_sentence)
                                 s.set_label('split_result')
