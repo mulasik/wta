@@ -100,6 +100,16 @@ class IdfxParser:
                     prev_version = tpsf.result_text
                     removed_sequence = ''
 
+                if key_name == 'VK_RIGHT' and prev_key not in self.NON_PRODUCTION_KEYS:
+                    # removed_sequence = removed_sequence[::-1]
+                    event_desc = self.POST_INS
+                    edit = (pos, removed_sequence, inserted_sequence)
+                    prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering)
+                    self.all_tpsfs_ecm.append(tpsf)
+                    prev_version = tpsf.result_text
+                    inserted_sequence = ''
+
                 # CHAR PRODUCTION: appending or inserting chars
                 if key_name not in self.NON_PRODUCTION_KEYS:
                     # capture the revision after deleting completed
