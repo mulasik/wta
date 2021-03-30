@@ -1,11 +1,10 @@
 # A tool for Writing Timecourse Analysis (WTA)
 
-A tool for analysing text production timecourse. It automatically creates the
-corresponding TPSF at any point of the production in two modes:
-* Edit Capturing Mode (ECM): TPSF creation is triggered by an edit action of the author
-* Pause Capturing Mode (PCM): TPSF creation is triggered by a pause in the writing process
+An open-source application implemented in Python for parsing raw key stroke logging data, processing it, and generating text and sentence histories based on the collected data. The input file processed by WTA is an idfx file in XML format.
 
-It also generates a sentence history based on the sentence data collected upon each edit during the text production process.
+## Processing Pipeline
+
+![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
 ## WTA Configuration
 
@@ -15,6 +14,7 @@ Several parameters related to TPSF generation are configurable. These are:
 * pause_duration: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
 * edit_distance: the maximum edit distance between two TPSFs which makes a TPSFs morphosyntactically irrelevant, default = 3
 * filtering: if set to True, a filtered TPSF list will be generated next to an unfiltered one, default = True
+* language: 'German' or 'English'
 
 The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
 
@@ -26,7 +26,8 @@ The configuration structure:
     'output_path': '',
     'pause_duration': int,
     'edit_distance': int,
-    'filtering': int
+    'filtering': int,
+    'language': ''
 }
 ```
 
