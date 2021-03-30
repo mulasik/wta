@@ -41,10 +41,12 @@ class Sentence:
         self.end_index = end
         self.revision_id = revision_id
         self.pos_in_text = pos
+        self.is_any_tok_oov = False
         self.label = None
         self.transforming_sequence = transforming_sequence
 
-        self.revision_relevance = None  # TODO
+        self.sentence_morphosyntactic_relevance = None
+        self.revision_morphosyntactic_relevance = None
 
         self.previous_sentence = None
 
@@ -57,8 +59,14 @@ class Sentence:
     def set_label(self, label):
         self.label = label
 
-    def set_revision_relevance(self, revision_relevance):
-        self.revision_relevance = revision_relevance
+    def set_is_any_tok_oov(self, is_any_tok_oov):
+        self.is_any_tok_oov = is_any_tok_oov
+
+    def set_sentence_morphosyntactic_relevance(self, relevance):
+        self.sentence_morphosyntactic_relevance = relevance
+
+    def set_revision_morphosyntactic_relevance(self, revision_relevance):
+        self.revision_morphosyntactic_relevance = revision_relevance
 
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__)
