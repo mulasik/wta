@@ -1,6 +1,6 @@
 # A tool for Writing Timecourse Analysis (WTA)
 
-An open-source application implemented in Python for parsing raw key stroke logging data, processing it, and generating text and sentence histories based on the collected data. The input file processed by WTA is an idfx file in XML format.
+An open-source application implemented in Python for parsing raw keystroke logging data, processing it, and generating text and sentence histories based on the collected data. The input file processed by WTA is an idfx file in XML format.
 
 ## Processing Pipeline
 
