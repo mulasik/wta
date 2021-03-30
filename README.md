@@ -15,6 +15,14 @@ The main processing steps are:
 * Sentence histories generation
 * Filtering according to morphosyntactic relevancy
 
+Key concepts:
+* TPSF
+* Transforming sequence
+* Text history
+* Sentence histories
+
+The following figure illustrates the processing pipeline:
+
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
 ## WTA Configuration
