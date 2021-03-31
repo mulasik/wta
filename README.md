@@ -17,6 +17,7 @@ The main outputs of the tool are:
 * complete text history in PCM in JSON format
 * sentence history in JSON format
 * sentence history visualisation in SVG format
+
 In case filtering has been activated in the configuration:
 * filtered text history in JSON format
 * filtered text versions exported to TXT format 
