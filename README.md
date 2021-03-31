@@ -38,15 +38,9 @@ In each step, the TPSF is enriched with the newly collected details.
 
 An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered. 
 
-The following figure provides an overview of the processing steps. The steps are described in more detail below.
+The following figure provides an overview of the processing steps.
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
-
-For supplementing the analysis with relevant linguistic annotations, we apply spaCy, an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
-
-#### Keystroke logging data processing
-
-The tool iterates over the idfx file collecting keystroke data such as cursor position, key name, keystroke value, start and end time until an event occurs that triggers the TPSF creation. In PCM it is a pause of a certain length in the text production process.  The configuration allows to set a static threshold in milliseconds.  If the limit is exceeded, the current text version is captured and stored as a TPSF instance. In ECM, the trigger is either a detected edit operation or a change of cursor position without edits. An edit operation is either deleting or inserting a sequence at the beginning, in the middle, or at the end of the text without interruption. As long as the writer keeps deleting or inserting subsequent characters one after another without changing direction or moving the cursor to a different position (e.g., with cursor keys or a mouse click), the whole sequence is treated as a single edit operation. As soon as the edit operation is interrupted (i.e., a change in production mode is detected), the current text version is captured. 
 
 An example of a TPSF exported to JSON format:
 
@@ -124,14 +118,9 @@ An example of a TPSF exported to JSON format:
 
 ```
 
-The characters deleted or inserted during a single edit operation are aggregated and stored in a data structure representing the transforming sequence. The character sequence is split into tokens and each token is described with additional metadata---e.g., part-of-speech and dependency tags---, and out-of-vocabulary labels. The token information is also stored in the transforming sequence data structure.
+## NLP Tools applied
 
-#### Sentence processing
-#### Text history generation
-#### Sentence histories generation
-#### Filtering according to morphosyntactic relevancy
-
-
+For supplementing the analysis with relevant linguistic annotations, we apply spaCy, an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
 
 ## Tool Configuration
 
