@@ -1,14 +1,18 @@
 # A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve text versions produced during this writing session, and eventually generating text and sentence histories based on the collected information. The input file processed by the tool is an idfx file in XML format.
+An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions produced during this session, and eventually generating text and sentence histories based on the collected information. 
 
-The central building block of the tool is TPSF data type. It is used to store the text version together with further details. 
+The input file processed by the tool is an idfx file in XML format.
 
-The tool uses two main modes to capture versions from idfx files: 
+The tool uses two main modes to capture text versions from idfx files: 
 * the Pause Capturing Mode (PCM), which relies on a preset pause duration in the writing process to yield versions, 
-* and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of TPSF, (b) deleting something, (c) inserting something.
+* and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 
-As soon as a new version is detected, it is stored as a TPSF instance. 
+## Main Outputs
+
+
+
+## Processing Pipeline
 
 Generating a complete TPSF comprises the following steps: 
 * First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
@@ -22,10 +26,6 @@ An accomplished collection of TPSF instances results in a text history which con
 The following figure illustrates the processing pipeline:
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
-
-## Main Outputs
-
-## Processing Pipeline
 
 #### Keystroke logging data processing
 #### Sentence processing
