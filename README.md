@@ -11,9 +11,9 @@ The tool uses two main modes to capture versions from idfx files:
 As soon as a new version is detected, it is stored as a TPSF instance. 
 
 Generating a complete TPSF instance comprises the following steps: 
-* First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version including the \term{transforming sequence} (see section \ref{sec:keystroke-logging-data-processing}). 
-* This data is next stored as a TDP and is subsequently used to retrieve information on the sentences constituting this version (see section \ref{sec:sentence-processing}). 
-* Finally, the version is evaluated for its morphosyntactic relevance (see section \ref{sec:relevance-evaluation}). 
+* First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
+* This data is next stored as a TDP and is subsequently used to retrieve information on the sentences constituting this version. 
+* Finally, the version is evaluated for its morphosyntactic relevance. 
 
 In each step, the TPSF instance is enriched with the newly collected details.
 
