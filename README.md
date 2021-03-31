@@ -95,7 +95,7 @@ To run the tool for the provided example data (short descriptive comments create
 python -m wta config.VIDEO
 ```
 
-By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py.
+By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
 
 
 
