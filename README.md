@@ -27,7 +27,7 @@ In case filtering has been activated in the configuration:
 
 ## Processing Pipeline
 
-The central building block of the tool is TPSF. It is a data structure for storing the text version together with further details.
+The central building block of the tool is TPSF. It is a data structure for storing the text version together with further details retrieved from the processed keystroke logging data.
 
 Generating a TPSF comprises the following steps: 
 * First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
