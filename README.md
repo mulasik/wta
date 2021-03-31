@@ -5,7 +5,7 @@ An open-source application implemented in Python for parsing raw keystroke loggi
 The input file processed by the tool is an idfx file in XML format.
 
 The tool uses two main modes to capture text versions from idfx files: 
-* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the writing process to yield versions, 
+* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the text production to yield versions, 
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 
 ## Tool Outputs
