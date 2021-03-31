@@ -10,8 +10,6 @@ The tool uses two main modes to capture versions from idfx files:
 
 As soon as a new version is detected, it is stored in a TPSF data structure. 
 
-In PCM, a TPSF data structure consists of the captured text version and the preceding pause duration.  In ECM, a TPSF data structure additionally contains the previous text version, revision number, the transforming sequence, categorized list of sentences which make up this version, and the result of morphosyntactic relevance evaluation. 
-
 ## Main Outputs
 
 ## Processing Pipeline
