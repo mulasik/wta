@@ -1,13 +1,13 @@
-from .utils.nlp import segment_sentences
 from .sentence import SentenceCandidate, Sentence
 
 
 class SentenceTokenizer:
 
-    def __init__(self, text, revision_id, transforming_sequence):
+    def __init__(self, text, revision_id, transforming_sequence, nlp_model):
 
         self.revision_id = revision_id
         self.transforming_sequence = transforming_sequence
+        self.nlp_model = nlp_model
 
         self.sentences = [] if text == '' else self.transform_into_sentence_list(text)
 
@@ -29,7 +29,7 @@ class SentenceTokenizer:
         return sentence_texts
 
     def transform_into_sentence_list(self, text):
-        sentence_list = segment_sentences(text)
+        sentence_list = self.nlp_model.segment_sentences(text)
         verified_sentence_list = self.verify_sentence_segmentation(sentence_list)
         sentences = []
         pos = 0

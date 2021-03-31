@@ -9,6 +9,7 @@ from .sentence_history import SentenceHistoryGenerator
 from .visualisation import Visualisation
 from .export import (export_tpsfs_to_json, export_tpsfs_to_txt, export_sentence_history_to_json, export_sentence_history_to_txt)
 from .console_output import output_revisions_number
+from .models import SpacyModel
 
 
 def load_path(dotted_path):
@@ -40,13 +41,15 @@ if __name__ == "__main__":
 
     config = load_path(args.config)
 
+    nlp_model = SpacyModel(config['language'])
+
     for idfx in config['xml']:
         print(f'\nProcessing the input file {idfx}...\n')
 
         ensure_path(config['output'])
 
         # generate text history
-        idfx_parser = IdfxParser(idfx, config['pause_duration'], config['edit_distance'], config['filtering'])
+        idfx_parser = IdfxParser(idfx, config['pause_duration'], config['edit_distance'], config['filtering'], nlp_model)
         idfx_parser.run()
         file_name = os.path.split(idfx)[-1].replace('.idfx', '')
 
@@ -59,21 +62,21 @@ if __name__ == "__main__":
         sentence_history_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
         sentence_history = sentence_history_generator.sentence_history
         filtered_sentence_history = sentence_history_generator.filtered_sentence_history
-        sentences_selected_for_reparsing = sentence_history_generator.sentences_selected_for_reparsing
 
         # export sentence history
         export_sentence_history_to_json(sentence_history, config['output'], file_name)
         export_sentence_history_to_json(filtered_sentence_history, config['output'], file_name, '_filtered')
-        export_sentence_history_to_json(sentences_selected_for_reparsing, config['output'], file_name, '_filtered_for_reparsing')
         export_sentence_history_to_txt(sentence_history, config['output'], file_name)
         export_sentence_history_to_txt(filtered_sentence_history, config['output'], file_name, '_filtered')
-        export_sentence_history_to_txt(sentences_selected_for_reparsing, config['output'], file_name, '_filtered_for_reparsing')
 
         # visualise text and sentence history
         tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0)]
         visualisation = Visualisation(config['output'], file_name)
         visualisation.visualise_text_history(tpsfs_to_visualise)
         visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
+
+        output_revisions_number(idfx_parser.all_tpsfs_ecm, ECM, False)
+        output_revisions_number(idfx_parser.all_tpsfs_pcm, PCM, False)
 
         # generate filtered outputs
         if config['filtering'] is True:

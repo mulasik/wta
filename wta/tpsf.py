@@ -13,7 +13,7 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, nlp_model):
 
         self.revision_id = revision_id
         self.event_description = event_desc
@@ -37,11 +37,11 @@ class TpsfEcm:
             self.edit_op = self.NO_EDIT
 
         if removed_sequence_text is not None:
-            self.transforming_sequence = TransformingSequence(removed_sequence_text, 'deletion')
+            self.transforming_sequence = TransformingSequence(removed_sequence_text, 'deletion', nlp_model)
         elif inserted_sequence_text is not None:
-            self.transforming_sequence = TransformingSequence(inserted_sequence_text, 'insertion')
+            self.transforming_sequence = TransformingSequence(inserted_sequence_text, 'insertion', nlp_model)
         elif appended_sequence_text is not None:
-            self.transforming_sequence = TransformingSequence(appended_sequence_text, 'append')
+            self.transforming_sequence = TransformingSequence(appended_sequence_text, 'append', nlp_model)
         else:
             self.transforming_sequence = None
 
@@ -50,9 +50,9 @@ class TpsfEcm:
             self.verify_edit_start_position()
 
         # perform sentence segmentation
-        sentence_tokenizer_prev = SentenceTokenizer(self.prev_text_version, self.revision_id, self.transforming_sequence)
+        sentence_tokenizer_prev = SentenceTokenizer(self.prev_text_version, self.revision_id, self.transforming_sequence, nlp_model)
         self.previous_sentence_list = sentence_tokenizer_prev.sentences
-        sentence_tokenizer = SentenceTokenizer(self.result_text, self.revision_id, self.transforming_sequence)
+        sentence_tokenizer = SentenceTokenizer(self.result_text, self.revision_id, self.transforming_sequence, nlp_model)
         self.sentence_list = sentence_tokenizer.sentences
 
         sentence_classifier = SentenceClassifier(self.previous_sentence_list, self.sentence_list, self.transforming_sequence)
@@ -63,7 +63,7 @@ class TpsfEcm:
         self.delta_current_previous = sentence_classifier.delta_current_previous
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
-        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering)
+        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering, nlp_model)
         self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
         self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results
 

@@ -1,12 +1,13 @@
-from .utils.nlp import retrieve_affected_tokens, analyse_affected_tokens
+from .utils.nlp import retrieve_affected_tokens
 
 
 class RelevanceEvaluator:
 
-    def __init__(self, tpsf, edit_distance_margin, filtering):
+    def __init__(self, tpsf, edit_distance_margin, filtering, nlp_model):
         self.tpsf = tpsf
         self.edit_distance_margin = edit_distance_margin
         self.filtering = filtering
+        self.nlp_model = nlp_model
         self.morphosyntactic_relevance = None
         self.morphosyntactic_relevance_eval_results = []
         self.set_morphosyntactic_relevance()
@@ -16,8 +17,7 @@ class RelevanceEvaluator:
         affected_tokens = retrieve_affected_tokens(sen)
         # edited_tokens = filter_out_irrelevant_tokens(affected_tokens)  # TODO consider tokens filtering
         if len(affected_tokens) > 0:
-            edit_distance, is_any_tok_oov, sentence_morphosyntactic_relevance = analyse_affected_tokens(affected_tokens,
-                                                                                                        self.edit_distance_margin)
+            edit_distance, is_any_tok_oov, sentence_morphosyntactic_relevance = self.nlp_model.analyse_affected_tokens(affected_tokens, self.edit_distance_margin)
         else:
             # if no tokens are affected the TPSF is not relevant
             edit_distance, is_any_tok_oov, sentence_morphosyntactic_relevance = None, None, False
