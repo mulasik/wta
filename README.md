@@ -4,22 +4,22 @@ An open-source application implemented in Python for parsing raw keystroke loggi
 
 ## Processing Pipeline
 
-The tool operates in two modes:
+### Key Concepts
+* TPSF
+* Transforming sequence
+* Text history
+* Sentence histories
+
+### Tool Modes
 * Edit Capturing Mode (ECM)
 * Pause Capturing Mode (PCM)
 
-The main processing steps are:
+### Main processing steps
 * Keystroke logging data processing
 * Sentence processing
 * Text history generation
 * Sentence histories generation
 * Filtering according to morphosyntactic relevancy
-
-Key concepts implemented in the tool are:
-* TPSF
-* Transforming sequence
-* Text history
-* Sentence histories
 
 The following figure illustrates the processing pipeline:
 
