@@ -2,21 +2,13 @@
 
 An open-source application implemented in Python for parsing raw keystroke logging data, processing it, and generating text and sentence histories based on the collected information. The input file processed by the tool is an idfx file in XML format.
 
+The central building block of THE TOOL is \emph{TPSF data structure} (\emph{TDS}). It is used to store the text version together with further details. 
+
+Since the interpretation of version may differ according to research questions, our approach uses two main modes to capture versions from idfx files: the \term{Pause Capturing Mode} (PCM), which relies on a preset pause duration to yield versions, and the \term{Edit Capturing Mode} (ECM), which uses a change production mode to determine versions.  As soon as a new version is detected, it is stored in a TDS. In PCM, a TDS consists of the captured text version and the preceding pause duration.  In ECM, a TDS additionally contains the previous text version, revision number, the transforming sequence (see section \ref{sec:transforming-sequences}), categorized list of sentences which make up this version, and the result of morphosyntactic relevance evaluation. 
+
+## Main Outputs
+
 ## Processing Pipeline
-
-### Key Concepts
-
-#### TPSF
-#### Transforming sequence
-#### Text history
-#### Sentence histories
-
-### Tool Modes
-
-#### Edit Capturing Mode (ECM)
-#### Pause Capturing Mode (PCM)
-
-### Main processing steps
 
 #### Keystroke logging data processing
 #### Sentence processing
