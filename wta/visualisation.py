@@ -101,6 +101,7 @@ class Visualisation:
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.02)
         fig_file = os.path.join(self.output_directory, f'{self.file_name}_text_history_visualisation{self.filtered}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
 
     def visualise_sentence_history(self, tpsfs_to_visualise, sentence_history):
 
@@ -158,4 +159,5 @@ class Visualisation:
         plt.tight_layout()
         fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_history_visualisation{self.filtered}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
 
