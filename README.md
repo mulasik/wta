@@ -17,7 +17,9 @@ Generating a complete TPSF instance comprises the following steps:
 
 In each step, the TPSF instance is enriched with the newly collected details.
 
-An accomplished collection of TPSF instances results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF instance, both the text and the sentence history can be filtered. The following figure illustrates the processing pipeline:
+An accomplished collection of TPSF instances results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF instance, both the text and the sentence history can be filtered. 
+
+The following figure illustrates the processing pipeline:
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
