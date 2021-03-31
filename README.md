@@ -27,7 +27,7 @@ In case filtering has been activated in the configuration:
 
 ## Processing Pipeline
 
-The central building block of the tool is TPSF. It is a data structure for storing the text version together with further details retrieved from the processed keystroke logging data.
+The central building block of the tool is TPSF. It is a data type for storing the text version together with further details retrieved from the processed keystroke logging data.
 
 Generating a TPSF comprises the following steps: 
 * First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
@@ -42,7 +42,90 @@ The following figure provides an overview of the processing steps. The steps are
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
+For supplementing the analysis with relevant linguistic annotations, we apply spaCy, an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
+
 #### Keystroke logging data processing
+
+The tool iterates over the idfx file collecting keystroke data such as cursor position, key name, keystroke value, start and end time until an event occurs that triggers the TPSF creation. In PCM it is a pause of a certain length in the text production process.  The configuration allows to set a static threshold in milliseconds.  If the limit is exceeded, the current text version is captured and stored as a TPSF instance. In ECM, the trigger is either a detected edit operation or a change of cursor position without edits. An edit operation is either deleting or inserting a sequence at the beginning, in the middle, or at the end of the text without interruption. As long as the writer keeps deleting or inserting subsequent characters one after another without changing direction or moving the cursor to a different position (e.g., with cursor keys or a mouse click), the whole sequence is treated as a single edit operation. As soon as the edit operation is interrupted (i.e., a change in production mode is detected), the current text version is captured. 
+
+An example of a TPSF exported to JSON format:
+
+```
+{
+	"revision_id": 4, 
+	"previous_text_version": "An edit operation is an act of either removing or inserting a sequence. ", 
+	"preceding_pause": 0.54, 
+	"result_text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
+	"edit": {
+		"edit_start_position": 70, 
+		"transforming_sequence": {
+			"label": "insertion",
+			"text": " without interruption", 
+			"tags": [
+				{"text": " ", "pos": "SPACE", "pos_details": "_SP", "dep": "", "lemma": " ", "oov": false, "is_punct": false, "is_space": true},
+				"text": "without", "pos": "ADP", "pos_details": "IN", "dep": "ROOT", "lemma": "without", "oov": false, "is_punct": false, "is_space": false},
+				"text": "interruption", "pos": "NOUN", "pos_details": "NN", "dep": "pobj", "lemma": "interruption", "oov": false, "is_punct": false, "is_space": false},
+				]
+	}, 
+	"sentences": {
+		"previous_sentence_list": [
+			{
+				"text": "An edit operation is an act of either removing or inserting a sequence. ", 
+				"start_index": 0, 
+				"end_index": 70, 
+				"revision_id": 3, 
+				"pos_in_text": 0
+			}
+		], 
+		"current_sentence_list": [
+			{
+				"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
+				"start_index": 0, 
+				"end_index": 91, 
+				"revision_id": 3, 
+				"pos_in_text": 0, 
+				"label": "modified"
+			}, 
+		"new_sentences": [], 
+		"edited_sentences": [
+			{
+				"previous_sentence": {
+					"text": "An edit operation is an act of either removing or inserting a sequence. ", 
+					"start_index": 0, 
+					"end_index": 70, 
+					"revision_id": 3, 
+					"pos_in_text": 0
+				}, 
+				"current_sentence": {
+					"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
+					"start_index": 0, 
+					"end_index": 91, 
+					"revision_id": 3, 
+					"pos_in_text": 0, 
+					"label": "modified"
+				}
+			}
+		], 
+		"deleted_sentences": [], 
+		"unchanged_sentences": []
+	}, 
+	"morphosyntactic_relevance_evaluation": [
+		"number_affected_tokens": 3,
+		"affected_tokens": [
+			{"prev_tok": ("sequence.", 62, 70), "cur_tok": ("sequence", 62, 69)}, 
+			{"prev_tok": ("", null, null), "cur_tok": ("without", 71, 77)},
+			{"prev_tok": ("", null, null), "cur_tok": ("interruption.", 79, 91)},
+		]
+		"is_any_tok_oov": false,
+		"edit_distance": 21
+	], 
+	"morphosyntactic_relevance": true
+}
+
+```
+
+The characters deleted or inserted during a single edit operation are aggregated and stored in a data structure representing the transforming sequence. The character sequence is split into tokens and each token is described with additional metadata---e.g., part-of-speech and dependency tags---, and out-of-vocabulary labels. The token information is also stored in the transforming sequence data structure.
+
 #### Sentence processing
 #### Text history generation
 #### Sentence histories generation
