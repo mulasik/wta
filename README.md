@@ -38,7 +38,7 @@ In each step, the TPSF is enriched with the newly collected details.
 
 An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered. 
 
-The following figure illustrates the processing pipeline:
+The following figure provides an overview of the processing steps:
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
