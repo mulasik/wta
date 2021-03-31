@@ -1,6 +1,6 @@
-# A tool for Writing Timecourse Analysis (WTA)
+# A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data, processing it, and generating text and sentence histories based on the collected information. The input file processed by WTA is an idfx file in XML format.
+An open-source application implemented in Python for parsing raw keystroke logging data, processing it, and generating text and sentence histories based on the collected information. The input file processed by the tool is an idfx file in XML format.
 
 ## Processing Pipeline
 
@@ -28,7 +28,7 @@ The following figure illustrates the processing pipeline:
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
-## WTA Configuration
+## Tool Configuration
 
 Several parameters related to TPSF generation are configurable. These are:
 * xml_paths: a list of paths to idfx files to be parsed
@@ -53,7 +53,7 @@ The configuration structure:
 }
 ```
 
-## Running WTA
+## Running the Tool
 
 * To install all dependencies, run: 
 
