@@ -45,20 +45,15 @@ if __name__ == "__main__":
 
         ensure_path(config['output'])
 
-        # generate TPSFs
+        # generate text history
         idfx_parser = IdfxParser(idfx, config['pause_duration'], config['edit_distance'], config['filtering'])
         idfx_parser.run()
         file_name = os.path.split(idfx)[-1].replace('.idfx', '')
 
-        # ECM
+        # export text history in PCM and ECM
         export_tpsfs_to_json(idfx_parser.all_tpsfs_ecm, ECM, config['output'], file_name)
         export_tpsfs_to_txt(idfx_parser.all_tpsfs_ecm, config['output'], file_name)
-        # output_tpsfs_to_console(idfx_parser.all_tpsfs_ecm)
-        # output_revisions_number(idfx_parser.all_tpsfs_ecm, ECM, False)
-
-        # PCM
         export_tpsfs_to_json(idfx_parser.all_tpsfs_pcm, PCM, config['output'], file_name)
-        # output_revisions_number(idfx_parser.all_tpsfs_pcm, PCM, False)
 
         # generate sentence history
         sentence_history_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
@@ -66,20 +61,21 @@ if __name__ == "__main__":
         filtered_sentence_history = sentence_history_generator.filtered_sentence_history
         sentences_selected_for_reparsing = sentence_history_generator.sentences_selected_for_reparsing
 
+        # export sentence history
         export_sentence_history_to_json(sentence_history, config['output'], file_name)
         export_sentence_history_to_json(filtered_sentence_history, config['output'], file_name, '_filtered')
         export_sentence_history_to_json(sentences_selected_for_reparsing, config['output'], file_name, '_filtered_for_reparsing')
         export_sentence_history_to_txt(sentence_history, config['output'], file_name)
         export_sentence_history_to_txt(filtered_sentence_history, config['output'], file_name, '_filtered')
         export_sentence_history_to_txt(sentences_selected_for_reparsing, config['output'], file_name, '_filtered_for_reparsing')
-        # output_sentence_history_to_console(filtered_sentence_history)
 
-        # visualise
+        # visualise text and sentence history
         tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0)]
         visualisation = Visualisation(config['output'], file_name)
         visualisation.visualise_text_history(tpsfs_to_visualise)
         visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
 
+        # generate filtered outputs
         if config['filtering'] is True:
             relevant_tpsfs = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0) and tpsf.morphosyntactic_relevance is True]
             export_tpsfs_to_json(relevant_tpsfs, ECM, config['output'], file_name, '_filtered')
