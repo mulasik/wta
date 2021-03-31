@@ -4,6 +4,7 @@ from .utils.nlp import (contains_end_punctuation_at_the_end,
                         starts_with_lowercase_letter)
 import json
 
+
 class SentenceCandidate:
 
     def __init__(self, text, prev_sen):
