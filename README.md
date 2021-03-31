@@ -8,9 +8,21 @@ The tool uses two main modes to capture text versions from idfx files:
 * the Pause Capturing Mode (PCM), which relies on a preset pause duration in the writing process to yield versions, 
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 
-## Main Outputs
+## Tool Outputs
 
-
+The main outputs of the tool are:
+* complete text history in ECM in JSON format
+* all text versions in ECM exported to TXT format
+* visualisation of text history in ECM in SVG format
+* complete text history in PCM in JSON format
+* sentence history in JSON format
+* sentence history visualisation in SVG format
+In case filtering has been activated in the configuration:
+* filtered text history in JSON format
+* filtered text versions exported to TXT format 
+* filtered sentence history in JSON format
+* visualisation of filtered text history in ECM in SVG format
+* filtered sentence history visualisation in SVG format
 
 ## Processing Pipeline
 
