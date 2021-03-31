@@ -7,6 +7,7 @@ The central building block of the tool is TPSF data structure. It is used to sto
 The tool uses two main modes to capture versions from idfx files: 
 * the Pause Capturing Mode (PCM), which relies on a preset pause duration to yield versions, 
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of TPSF, (b) deleting something, (c) inserting something.
+
 As soon as a new version is detected, it is stored in a TPSF data structure. 
 
 In PCM, a TPSF data structure consists of the captured text version and the preceding pause duration.  In ECM, a TPSF data structure additionally contains the previous text version, revision number, the transforming sequence, categorized list of sentences which make up this version, and the result of morphosyntactic relevance evaluation. 
