@@ -159,7 +159,7 @@ pip install -r requirements.txt
 python -m wta config.<YOUR CONFIGURATION NAME>
 ```
 
-To run the tool for the provided example data (short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
+To run the tool for the provided **example data** (seven idfx files with short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
 
 ```
 python -m wta config.VIDEO
