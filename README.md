@@ -27,14 +27,16 @@ In case filtering has been activated in the configuration:
 
 ## Processing Pipeline
 
-Generating a complete TPSF comprises the following steps: 
+The central building block of the tool is TPSF. It is a data structure for storing the text version together with further details.
+
+Generating a TPSF comprises the following steps: 
 * First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
-* This data is next used to create a TPSF instance and subsequently to retrieve information on the sentences constituting this version. 
+* This data is next stored in a TPSF data structure and subsequently used to retrieve information on the sentences constituting this version. 
 * Finally, the version is evaluated for its morphosyntactic relevance. 
 
-In each step, the TPSF instance is enriched with the newly collected details.
+In each step, the TPSF is enriched with the newly collected details.
 
-An accomplished collection of TPSF instances results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF instance, both the text and the sentence history can be filtered. 
+An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered. 
 
 The following figure illustrates the processing pipeline:
 
@@ -86,6 +88,14 @@ pip install -r requirements.txt
 ```
 python -m wta config.<YOUR CONFIGURATION NAME>
 ```
+
+To run the tool for the provided example data (short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
+
+```
+python -m wta config.VIDEO
+```
+
+By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py.
 
 
 
