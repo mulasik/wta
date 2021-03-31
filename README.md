@@ -5,7 +5,7 @@ An open-source application implemented in Python for parsing raw keystroke loggi
 The central building block of the tool is TPSF data structure. It is used to store the text version together with further details. 
 
 The tool uses two main modes to capture versions from idfx files: 
-* the Pause Capturing Mode (PCM), which relies on a preset pause duration to yield versions, 
+* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the writing process to yield versions, 
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of TPSF, (b) deleting something, (c) inserting something.
 
 As soon as a new version is detected, it is stored in a TPSF data structure. 
