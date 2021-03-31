@@ -2,6 +2,7 @@ import argparse
 import sys
 from importlib import import_module
 import os
+import errno
 
 from .idfx_parser import IdfxParser
 from .sentence_history import SentenceHistoryGenerator
@@ -15,6 +16,16 @@ def load_path(dotted_path):
     module = import_module('.'.join(parts[:-1]))
     attr = getattr(module, parts[-1])
     return attr
+
+
+def ensure_path(path):
+    try:
+        os.makedirs(path)
+    except OSError as err:
+        if err.errno == errno.EEXIST:
+            pass
+        else:
+            raise
 
 
 ECM = 'Edit Capturing Mode'
@@ -31,6 +42,8 @@ if __name__ == "__main__":
 
     for idfx in config['xml']:
         print(f'\nProcessing the input file {idfx}...\n')
+
+        ensure_path(config['output'])
 
         # generate TPSFs
         idfx_parser = IdfxParser(idfx, config['pause_duration'], config['edit_distance'], config['filtering'])
