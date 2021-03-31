@@ -11,10 +11,10 @@ The tool uses two main modes to capture text versions from idfx files:
 ## Tool Outputs
 
 The main outputs of the tool are:
-* complete text history in ECM in JSON format
+* text history in ECM in JSON format
 * all text versions in ECM exported to TXT format
 * visualisation of text history in ECM in SVG format
-* complete text history in PCM in JSON format
+* text history in PCM in JSON format
 * sentence history in JSON format
 * sentence history visualisation in SVG format
 
