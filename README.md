@@ -118,7 +118,7 @@ An example of a TPSF exported to JSON format:
 
 ```
 
-For supplementing the analysis with relevant linguistic annotations, we apply spaCy, an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
+For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
 
 ## Tool Configuration
 
@@ -159,7 +159,7 @@ pip install -r requirements.txt
 python -m wta config.<YOUR CONFIGURATION NAME>
 ```
 
-To run the tool for the provided example data (short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
+To run the tool for the provided **example data** (seven idfx files with short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
 
 ```
 python -m wta config.VIDEO
