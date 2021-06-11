@@ -15,6 +15,11 @@ class SpacyModel:
             self.nlp = English()
             print('Loading Spacy model for English...')
             self.nlp = spacy.load("en_core_web_md")
+        elif lang == 'Greek':
+            from spacy.lang.el import Greek
+            self.nlp = Greek()
+            print('Loading Spacy model for Greek...')
+            self.nlp = spacy.load("el_core_news_md")
 
     def tag_words(self, text: str) -> list:
         doc = self.nlp(text)

@@ -196,6 +196,9 @@ class IdfxParser:
                         prev_version = ''.join(output_chars)
                         inserted_sequence = ''  # CHECK
                     # if prev_key != 'VK_LEFT':
+                    print(f"pos: {pos}")
+                    print(f"output_chars length: {len(output_chars)}")
+                    print(f"output_chars: {output_chars}")
                     removed_sequence += output_chars[pos - 1]
                     del output_chars[pos - 1]
                     backspace_count += 1
@@ -267,6 +270,10 @@ class IdfxParser:
                 self.all_tpsfs_ecm.append(tpsf)
                 prev_version = tpsf.result_text
                 inserted_sequence = ''
+
+            # we are not interested in other stuff (e.g. "focus", "mouse")
+            else:
+                continue
 
             prev_endtime = endtime
             prev_pos = pos
