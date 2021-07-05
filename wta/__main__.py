@@ -3,14 +3,13 @@ import sys
 from importlib import import_module
 import os
 import errno
-
 from .idfx_parser import IdfxParser
 from .sentence_history import SentenceHistoryGenerator
 from .visualisation import Visualisation
 from .export import (export_tpsfs_to_json, export_tpsfs_to_txt, export_sentence_history_to_json, export_sentence_history_to_txt)
 from .console_output import output_revisions_number
 from .models import SpacyModel
-
+import traceback
 
 def load_path(dotted_path):
     parts = dotted_path.split('.')
@@ -82,11 +81,16 @@ if __name__ == "__main__":
             # generate filtered outputs
             if config['filtering'] is True:
                 relevant_tpsfs = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0) and tpsf.morphosyntactic_relevance is True]
-                export_tpsfs_to_json(relevant_tpsfs, ECM, config['output'], file_name, nlp_model, '_filtered')
-                export_tpsfs_to_txt(relevant_tpsfs, config['output'], file_name, nlp_model, '_filtered')
-                output_revisions_number(relevant_tpsfs, ECM, True)
-                visualisation_filtered = Visualisation(config['output'], file_name, '_filtered')
-                visualisation_filtered.visualise_text_history(relevant_tpsfs)
-                visualisation_filtered.visualise_sentence_history(relevant_tpsfs, sentence_history)
+                if len(relevant_tpsfs) > 0:
+                    export_tpsfs_to_json(relevant_tpsfs, ECM, config['output'], file_name, nlp_model, '_filtered')
+                    export_tpsfs_to_txt(relevant_tpsfs, config['output'], file_name, nlp_model, '_filtered')
+                    output_revisions_number(relevant_tpsfs, ECM, True)
+                    visualisation_filtered = Visualisation(config['output'], file_name, '_filtered')
+                    visualisation_filtered.visualise_text_history(relevant_tpsfs)
+                    visualisation_filtered.visualise_sentence_history(relevant_tpsfs, sentence_history)
+                else:
+                    print(f"no relevant tpsfs found for: {idfx}", file=sys.stderr)
         except:
-            print(idfx, file=sys.stderr)
+            e = sys.exc_info()[0]
+            traceback.print_exc()
+            print(f"failed for {idfx}", file=sys.stderr)

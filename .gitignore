@@ -3,3 +3,6 @@ example_data
 
 *.idfx
 *.pyc
+GREEK_PHASE1.log
+.vscode/launch.json
+wta.tar
