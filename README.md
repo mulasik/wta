@@ -172,5 +172,5 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 **SENTENCE MORPHOSYNTACTIC RELEVANCE** A sentence is morphosyntactically relevant if:
 * it does not contain any spelling errors
 * it does not contain any tokens of the length 1
-* the edit distance between the sentence and its previous version is larger than 3 but this condition is checked only if the difference between the sentence versions contains one token. The edit distance is not taken into account, if the difference between versions contains multiple tokens.
+* the edit distance between the sentence and its previous version is larger than 3 (only relevant if the difference between the sentence versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens.)
 
