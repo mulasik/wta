@@ -6,3 +6,7 @@ example_data
 GREEK_PHASE1.log
 .vscode/launch.json
 wta.tar
+/venv/
+/myconfig.py
+/xml_content_check.py
+/tests.py
