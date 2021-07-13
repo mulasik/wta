@@ -110,6 +110,7 @@ TPSF version {id}:
 
 """)
 
+
 def get_aligned_word_pos_sequences(nlp_model, result_text):
     tup_processed = None, None
     if ( result_text != None ):
@@ -121,6 +122,7 @@ def get_aligned_word_pos_sequences(nlp_model, result_text):
         tup_processed = str_token_sequence, str_POS_sequence
 
     return tup_processed
+
 
 def align_processed_tokens(lst_processed_tokens):
     tupProcessed = None, None
@@ -134,9 +136,10 @@ def align_processed_tokens(lst_processed_tokens):
             n_feature_max_length = len(str_token) if len(str_token) > len(str_POS)+1 else len(str_POS)+1
             str_token_sequence += f"{str_token: <{n_feature_max_length}}"
             str_POS_sequence += f"{str_POS: <{n_feature_max_length}}"
-        tupProcessed = str_token_sequence,str_POS_sequence
+        tupProcessed = str_token_sequence, str_POS_sequence
 
     return tupProcessed
+
 
 def export_sentence_history_to_dict(sentence_history):
     sen_hist = {}
@@ -152,6 +155,21 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
     json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
+
+
+def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
+    sentence_history = export_sentence_history_to_dict(sen_hist)
+    txt_file = f'{file_name}_sentence_history{filtered}.txt'
+    txt_file_path = os.path.join(output_path, txt_file)
+    with open(txt_file_path, 'w') as f:
+        for id, sens in sentence_history.items():
+            f.write(f'''
+******* {id} *******
+''')
+            for s in sens:
+                f.write(f'''
+{s["text"]}
+''')
 
 
 def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):

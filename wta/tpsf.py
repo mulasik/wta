@@ -13,7 +13,7 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, nlp_model):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, nlp_model, final=False):
 
         self.revision_id = revision_id
         self.event_description = event_desc
@@ -64,10 +64,12 @@ class TpsfEcm:
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
         relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering, nlp_model)
-        self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
-        self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results
-
-        # print(self)
+        if not final:
+            self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
+            self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results
+        else:
+            self.morphosyntactic_relevance = True
+            self.morphosyntactic_relevance_eval_results = []
 
     def verify_edit_start_position(self):
         pos = self.edit_start_position

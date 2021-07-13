@@ -1,5 +1,6 @@
 from .utils.nlp import check_overlap_with_seq_beginning, calculate_sequence_similarity
 import unicodedata
+from .sentence import Sentence
 
 
 class SentenceClassifier:
@@ -169,15 +170,33 @@ class SentenceClassifier:
                             self.deleted_sentences.append(s)
 
     def verify_segmentation(self, shorter_list, longer_list):
+        print('\nAttention. A potential sentence segmentation error detected. Verifying segmentation...')
+        false_segmentation_candidates = {}
         for sl in shorter_list:
+            false_segmentation_candidates[sl] = []
             for ll in longer_list:
                 if ll.text in sl.text:
-                    ll.set_label('erroneous_automatic_segmentation_detected')
-                    self.unchanged_sentences.append(ll)
-                else:
-                    new_sen = ll
-        new_sen.set_label('new')
-        self.new_sentences.append(new_sen)
-
-
+                    false_segmentation_candidates[sl].append(ll)
+        for sl_sen, ll_sens in false_segmentation_candidates.items():
+            if len(ll_sens) > 0:
+                print('Potential incorrect segmentations:')
+                for ll_sen in ll_sens:
+                    print(f'> {ll_sen}')
+                longest_sen_length = max([len(ll_sen.text) for ll_sen in ll_sens])
+                for ll_sen in ll_sens:
+                    if len(ll_sen.text) == longest_sen_length:
+                        prev_sen = ll_sen
+                        prev_sen.set_label('modified')
+                    else:
+                        ll_sen.set_label('erroneous_automatic_segmentation_detected')
+                        self.unchanged_sentences.append(ll_sen)
+                sl_sen.set_label('modified')
+                sl_sen.set_previous_text_version(prev_sen)
+                self.modified_sentences.append(sl_sen)
+            else:
+                print('Segmentation error not confirmed. The following sentence has been labeled as new:')
+                print(f'> {sl_sen}')
+                new_sen = sl_sen
+                new_sen.set_label('new')
+                self.new_sentences.append(new_sen)
 

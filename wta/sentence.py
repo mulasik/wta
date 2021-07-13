@@ -72,3 +72,6 @@ class Sentence:
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
+    def __str__(self):
+        return f'{self.text}'
+

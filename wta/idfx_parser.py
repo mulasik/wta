@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from tqdm import tqdm
 
 from .tpsf import TpsfEcm, TpsfPcm
 
@@ -53,7 +54,8 @@ class IdfxParser:
         # iterate over the XML to track writer's actions and collect all TPFSs
         # there are three types of events 'keyboard', 'insert' and 'replacement', they have different structure
 
-        for i, event in enumerate(events):
+        progress = tqdm(events, 'Processing keylogs')
+        for i, event in enumerate(progress):
             # print(f"id={event['id']}")
             # print(f"output_chars={output_chars}")
             parts = event.find_all('part')
@@ -345,7 +347,7 @@ class IdfxParser:
         event_desc = self.FINAL
         edit = (pos, removed_sequence, inserted_sequence)
         prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model, final=True)
         self.all_tpsfs_ecm.append(tpsf)
         # PAUSE CAPTURING MODE: append final text to tpsf list
         tpsf_paused = TpsfPcm(output_chars, pause, True)
