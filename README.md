@@ -42,7 +42,7 @@ The following figure provides an overview of the processing steps.
 
 ![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
 
-An example of a TPSF exported to JSON format:
+An example of a TPD exported to JSON format:
 
 ```
 {
