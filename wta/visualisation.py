@@ -41,12 +41,14 @@ class Visualisation:
             'insertion': 'darkslategrey',
         }
 
+        min_fig_heigth = 15
+
         tpsf_labels = []
         for key in sentences_lengths.keys():
             text = f'TPSF {key}'
             tpsf_labels.append(text)
 
-        fig_height = len(tpsfs_to_visualise) * 0.80
+        fig_height = len(tpsfs_to_visualise) * 0.80 if len(tpsfs_to_visualise) > 15 else min_fig_heigth
         fig_width = fig_height * 0.8
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(fig_width, fig_height), gridspec_kw={'width_ratios': [4, 1]})
 
@@ -54,11 +56,9 @@ class Visualisation:
 
         ax1.set_ylim(len(sentences_lengths) + 1, -1)
         ax1.tick_params(axis='both', which='major', labelsize=7)
-        ax1.set_yticklabels(tpsf_labels)
 
         ax2.set_ylim(len(sentences_lengths) + 1, -1)
         ax2.tick_params(axis='both', which='major', labelsize=7)
-        ax2.set_yticklabels(tpsf_labels)
 
         ax1.label_outer()
         ax2.label_outer()
