@@ -63,7 +63,6 @@ class SentenceHistoryGenerator:
                         self.sentence_history[id].append(us)
         self.sentence_history = self.eliminate_duplicates(self.sentence_history)
 
-    @staticmethod
     def eliminate_duplicates(self, sentence_history):
         sentence_history_duplicates_eliminated = {}
         for id, sens in sentence_history.items():
