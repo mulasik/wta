@@ -24,11 +24,12 @@ class IdfxParser:
     NAV = 'navigating without editing'
     FINAL = 'final text revision'
 
-    def __init__(self, idfx, pause_duration, edit_distance, filtering, nlp_model):
+    def __init__(self, idfx, pause_duration, edit_distance, filtering, spelling_check, nlp_model):
         self.idfx = idfx
         self.pause_duration = pause_duration
         self.edit_distance = edit_distance
         self.filtering = filtering
+        self.spelling_check = spelling_check
         self.nlp_model = nlp_model
         self.all_tpsfs_ecm = []  # accumulates the revisions of TPSF based on edit operations
         self.all_tpsfs_pcm = []  # accumulates the revisions of TPSF based on pause duration
@@ -56,8 +57,6 @@ class IdfxParser:
 
         progress = tqdm(events, 'Processing keylogs')
         for i, event in enumerate(progress):
-            # print(f"id={event['id']}")
-            # print(f"output_chars={output_chars}")
             parts = event.find_all('part')
 
             # for 'keyboard' event type, each keystroke is tracked to derive the TPSF
@@ -77,23 +76,25 @@ class IdfxParser:
 
                 # save tpsf every time the writer moves backwards without editing the text
                 if (pos < prev_pos and prev_key != self.BACKSPACE and prev_key != self.DELETE) or (pos == prev_pos and inserted_sequence != '' and prev_key != self.BACKSPACE and prev_key != self.DELETE):
-                    event_desc = self.NAV
+                    event_desc = ""  # self.NAV TODO define the event description
                     edit = (prev_pos, removed_sequence, inserted_sequence)  # TODO test extensively
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
+                    removed_sequence = ''
                     inserted_sequence = ''
-                    prev_version = tpsf.result_text
 
                 # save tpsf every time the writer moves forwards by more than one position at a time
                 if abs(pos - prev_pos) > 1:  # TODO: test extensively
-                    event_desc = self.NAV
+                    if prev_key == self.BACKSPACE:
+                        removed_sequence = removed_sequence[::-1]
+                    event_desc = ""  # self.NAV TODO define the event description
                     edit = (pos, removed_sequence, inserted_sequence)
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
+                    removed_sequence = ''
                     inserted_sequence = ''
-                    prev_version = tpsf.result_text
 
                 # EDIT CAPTURING MODE
 
@@ -102,28 +103,27 @@ class IdfxParser:
                     event_desc = self.POST_DEL
                     edit = (pos, removed_sequence, inserted_sequence)
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
-                    prev_version = tpsf.result_text
                     removed_sequence = ''
+                    inserted_sequence = ''
 
                 if key_name in self.ARROW_KEYS and prev_key == self.DELETE:
                     event_desc = self.POST_DEL
                     edit = (pos, removed_sequence, inserted_sequence)
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
-                    prev_version = tpsf.result_text
                     removed_sequence = ''
+                    inserted_sequence = ''
 
                 if key_name == 'VK_RIGHT' and prev_key not in self.NON_PRODUCTION_KEYS:
                     # removed_sequence = removed_sequence[::-1]
                     event_desc = self.POST_INS
                     edit = (pos, removed_sequence, inserted_sequence)
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
-                    prev_version = tpsf.result_text
                     inserted_sequence = ''
 
                 # CHAR PRODUCTION: appending or inserting chars
@@ -134,17 +134,15 @@ class IdfxParser:
                         event_desc = self.POST_DEL
                         edit = (pos, removed_sequence, inserted_sequence)
                         prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                         self.all_tpsfs_ecm.append(tpsf)
-                        prev_version = tpsf.result_text
                         inserted_sequence = ''  # CHECK
                     if prev_key == self.DELETE:
                         event_desc = self.POST_DEL
                         edit = (pos, removed_sequence, inserted_sequence)
                         prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                         self.all_tpsfs_ecm.append(tpsf)
-                        prev_version = tpsf.result_text
                         inserted_sequence = ''  # CHECK
                     # if cursor at the end of the text, append the char
                     if pos == len(output_chars):
@@ -158,9 +156,8 @@ class IdfxParser:
                                 n_insertion_position += 1
                             edit = (pos, removed_sequence, inserted_sequence)
                             prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                             self.all_tpsfs_ecm.append(tpsf)
-                            prev_version = tpsf.result_text
                             inserted_sequence = ''
                         else:
                             output_chars.extend(list(strInsertionValue))
@@ -171,9 +168,8 @@ class IdfxParser:
                             event_desc = self.PRE_INS
                             edit = (pos, removed_sequence, inserted_sequence)
                             prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                             self.all_tpsfs_ecm.append(tpsf)
-                            prev_version = tpsf.result_text
                             inserted_sequence = ''
                         # capture insertion by pasting with CTRL+V
                         if key_name == 'VK_V' and len(strInsertionValue) > 1:
@@ -185,9 +181,8 @@ class IdfxParser:
                                 n_insertion_position += 1
                             edit = (pos, removed_sequence, inserted_sequence)
                             prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                             self.all_tpsfs_ecm.append(tpsf)
-                            prev_version = tpsf.result_text
                             inserted_sequence = ''
                         else:
                             n_insertion_position = pos
@@ -219,18 +214,14 @@ class IdfxParser:
                             event_desc = self.PRE_DEL
                             edit = (prev_pos, removed_sequence, inserted_sequence)
                             prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                            tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                             self.all_tpsfs_ecm.append(tpsf)
-                            prev_version = ''.join(output_chars)
-                            inserted_sequence = ''  # CHECK
-                        # if prev_key != 'VK_LEFT':
-                        # print(f"pos: {pos}")
-                        # print(f"output_chars length: {len(output_chars)}")
-                        # print(f"output_chars: {output_chars}")
+                            inserted_sequence = ''
+                        if prev_key != self.BACKSPACE or pos != prev_pos - 1:
+                            removed_sequence = ''
                         removed_sequence += output_chars[pos - 1]
                         del output_chars[pos - 1]
                         backspace_count += 1
-                        inserted_sequence = ''
 
                 # CHAR DELETION: removing chars with delete
                 if key_name == self.DELETE:
@@ -240,14 +231,8 @@ class IdfxParser:
                         event_desc = self.PRE_DEL
                         edit = (prev_pos, removed_sequence, inserted_sequence)
                         prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                         self.all_tpsfs_ecm.append(tpsf)
-                        prev_version = ''.join(output_chars)
-                        inserted_sequence = ''  # CHECK
-                    # if prev_key != 'VK_LEFT':
-                    # print(f"pos: {pos}")
-                    # print(f"output_chars length: {len(output_chars)}")
-                    # print(f"output_chars: {output_chars}")
                     removed_sequence += output_chars[pos]
                     del output_chars[pos]
                     delete_count += 1
@@ -257,10 +242,9 @@ class IdfxParser:
                     event_desc = self.END
                     edit = (prev_pos, removed_sequence, inserted_sequence)
                     prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                    tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                     self.all_tpsfs_ecm.append(tpsf)
                     inserted_sequence = ''
-                    prev_version = tpsf.result_text
 
             # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
             elif event['type'] == 'replacement':
@@ -279,9 +263,9 @@ class IdfxParser:
                     output_chars.insert(pos, removed_sequence)
 
                 prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                 self.all_tpsfs_ecm.append(tpsf)
-                prev_version = ''.join(output_chars)
+                inserted_sequence = ''
 
                 # the replacement starts at startpos and ends at endpos
                 endtime = None
@@ -303,9 +287,8 @@ class IdfxParser:
                 event_desc = self.POST_REPL
                 edit = (startpos, removed_sequence, inserted_sequence)
                 prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                 self.all_tpsfs_ecm.append(tpsf)
-                prev_version = tpsf.result_text
                 removed_sequence = ''
                 inserted_sequence = ''  # CHECK
 
@@ -324,9 +307,8 @@ class IdfxParser:
                 event_desc = self.POST_INS
                 edit = (startpos, removed_sequence, inserted_sequence)
                 prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model)
+                tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model)
                 self.all_tpsfs_ecm.append(tpsf)
-                prev_version = tpsf.result_text
                 inserted_sequence = ''
                 
             # we are not interested in other stuff (e.g. "focus", "mouse")
@@ -347,7 +329,7 @@ class IdfxParser:
         event_desc = self.FINAL
         edit = (pos, removed_sequence, inserted_sequence)
         prev_tpsf = None if len(self.all_tpsfs_ecm) == 0 else self.all_tpsfs_ecm[-1]
-        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.nlp_model, final=True)
+        tpsf = TpsfEcm(len(self.all_tpsfs_ecm), output_chars, edit, pause, event_desc, prev_tpsf, self.edit_distance, self.filtering, self.spelling_check, self.nlp_model, final=True)
         self.all_tpsfs_ecm.append(tpsf)
         # PAUSE CAPTURING MODE: append final text to tpsf list
         tpsf_paused = TpsfPcm(output_chars, pause, True)

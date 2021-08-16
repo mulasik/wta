@@ -50,7 +50,7 @@ if __name__ == "__main__":
             ensure_path(config['output'])
 
             # generate text history
-            idfx_parser = IdfxParser(idfx, config['pause_duration'], config['edit_distance'], config['filtering'], nlp_model)
+            idfx_parser = IdfxParser(idfx, config['pause_duration'], config['min_edit_distance'], config['filtering'], config['spelling_check'], nlp_model)
             idfx_parser.run()
             file_name = os.path.split(idfx)[-1].replace('.idfx', '')
 
