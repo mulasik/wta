@@ -45,6 +45,7 @@ class Sentence:
         self.is_any_tok_oov = False
         self.label = None
         self.transforming_sequence = transforming_sequence
+        self.tagged_tokens = None
 
         self.sentence_morphosyntactic_relevance = None
         self.revision_morphosyntactic_relevance = None
@@ -59,6 +60,9 @@ class Sentence:
 
     def set_label(self, label):
         self.label = label
+
+    def set_tagged_tokens(self, tagged_tokens):
+        self.tagged_tokens = tagged_tokens
 
     def set_is_any_tok_oov(self, is_any_tok_oov):
         self.is_any_tok_oov = is_any_tok_oov

@@ -5,10 +5,11 @@ from .sentence import Sentence
 
 class SentenceClassifier:
 
-    def __init__(self, prev_sens, sens, transforming_sequence):
+    def __init__(self, prev_sens, sens, transforming_sequence, nlp_model):
         self.prev_sens = prev_sens
         self.sens = sens
         self.transforming_sequence = transforming_sequence
+        self.nlp_model = nlp_model
 
         self.delta_current_previous = []
         self.delta_previous_current = []
@@ -22,14 +23,22 @@ class SentenceClassifier:
             self.new_sentences = [s for s in self.sens]
             for s in self.new_sentences:
                 s.set_label('new')
+                sen_tagged_tokens = self.nlp_model.tag_words(s.text)
+                s.set_tagged_tokens(sen_tagged_tokens)
         # if there is previous TPSF version
         else:
             # sentences which already existed in the previous TPSF:
-            self.unchanged_sentences = [sen for sen in self.sens if sen.text in [ps.text for ps in self.prev_sens]]
-            for s in self.unchanged_sentences:
-                s.set_label('unchanged')
+            self.unchanged_sentences = [sen for sen in self.prev_sens if sen.text in [ps.text for ps in self.sens]]
+            for us in self.unchanged_sentences:
+                us.set_label('unchanged')
+                for s in self.sens:
+                    if us.text == s.text:
+                        s.set_tagged_tokens(us.tagged_tokens)
             # sentences which didn't occur in the previous TPSF but do occur in the current TPSF:
             self.delta_current_previous = [sen for sen in self.sens if sen.text not in [ps.text for ps in self.prev_sens]]
+            for dcp in self.delta_current_previous:
+                sen_tagged_tokens = self.nlp_model.tag_words(dcp.text)
+                dcp.set_tagged_tokens(sen_tagged_tokens)
             # sentences which occurred in the previous TPSF but don't occur in the current sentences:
             self.delta_previous_current = [s for s in self.prev_sens if s.text not in [cs.text for cs in self.sens]]
             # match sentences from the deltas

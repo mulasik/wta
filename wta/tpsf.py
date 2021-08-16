@@ -13,13 +13,14 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, nlp_model, final=False):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, spelling_check, nlp_model, final=False):
 
         self.revision_id = revision_id
         self.event_description = event_desc
         self.preceeding_pause = pause
         self.prev_text_version = '' if not prev_tpsf else prev_tpsf.result_text
         self.result_text = ''.join(output_chars)
+        self.previous_sentence_list = [] if not prev_tpsf else prev_tpsf.sentence_list
 
         removed_sequence_text = ''.join(edit[1]) if len(edit[1]) > 0 else None
         inserted_sequence_text = edit[2] if len(edit[2]) > 0 else None
@@ -50,12 +51,10 @@ class TpsfEcm:
             self.verify_edit_start_position()
 
         # perform sentence segmentation
-        sentence_tokenizer_prev = SentenceTokenizer(self.prev_text_version, self.revision_id, self.transforming_sequence, nlp_model)
-        self.previous_sentence_list = sentence_tokenizer_prev.sentences
         sentence_tokenizer = SentenceTokenizer(self.result_text, self.revision_id, self.transforming_sequence, nlp_model)
         self.sentence_list = sentence_tokenizer.sentences
 
-        sentence_classifier = SentenceClassifier(self.previous_sentence_list, self.sentence_list, self.transforming_sequence)
+        sentence_classifier = SentenceClassifier(self.previous_sentence_list, self.sentence_list, self.transforming_sequence, nlp_model)
         self.new_sentences = sentence_classifier.new_sentences
         self.modified_sentences = sentence_classifier.modified_sentences
         self.deleted_sentences = sentence_classifier.deleted_sentences
@@ -63,7 +62,7 @@ class TpsfEcm:
         self.delta_current_previous = sentence_classifier.delta_current_previous
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
-        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering, nlp_model)
+        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering, spelling_check, nlp_model)
         if not final:
             self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
             self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results

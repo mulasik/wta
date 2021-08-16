@@ -14,6 +14,7 @@ def export_sentences_to_list(sens):
             'pos_in_text': s.pos_in_text,
             'label': s.label,
             'revision_id': s.revision_id,
+            'tagged_tokens': s.tagged_tokens,
             'sentence_morphosyntactic_relevance': s.sentence_morphosyntactic_relevance,
             'transforming_sequence': {
                 'text': None if s.transforming_sequence is None else s.transforming_sequence.text,
