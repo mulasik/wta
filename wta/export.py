@@ -1,6 +1,5 @@
 import json
 import os
-from re import S
 from wta.models import SpacyModel
 
 
@@ -15,12 +14,13 @@ def export_sentences_to_list(sens):
             'label': s.label,
             'revision_id': s.revision_id,
             'tagged_tokens': s.tagged_tokens,
-            'sentence_morphosyntactic_relevance': s.sentence_morphosyntactic_relevance,
+            'sentence_relevance': s.sentence_relevance,
             'transforming_sequence': {
-                'text': None if s.transforming_sequence is None else s.transforming_sequence.text,
-                'label': None if s.transforming_sequence is None else s.transforming_sequence.label,
-                'tagged_tokens': None if s.transforming_sequence is None else s.transforming_sequence.tagged_tokens
+                'text': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.text,
+                'label': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.label,
+                'tagged_tokens': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.tagged_tokens
             },
+            "irrelevant_ts_aggregated": s.irrelevant_ts_aggregated,
             'previous_sentence': {
                 'text': None if s.previous_sentence is None else s.previous_sentence.text,
             }
@@ -58,8 +58,9 @@ def export_ecm_tpsf_to_dict(tpsf):
             "transforming_sequence": {
                 "label": '' if tpsf.transforming_sequence is None else tpsf.transforming_sequence.label,
                 "text": '' if tpsf.transforming_sequence is None else tpsf.transforming_sequence.text,
-                "tags": '' if tpsf.transforming_sequence is None else tpsf.transforming_sequence.tagged_tokens
+                "tokens": '' if tpsf.transforming_sequence is None else tpsf.transforming_sequence.tagged_tokens
             },
+            "irrelevant_ts_aggregated": tpsf.irrelevant_ts_aggregated
         },
         "sentences": {
             "previous_sentence_list": previous_sentence_list,
@@ -71,8 +72,8 @@ def export_ecm_tpsf_to_dict(tpsf):
             "deleted_sentences": deleted_sentences,
             "unchanged_sentences": unchanged_sentences,
         },
-        "morphosyn_relevance_evaluation": tpsf.morphosyntactic_relevance_eval_results,
-        "morphosyntactic_relevance": tpsf.morphosyntactic_relevance
+        "relevance_evaluation": tpsf.relevance_eval_results,
+        "relevance": tpsf.relevance
     }
     return tpsf_dict
 
@@ -184,7 +185,7 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 ''')
             for s in sens:
                 str_token_sequence, str_POS_sequence = get_aligned_word_pos_sequences(nlp_model, s["text"])
-                relevance = 'morphosyntactically relevant' if s['sentence_morphosyntactic_relevance'] is True else 'morphosyntactically irrelevant'
+                relevance = 'relevant' if s['sentence_relevance'] is True else 'morphosyntactically irrelevant'
                 f.write(f'''
 {str_token_sequence}
 {str_POS_sequence}

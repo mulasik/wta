@@ -13,14 +13,16 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, filtering, spelling_check, nlp_model, final=False):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, nlp_model, final=False):
 
         self.revision_id = revision_id
         self.event_description = event_desc
         self.preceeding_pause = pause
         self.prev_text_version = '' if not prev_tpsf else prev_tpsf.result_text
+        self.prev_tpsf = prev_tpsf
         self.result_text = ''.join(output_chars)
         self.previous_sentence_list = [] if not prev_tpsf else prev_tpsf.sentence_list
+        self.contains_typos = None
 
         removed_sequence_text = ''.join(edit[1]) if len(edit[1]) > 0 else None
         inserted_sequence_text = edit[2] if len(edit[2]) > 0 else None
@@ -62,13 +64,15 @@ class TpsfEcm:
         self.delta_current_previous = sentence_classifier.delta_current_previous
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
-        relevance_evaluator = RelevanceEvaluator(self, edit_distance, filtering, spelling_check, nlp_model)
+        relevance_evaluator = RelevanceEvaluator(self, edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, nlp_model)
         if not final:
-            self.morphosyntactic_relevance = relevance_evaluator.morphosyntactic_relevance
-            self.morphosyntactic_relevance_eval_results = relevance_evaluator.morphosyntactic_relevance_eval_results
+            self.relevance = relevance_evaluator.relevance
+            self.relevance_eval_results = relevance_evaluator.relevance_eval_results
         else:
-            self.morphosyntactic_relevance = True
-            self.morphosyntactic_relevance_eval_results = []
+            self.relevance = True
+            self.relevance_eval_results = []
+
+        self.irrelevant_ts_aggregated = []
 
     def verify_edit_start_position(self):
         pos = self.edit_start_position
@@ -98,6 +102,19 @@ class TpsfEcm:
                 self.edit_start_position = pos
         else:
             self.edit_start_position = None
+
+    def check_tpsf_spelling(self):
+        # check if tpsf contains typos
+        sentence_spellcheck_results = []
+        sens_to_check = self.new_sentences + self.modified_sentences
+        for s in sens_to_check:
+            s.check_sentence_spelling()
+            sentence_spellcheck_results.append(s.typos_detected)
+        tpsf_contains_typos = True if True in sentence_spellcheck_results else False
+        self.contains_typos = tpsf_contains_typos
+
+    def set_irrelevant_ts_aggregated(self, irrelevant_ts_aggregated):
+        self.irrelevant_ts_aggregated = irrelevant_ts_aggregated
 
     def __str__(self):
         return f'''

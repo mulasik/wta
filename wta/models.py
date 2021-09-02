@@ -29,7 +29,7 @@ class SpacyModel:
         doc = self.nlp(text)
         tags = []
         for token in doc:
-            is_typo = True if self.tool.check(token.text) else False
+            is_typo = True if self.tool.check(token.text) and self.tool.check(token.text)[0].ruleId == 'GERMAN_SPELLER_RULE' else False
             is_single_char = True if len(token) == 1 else False
             tags.append({
                 'text': token.text,
@@ -69,17 +69,17 @@ class SpacyModel:
 
     def check_if_any_oov(self, tokens: list) -> bool:
         for t in tokens:
-            pt = t['prev_tok']
-            ct = t['cur_tok']
-            if pt[0] != '':
-                pt = pt[0]
+            pt = t['prev']
+            ct = t['cur']
+            if pt is not None and pt['text'] != '':
+                pt = pt['text']
                 pt = self.nlp(pt)
                 pt = pt[0]
                 pt_oov = pt.is_oov
             else:
                 pt_oov = None
-            if ct[0] != '':
-                ct = ct[0]
+            if ct is not None and ct['text'] != '':
+                ct = ct['text']
                 ct = self.nlp(ct)
                 ct = ct[0]
                 ct_oov = ct.is_oov
@@ -89,19 +89,22 @@ class SpacyModel:
                 return True
         return False
 
+    def check_if_token_a_typo(self, token: str) -> bool:
+        return True if self.tool.check(token) and self.tool.check(token)[0].ruleId == 'GERMAN_SPELLER_RULE' else False
+
     def check_if_any_typos(self, tokens: list) -> bool:
         typos = []
         for t in tokens:
-            pt = t['prev_tok']
-            ct = t['cur_tok']
-            if pt[0] != '':
-                pt = pt[0].strip(',.:')
+            pt = t['prev']
+            ct = t['cur']
+            if pt is not None and pt['text'] != '':
+                pt = pt['text'].strip(',.:')
                 pt_is_typo = True if self.tool.check(pt) and self.tool.check(pt)[0].ruleId == 'GERMAN_SPELLER_RULE' else False
             else:
                 pt_is_typo = None
             typos.append(pt_is_typo)
-            if ct[0] != '':
-                ct = ct[0].strip(',.:')
+            if ct is not None and ct['text'] != '':
+                ct = ct['text'].strip(',.:')
                 ct_is_typo = True if self.tool.check(ct) and self.tool.check(ct)[0].ruleId == 'GERMAN_SPELLER_RULE' else False
             else:
                 ct_is_typo = None
@@ -126,7 +129,7 @@ class SpacyModel:
                 else:
                     morphosyntactic_relevance = True
             else:
-                contains_one_char_token = True if 1 in [len(t['cur_tok'][0]) for t in affected_tokens] else False
+                contains_one_char_token = True if 1 in [len(t['cur']['text']) for t in affected_tokens if t['cur'] is not None] else False
                 if contains_one_char_token:
                     morphosyntactic_relevance = False
                     edit_distance = None

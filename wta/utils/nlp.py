@@ -90,7 +90,41 @@ def retrieve_token_indices(prev_sen: str, cur_sen: str) -> tuple:
     return prev_toks_with_indices, cur_toks_with_indices
 
 
+def identify_affected_tokens(prev_sen_toks: list, cur_sen_toks: list, edit_type: str) -> list:
+    affected_tokens = []
+    if prev_sen_toks and cur_sen_toks:
+        for (pt, ct) in itertools.zip_longest(prev_sen_toks, cur_sen_toks):
+            print(ct)
+            if pt['text'] != ct['text']:
+                if edit_type == 'insertion':
+                    affected_tokens.append({
+                        'prev': None,
+                        'cur': ct
+                    })
+                elif edit_type == 'deletion':
+                    affected_tokens.append({
+                        'prev': pt,
+                        'cur': None
+                    })
+    elif not prev_sen_toks and cur_sen_toks:
+        for ct in cur_sen_toks:
+            affected_tokens.append({
+                'prev': None,
+                'cur': ct
+            })
+    elif prev_sen_toks and not cur_sen_toks:
+        for pt in prev_sen_toks:
+            affected_tokens.append({
+                'prev': pt,
+                'cur': None
+            })
+    print('AFFECTED TOKENS:')
+    print(affected_tokens)
+    return affected_tokens
+
+
 def retrieve_affected_tokens(prev_sen, cur_sen) -> list:
+    # affected_tokens is a list of tuples: previous word, current word with their indices
     affected_tokens = []
     prev_toks_with_indices, cur_toks_with_indices = retrieve_token_indices(prev_sen, cur_sen)
     _, mismatch_range, _ = retrieve_mismatch_range_for_sentence_pair(prev_sen, cur_sen)
@@ -135,16 +169,18 @@ def retrieve_affected_tokens(prev_sen, cur_sen) -> list:
     return affected_tokens
 
 
-def filter_out_irrelevant_tokens(tokens: list) -> list:
-    relevant_tokens = []
-    for tok in tokens:
-        if tokens['prev_tok'][1] is not None and tokens['cur_tok'][1] is not None:
-            relevant_tokens.append(tok)
-    return relevant_tokens
+# def filter_out_irrelevant_tokens(tokens: list) -> list:
+#     relevant_tokens = []
+#     for tok in tokens:
+#         if tokens['prev'][1] is not None and tokens['cur'][1] is not None:
+#             relevant_tokens.append(tok)
+#     return relevant_tokens
 
 
 def check_edit_distance(tokens: list) -> int:
-    ed = nltk.edit_distance(tokens['prev_tok'][0], tokens['cur_tok'][0])
+    prev_tok = '' if tokens['prev'] is None else tokens['prev']['text']
+    cur_tok = '' if tokens['cur'] is None else tokens['cur']['text']
+    ed = nltk.edit_distance(prev_tok, cur_tok)
     return ed
 
 

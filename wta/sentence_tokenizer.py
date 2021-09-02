@@ -37,7 +37,7 @@ class SentenceTokenizer:
         for sen in verified_sentence_list:
             sent_start_index = text.find(sen, prev_sent_end_index)
             sent_end_index = sent_start_index + len(sen.strip()) - 1
-            sentence = Sentence(sen, sent_start_index, sent_end_index, self.revision_id, pos, self.transforming_sequence)
+            sentence = Sentence(sen, sent_start_index, sent_end_index, self.revision_id, pos, self.transforming_sequence, self.nlp_model)
             sentences.append(sentence)
             prev_sent_end_index = sent_end_index
             pos += 1

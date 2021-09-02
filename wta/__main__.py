@@ -50,7 +50,7 @@ if __name__ == "__main__":
             ensure_path(config['output'])
 
             # generate text history
-            idfx_parser = IdfxParser(idfx, config['pause_duration'], config['min_edit_distance'], config['filtering'], config['spelling_check'], nlp_model)
+            idfx_parser = IdfxParser(idfx, config, nlp_model)
             idfx_parser.run()
             file_name = os.path.split(idfx)[-1].replace('.idfx', '')
 
@@ -71,7 +71,7 @@ if __name__ == "__main__":
             export_sentence_history_to_txt(filtered_sentence_history, config['output'], file_name, nlp_model, '_filtered')
 
             # visualise text and sentence history
-            tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0)]
+            tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0 or len(tpsf.deleted_sentences) > 0)]
             visualisation = Visualisation(config['output'], file_name)
             visualisation.visualise_text_history(tpsfs_to_visualise)
             visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
@@ -80,18 +80,17 @@ if __name__ == "__main__":
             output_revisions_number(idfx_parser.all_tpsfs_pcm, PCM, False)
 
             # generate filtered outputs
-            if config['filtering'] is True:
-                relevant_tpsfs = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0) and tpsf.morphosyntactic_relevance is True]
-                if len(relevant_tpsfs) > 0:
-                    export_tpsfs_to_json(relevant_tpsfs, ECM, config['output'], file_name, nlp_model, '_filtered')
-                    export_tpsfs_to_txt(relevant_tpsfs, config['output'], file_name, nlp_model, '_filtered')
-                    output_revisions_number(relevant_tpsfs, ECM, True)
-                    visualisation_filtered = Visualisation(config['output'], file_name, '_filtered')
-                    visualisation_filtered.visualise_text_history(relevant_tpsfs)
-                    visualisation_filtered.visualise_sentence_history(relevant_tpsfs, sentence_history)
-                else:
-                    print(f"no relevant tpsfs found for: {idfx}", file=sys.stderr)
+            idfx_parser.filter_tpsfs_ecm()
+            if len(idfx_parser.filtered_tpsfs_ecm) > 0:
+                export_tpsfs_to_json(idfx_parser.filtered_tpsfs_ecm, ECM, config['output'], file_name, nlp_model, '_filtered')
+                export_tpsfs_to_txt(idfx_parser.filtered_tpsfs_ecm, config['output'], file_name, nlp_model, '_filtered')
+                output_revisions_number(idfx_parser.filtered_tpsfs_ecm, ECM, True)
+                visualisation_filtered = Visualisation(config['output'], file_name, '_filtered')
+                visualisation_filtered.visualise_filtered_text_history(idfx_parser.filtered_tpsfs_ecm)
+                visualisation_filtered.visualise_sentence_history(idfx_parser.filtered_tpsfs_ecm, sentence_history)
+            else:
+                print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
         except:
             e = sys.exc_info()[0]
             traceback.print_exc()
-            print(f"failed for {idfx}", file=sys.stderr)
+            print(f"Failed for {idfx}", file=sys.stderr)

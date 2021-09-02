@@ -58,6 +58,7 @@ An example of a TPSF exported to JSON format:
 			"tags": [
 				{"text": " ", "pos": "SPACE", "pos_details": "_SP", "dep": "", "lemma": " ", "oov": false, "is_punct": false, "is_space": true},
 				"text": "without", "pos": "ADP", "pos_details": "IN", "dep": "ROOT", "lemma": "without", "oov": false, "is_punct": false, "is_space": false},
+				{"text": " ", "pos": "SPACE", "pos_details": "_SP", "dep": "", "lemma": " ", "oov": false, "is_punct": false, "is_space": true},
 				"text": "interruption", "pos": "NOUN", "pos_details": "NN", "dep": "pobj", "lemma": "interruption", "oov": false, "is_punct": false, "is_space": false},
 				]
 	}, 
@@ -103,17 +104,13 @@ An example of a TPSF exported to JSON format:
 		"deleted_sentences": [], 
 		"unchanged_sentences": []
 	}, 
-	"morphosyntactic_relevance_evaluation": [
-		"number_affected_tokens": 3,
-		"affected_tokens": [
-			{"prev_tok": ("sequence.", 62, 70), "cur_tok": ("sequence", 62, 69)}, 
-			{"prev_tok": ("", null, null), "cur_tok": ("without", 71, 77)},
-			{"prev_tok": ("", null, null), "cur_tok": ("interruption.", 79, 91)},
-		]
-		"is_any_tok_oov": false,
-		"edit_distance": 21
+	"relevance_evaluation": [
+	    "edit_distance": 21,
+		"number_tokens_in_transformin_seq": 4,
+		"tpsf_contains_typos": false,
+		
 	], 
-	"morphosyntactic_relevance": true
+	"relevance": true
 }
 
 ```
@@ -122,13 +119,19 @@ For supplementing the analysis with relevant linguistic annotations, we apply [s
 
 ## Tool Configuration
 
-Several parameters related to TPSF generation are configurable. These are:
+Several parameters related to TPSF generation and relevance definition are configurable.
+
+TPSF generation parameters:
 * xml_paths: a list of paths to idfx files to be parsed
 * output_path: path to the directory where the all output files should be stored
 * pause_duration: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
-* edit_distance: the maximum edit distance between two TPSFs which makes a TPSFs morphosyntactically irrelevant, default = 3
-* filtering: if set to True, a filtered TPSF list will be generated next to an unfiltered one, default = True
-* language: 'German' or 'English'
+* language: 'German', 'English' or 'Greek'
+
+TPSF relevance definition parameters:
+* min_edit_distance: the minimum edit distance between two TPSFs required for classifying a TPSF as relevant, default = 3
+* ts_min_tokens_number: the minimum number of tokens contained in a transforming sequence required for classifying a TPSF as relevant, default = 2
+* spellchecking: if set to True, only the TPSFs which don't contain any spelling errors are classified as relevant, default = False
+* punctuation: if set to True, a TPSF is always classified as relevant if the edit affects the punctuation in any way (removing or adding a punctuation mark), default = True
 
 The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
 
@@ -136,12 +139,14 @@ The configuration structure:
 
 ```
 <YOUR CONFIGURATION NAME> = {
-    'xml_paths': [],
-    'output_path': '',
+    'xml': list,
+    'output': str,
     'pause_duration': int,
-    'edit_distance': int,
-    'filtering': int,
-    'language': ''
+    "min_edit_distance": int,
+    "ts_min_tokens_number": int,
+    "spellchecking": bool,
+    "punctuation": bool,
+    "language": str,
 }
 ```
 
@@ -165,8 +170,57 @@ To run the tool for the provided **example data** (seven idfx files with short d
 python -m wta config.VIDEO
 ```
 
-By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
+By default, the tool will create a directory ```output_data``` in the tool directory where it will store the output files. The output path can be changed by modifying the ```output```in the ```VIDEO``` configuration in ```config.py```.
 
 
+## Relevance
+
+There are 4 relevance definition parameters:
+* min_edit_distance: the minimum edit distance between two TPSFs required for classifying a TPSF as relevant, default = 3
+* ts_min_tokens_number: the minimum number of tokens contained in a transforming sequence required for classifying a TPSF as relevant, default = 2
+* spellchecking: if set to True, only the TPSFs which don't contain any spelling errors are classified as relevant, default = False
+* punctuation: if set to True, a TPSF is always classified as relevant if the edit affects the punctuation in any way (removing or adding a punctuation mark), default = True
+
+The parameters allow you to define what determines whether a text version is relevant or not. The relevance is defined on two levels:
+* the relevance of the whole TPSF
+* relevance of each sentence modified or added as a result of the edit
+
+Based on the relevance, the tool outputs are filtered. There are 2 outputs which are subject to filtering:
+* text history (filtered based on the TPSF relevance)
+* sentence history (filtered based on the sentence relevance)
+
+Examples:
+
+Given the following configuration file:
+```
+VIDEO = {
+    "xml": [
+        os.path.join(VIDEO_DATA_DIR, f)
+        for f in os.listdir(VIDEO_DATA_DIR)
+        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
+    ],
+    "output": os.path.join("output_data", "video"),
+    "pause_duration": 2,
+    "min_edit_distance": 3,
+    "ts_min_tokens_number": 2,
+    "spellchecking": True,
+    "punctuation": False,
+    "language": "English",
+}
+```
+
+the following TPSF versions will be classified as irrelevant:
+
+* "The sky is blue." --> "The sky is blue"
+
+The edit consists in removing the punctuation mark. As ```punctuation``` is set to False, this text version is classified as irrelevant.
+
+* "The sky is blue" --> "The sky abov us is blue"
+
+The edit consists in inserting the phrase "abov us". As ```spellchecking``` is set to True and the phrase contains a typo, this text version is classified as irrelevant.
+
+* "The sky abov us is blue" --> "The sky above us is blue"
+
+The edit consists in inserting "e". As ```min_edit_distance``` is set to 3 and the edit contains only 1 character and as ```ts_min_tokens_number``` is set to 2 and the edit contains only one token, this text version is classified as irrelevant)
 
 
