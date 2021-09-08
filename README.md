@@ -175,7 +175,7 @@ By default, the tool will create a directory ```output_data``` in the tool direc
 
 ## Relevance
 
-There are 4 relevance definition parameters:
+There are 5 relevance definition parameters:
 * min_edit_distance: the minimum edit distance between two TPSFs required for classifying a TPSF as relevant, default = 3
 * ts_min_tokens_number: the minimum number of tokens contained in a transforming sequence required for classifying a TPSF as relevant, default = 2
 * combine_edit_distance_with_tok_number: if set to True, a text version is relevant only if the edit distance >= min_edit_distance AND the number tokens in the transforming sequence >= ts_min_tokens_number (AND relation); Otherwise, there is an OR relation between the two conditions.
