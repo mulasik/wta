@@ -178,8 +178,9 @@ By default, the tool will create a directory ```output_data``` in the tool direc
 There are 4 relevance definition parameters:
 * min_edit_distance: the minimum edit distance between two TPSFs required for classifying a TPSF as relevant, default = 3
 * ts_min_tokens_number: the minimum number of tokens contained in a transforming sequence required for classifying a TPSF as relevant, default = 2
-* spellchecking: if set to True, only the TPSFs which don't contain any spelling errors are classified as relevant, default = False
-* punctuation: if set to True, a TPSF is always classified as relevant if the edit affects the punctuation in any way (removing or adding a punctuation mark), default = True
+* combine_edit_distance_with_tok_number: if set to True, a text version is relevant only if the edit distance >= min_edit_distance AND the number tokens in the transforming sequence >= ts_min_tokens_number (AND relation); Otherwise, there is an OR relation between the two conditions.
+* enable_spellchecking: if set to True, only the TPSFs which don't contain any spelling errors are classified as relevant, default = False
+* include_punctuation_edits: if set to True, a TPSF is always classified as relevant if the edit affects the punctuation in any way (removing or adding a punctuation mark), default = True
 
 The parameters allow you to define what determines whether a text version is relevant or not. The relevance is defined on two levels:
 * the relevance of the whole TPSF
@@ -203,8 +204,9 @@ VIDEO = {
     "pause_duration": 2,
     "min_edit_distance": 3,
     "ts_min_tokens_number": 2,
-    "spellchecking": True,
-    "punctuation": False,
+    "combine_edit_distance_with_tok_number": True,
+    "enable_spellchecking": True,
+    "include_punctuation_edits": False,
     "language": "English",
 }
 ```
@@ -221,6 +223,6 @@ The edit consists in inserting the phrase "abov us". As ```spellchecking``` is s
 
 * "The sky abov us is blue" --> "The sky above us is blue"
 
-The edit consists in inserting "e". As ```min_edit_distance``` is set to 3 and the edit contains only 1 character and as ```ts_min_tokens_number``` is set to 2 and the edit contains only one token, this text version is classified as irrelevant)
+The edit consists in inserting "e". As ```min_edit_distance``` is set to 3 and the edit contains only 1 character and as ```ts_min_tokens_number``` is set to 2 and the edit contains only one token, this text version is classified as irrelevant.
 
 
