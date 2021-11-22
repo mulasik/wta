@@ -1,4 +1,4 @@
-# A tool for Linguistic Modeling of Written Text Production
+# Text History Extraction Tool (THEtool). A tool for Linguistic Modeling of Written Text Production
 
 An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions produced during this session, and eventually generating text and sentence histories based on the collected information. 
 
