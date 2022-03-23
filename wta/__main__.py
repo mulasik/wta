@@ -8,6 +8,7 @@ from .sentence_history import SentenceHistoryGenerator
 from .visualisation import Visualisation
 from .export import (export_tpsfs_to_json, export_tpsfs_to_txt,
                      export_sentence_history_to_json, export_sentence_history_to_txt)
+from .stats_generator import generate_statistics
 from .console_output import output_revisions_number
 from .models import SpacyModel
 import traceback
@@ -90,6 +91,10 @@ if __name__ == "__main__":
                 visualisation_filtered.visualise_sentence_history(idfx_parser.filtered_tpsfs_ecm, sentence_history)
             else:
                 print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
+
+            # generate basic statistics from <...>_output_ecm.json
+            generate_statistics(idfx, config['output'], file_name)
+
         except:
             e = sys.exc_info()[0]
             traceback.print_exc()
