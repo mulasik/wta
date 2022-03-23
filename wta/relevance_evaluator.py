@@ -1,10 +1,11 @@
 class RelevanceEvaluator:
 
-    def __init__(self, tpsf, min_edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, nlp_model):
+    def __init__(self, tpsf, min_edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, edit_dist_combined_with_tok_number, nlp_model):
         self.tpsf = tpsf
         self.min_edit_distance = min_edit_distance
         self.spellchecking = spellchecking
         self.ts_min_tokens_number = ts_min_tokens_number
+        self.edit_dist_combined_with_tok_number = edit_dist_combined_with_tok_number
         self.punctuation_rel = punctuation_rel
         self.nlp_model = nlp_model
         self.sens_to_evaluate = self.tpsf.modified_sentences + self.tpsf.new_sentences
@@ -21,10 +22,16 @@ class RelevanceEvaluator:
         more_toks_than_min = ts_tokens_number >= self.ts_min_tokens_number
         if self.punctuation_rel is True and ts.contains_punctuation:
             ts.set_ts_relevance(True)
-        elif ts_longer_than_min and more_toks_than_min:
-            ts.set_ts_relevance(True)
-        else:
-            ts.set_ts_relevance(False)
+        elif self.edit_dist_combined_with_tok_number is True:
+            if ts_longer_than_min and more_toks_than_min:
+                ts.set_ts_relevance(True)
+            else:
+                ts.set_ts_relevance(False)
+        elif self.edit_dist_combined_with_tok_number is False:
+            if ts_longer_than_min or more_toks_than_min:
+                ts.set_ts_relevance(True)
+            else:
+                ts.set_ts_relevance(False)
 
     def determine_sentence_relevance(self, sen):
         sen_transforming_sequence = sen.retrieve_sen_transforming_sequence()

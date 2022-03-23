@@ -13,7 +13,7 @@ class TpsfEcm:
     INS_ENT = 'insertion by entering'
     NO_EDIT = 'non-edit operation'
 
-    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, nlp_model, final=False):
+    def __init__(self, revision_id, output_chars, edit, pause, event_desc, prev_tpsf, config, nlp_model, final=False):
 
         self.revision_id = revision_id
         self.event_description = event_desc
@@ -64,7 +64,7 @@ class TpsfEcm:
         self.delta_current_previous = sentence_classifier.delta_current_previous
         self.delta_previous_current = sentence_classifier.delta_previous_current
 
-        relevance_evaluator = RelevanceEvaluator(self, edit_distance, ts_min_tokens_number, spellchecking, punctuation_rel, nlp_model)
+        relevance_evaluator = RelevanceEvaluator(self, config['min_edit_distance'], config['ts_min_tokens_number'], config['enable_spellchecking'], config['include_punctuation_edits'], config['combine_edit_distance_with_tok_number'], nlp_model)
         if not final:
             self.relevance = relevance_evaluator.relevance
             self.relevance_eval_results = relevance_evaluator.relevance_eval_results
