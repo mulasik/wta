@@ -26,18 +26,20 @@ class SentenceTokenizer:
             else:
                 sentence_texts.append(sen)
             prev_sentence = sen
+
         return sentence_texts
 
     def transform_into_sentence_list(self, text):
         sentence_list = self.nlp_model.segment_sentences(text)
-        verified_sentence_list = self.verify_sentence_segmentation(sentence_list)
+        non_empty_sentences = [s for s in sentence_list if s != '']
+        verified_sentence_list = self.verify_sentence_segmentation(non_empty_sentences)
         sentences = []
         pos = 0
         prev_sent_end_index = 0
         for sen in verified_sentence_list:
             sent_start_index = text.find(sen, prev_sent_end_index)
             sent_end_index = sent_start_index + len(sen.strip()) - 1
-            sentence = Sentence(sen, sent_start_index, sent_end_index, self.revision_id, pos, self.transforming_sequence)
+            sentence = Sentence(sen, sent_start_index, sent_end_index, self.revision_id, pos, self.transforming_sequence, self.nlp_model)
             sentences.append(sentence)
             prev_sent_end_index = sent_end_index
             pos += 1

@@ -4,10 +4,11 @@ import unicodedata
 
 class SentenceClassifier:
 
-    def __init__(self, prev_sens, sens, transforming_sequence):
+    def __init__(self, prev_sens, sens, transforming_sequence, nlp_model):
         self.prev_sens = prev_sens
         self.sens = sens
         self.transforming_sequence = transforming_sequence
+        self.nlp_model = nlp_model
 
         self.delta_current_previous = []
         self.delta_previous_current = []
@@ -21,14 +22,22 @@ class SentenceClassifier:
             self.new_sentences = [s for s in self.sens]
             for s in self.new_sentences:
                 s.set_label('new')
+                sen_tagged_tokens = self.nlp_model.tag_words(s.text)
+                s.set_tagged_tokens_and_typos(sen_tagged_tokens)
         # if there is previous TPSF version
         else:
             # sentences which already existed in the previous TPSF:
-            self.unchanged_sentences = [sen for sen in self.sens if sen.text in [ps.text for ps in self.prev_sens]]
-            for s in self.unchanged_sentences:
-                s.set_label('unchanged')
+            self.unchanged_sentences = [sen for sen in self.prev_sens if sen.text in [ps.text for ps in self.sens]]
+            for us in self.unchanged_sentences:
+                us.set_label('unchanged')
+                for s in self.sens:
+                    if us.text == s.text:
+                        s.set_tagged_tokens_and_typos(us.tagged_tokens)
             # sentences which didn't occur in the previous TPSF but do occur in the current TPSF:
             self.delta_current_previous = [sen for sen in self.sens if sen.text not in [ps.text for ps in self.prev_sens]]
+            for dcp in self.delta_current_previous:
+                sen_tagged_tokens = self.nlp_model.tag_words(dcp.text)
+                dcp.set_tagged_tokens_and_typos(sen_tagged_tokens)
             # sentences which occurred in the previous TPSF but don't occur in the current sentences:
             self.delta_previous_current = [s for s in self.prev_sens if s.text not in [cs.text for cs in self.sens]]
             # match sentences from the deltas
@@ -169,15 +178,33 @@ class SentenceClassifier:
                             self.deleted_sentences.append(s)
 
     def verify_segmentation(self, shorter_list, longer_list):
+        print('\nAttention. A potential sentence segmentation error detected. Verifying segmentation...')
+        false_segmentation_candidates = {}
         for sl in shorter_list:
+            false_segmentation_candidates[sl] = []
             for ll in longer_list:
                 if ll.text in sl.text:
-                    ll.set_label('erroneous_automatic_segmentation_detected')
-                    self.unchanged_sentences.append(ll)
-                else:
-                    new_sen = ll
-        new_sen.set_label('new')
-        self.new_sentences.append(new_sen)
-
-
+                    false_segmentation_candidates[sl].append(ll)
+        for sl_sen, ll_sens in false_segmentation_candidates.items():
+            if len(ll_sens) > 0:
+                print('Potential incorrect segmentations:')
+                for ll_sen in ll_sens:
+                    print(f'> {ll_sen}')
+                longest_sen_length = max([len(ll_sen.text) for ll_sen in ll_sens])
+                for ll_sen in ll_sens:
+                    if len(ll_sen.text) == longest_sen_length:
+                        prev_sen = ll_sen
+                        prev_sen.set_label('modified')
+                    else:
+                        ll_sen.set_label('erroneous_automatic_segmentation_detected')
+                        self.unchanged_sentences.append(ll_sen)
+                sl_sen.set_label('modified')
+                sl_sen.set_previous_text_version(prev_sen)
+                self.modified_sentences.append(sl_sen)
+            else:
+                print('Segmentation error not confirmed. The following sentence has been labeled as new:')
+                print(f'> {sl_sen}')
+                new_sen = sl_sen
+                new_sen.set_label('new')
+                self.new_sentences.append(new_sen)
 

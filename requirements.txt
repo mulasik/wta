@@ -2,12 +2,17 @@ benepar[cpu]
 cython
 numpy
 bs4
-spacy
+spacy==3.0.6
 lxml
 nltk
+matplotlib
+language-tool-python==2.5.4
 
 # Spacy's model for German
-https://github.com/explosion/spacy-models/releases/download/de_core_news_md-1.0.0/de_core_news_md-1.0.0.tar.gz#egg=de_core_news_md
+https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.0.0/de_core_news_md-3.0.0.tar.gz#egg=de_core_news_md
 
 # Spacy's model for English
-https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.0.0/en_core_web_md-3.0.0.tar.gz#egg=en_core_web_md
+https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.0.0/en_core_web_md-3.0.0.tar.gz#egg=en_core_web_md
+
+# Spacy's model for Greek
+https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.0.0/el_core_news_md-3.0.0.tar.gz#egg=el_core_news_md

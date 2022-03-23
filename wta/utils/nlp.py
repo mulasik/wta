@@ -90,15 +90,47 @@ def retrieve_token_indices(prev_sen: str, cur_sen: str) -> tuple:
     return prev_toks_with_indices, cur_toks_with_indices
 
 
-def retrieve_affected_tokens(sentence: dict) -> list:
+def identify_affected_tokens(prev_sen_toks: list, cur_sen_toks: list, edit_type: str) -> list:
     affected_tokens = []
-    cur_sen = sentence.text
-    prev_sen = '' if sentence.previous_sentence is None else sentence.previous_sentence.text
+    if prev_sen_toks and cur_sen_toks:
+        for (pt, ct) in itertools.zip_longest(prev_sen_toks, cur_sen_toks):
+            print(ct)
+            if pt['text'] != ct['text']:
+                if edit_type == 'insertion':
+                    affected_tokens.append({
+                        'prev': None,
+                        'cur': ct
+                    })
+                elif edit_type == 'deletion':
+                    affected_tokens.append({
+                        'prev': pt,
+                        'cur': None
+                    })
+    elif not prev_sen_toks and cur_sen_toks:
+        for ct in cur_sen_toks:
+            affected_tokens.append({
+                'prev': None,
+                'cur': ct
+            })
+    elif prev_sen_toks and not cur_sen_toks:
+        for pt in prev_sen_toks:
+            affected_tokens.append({
+                'prev': pt,
+                'cur': None
+            })
+    print('AFFECTED TOKENS:')
+    print(affected_tokens)
+    return affected_tokens
+
+
+def retrieve_affected_tokens(prev_sen, cur_sen) -> list:
+    # affected_tokens is a list of tuples: previous word, current word with their indices
+    affected_tokens = []
     prev_toks_with_indices, cur_toks_with_indices = retrieve_token_indices(prev_sen, cur_sen)
     _, mismatch_range, _ = retrieve_mismatch_range_for_sentence_pair(prev_sen, cur_sen)
     if mismatch_range:
         # as there is only one edit per TPSF (one sequence gets changed), there can always be only one mismatch range
-        # if more than one mismatch range exists, merge all consequtive mismatch ranges together
+        # if more than one mismatch range exists, merge all consecutive mismatch ranges together
         # multiple mismatch ranges occur if the inserted or deleted sequence is very short
         # and can be found at another position in the sentence which hasn't been edited
         mismatch_range = range(mismatch_range[0][0], mismatch_range[-1][-1]+1)
@@ -137,16 +169,18 @@ def retrieve_affected_tokens(sentence: dict) -> list:
     return affected_tokens
 
 
-def filter_out_irrelevant_tokens(tokens: list) -> list:
-    relevant_tokens = []
-    for tok in tokens:
-        if tokens['prev_tok'][1] is not None and tokens['cur_tok'][1] is not None:
-            relevant_tokens.append(tok)
-    return relevant_tokens
+# def filter_out_irrelevant_tokens(tokens: list) -> list:
+#     relevant_tokens = []
+#     for tok in tokens:
+#         if tokens['prev'][1] is not None and tokens['cur'][1] is not None:
+#             relevant_tokens.append(tok)
+#     return relevant_tokens
 
 
 def check_edit_distance(tokens: list) -> int:
-    ed = nltk.edit_distance(tokens['prev_tok'][0], tokens['cur_tok'][0])
+    prev_tok = '' if tokens['prev'] is None else tokens['prev']['text']
+    cur_tok = '' if tokens['cur'] is None else tokens['cur']['text']
+    ed = nltk.edit_distance(prev_tok, cur_tok)
     return ed
 
 
