@@ -30,7 +30,7 @@ class SentenceHistoryGenerator:
                         texts = [s.text for s in sens]
                         if ns.text in texts:
                             existing_id = id
-                            ns.set_revision_elevance(revision_relevance)
+                            ns.set_revision_relevance(revision_relevance)
                             self.sentence_history[existing_id].append(ns)
                 else:
                     uid = uuid.uuid1().int
@@ -54,8 +54,6 @@ class SentenceHistoryGenerator:
                         sentence_remains = Sentence(None, None, None, ds.revision_id, None, None, self.nlp_model)
                         sentence_remains.set_label(label)
                         sentence_remains.set_revision_relevance(revision_relevance)
-                        sen_tagged_tokens = self.nlp_model.tag_words(sentence_remains.text)
-                        sentence_remains.set_tagged_tokens(sen_tagged_tokens)
                         self.sentence_history[id].append(sentence_remains)
             for us in unchanged_sens:
                 us.set_revision_relevance(revision_relevance)

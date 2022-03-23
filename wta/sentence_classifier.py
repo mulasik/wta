@@ -1,6 +1,5 @@
 from .utils.nlp import check_overlap_with_seq_beginning, calculate_sequence_similarity
 import unicodedata
-from .sentence import Sentence
 
 
 class SentenceClassifier:
@@ -24,7 +23,7 @@ class SentenceClassifier:
             for s in self.new_sentences:
                 s.set_label('new')
                 sen_tagged_tokens = self.nlp_model.tag_words(s.text)
-                s.set_tagged_tokens(sen_tagged_tokens)
+                s.set_tagged_tokens_and_typos(sen_tagged_tokens)
         # if there is previous TPSF version
         else:
             # sentences which already existed in the previous TPSF:
@@ -33,12 +32,12 @@ class SentenceClassifier:
                 us.set_label('unchanged')
                 for s in self.sens:
                     if us.text == s.text:
-                        s.set_tagged_tokens(us.tagged_tokens)
+                        s.set_tagged_tokens_and_typos(us.tagged_tokens)
             # sentences which didn't occur in the previous TPSF but do occur in the current TPSF:
             self.delta_current_previous = [sen for sen in self.sens if sen.text not in [ps.text for ps in self.prev_sens]]
             for dcp in self.delta_current_previous:
                 sen_tagged_tokens = self.nlp_model.tag_words(dcp.text)
-                dcp.set_tagged_tokens(sen_tagged_tokens)
+                dcp.set_tagged_tokens_and_typos(sen_tagged_tokens)
             # sentences which occurred in the previous TPSF but don't occur in the current sentences:
             self.delta_previous_current = [s for s in self.prev_sens if s.text not in [cs.text for cs in self.sens]]
             # match sentences from the deltas

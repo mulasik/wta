@@ -84,13 +84,13 @@ def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: st
         for tpsf in tpsfs:
             dict_tpsf = export_ecm_tpsf_to_dict(tpsf)
             tpsf_list.append(dict_tpsf)
-        json_file = f'{file_name}_output_ecm{filtered}.json'
+        json_file = f'{file_name}_text_history_ecm{filtered}.json'
         json_file_path = os.path.join(output_path, json_file)
     elif mode == 'Pause Capturing Mode':
         tpsf_list = []
         for tpsf in tpsfs:
             tpsf_list.append(export_pcm_tpsf_to_dict(tpsf))
-        json_file = f'{file_name}_output_pcm.json'
+        json_file = f'{file_name}_text_history_pcm.json'
         json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
         json.dump(tpsf_list, f)
@@ -100,15 +100,18 @@ def export_tpsfs_to_txt(tpsfs: list, output_path: str, file_name: str, nlp_model
     tpsf_list = []
     for tpsf in tpsfs:
         tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
-    txt_file = f'{file_name}_output_ecm{filtered}.txt'
+    txt_file = f'{file_name}_text_history_ecm{filtered}.txt'
     txt_file_path = os.path.join(output_path, txt_file)
     with open(txt_file_path, 'w') as f:
         for tpsf in tpsf_list:
             result_text = tpsf['result_text']
+            preceeding_edits = tpsf['edit']['irrelevant_ts_aggregated']
+            preceeding_edits.append((tpsf['edit']['transforming_sequence']['text'], tpsf['edit']['transforming_sequence']['label']))
             id = tpsf['revision_id']
             f.write(f"""
 TPSF version {id}:
 {result_text}
+Preceeding edits: {preceeding_edits}
 
 """)
 
@@ -171,6 +174,8 @@ def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file
             for s in sens:
                 f.write(f'''
 {s["text"]}
+{s["irrelevant_ts_aggregated"]}
+{s['transforming_sequence']['text'], s['transforming_sequence']['label']}
 ''')
 
 
@@ -185,7 +190,7 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 ''')
             for s in sens:
                 str_token_sequence, str_POS_sequence = get_aligned_word_pos_sequences(nlp_model, s["text"])
-                relevance = 'relevant' if s['sentence_relevance'] is True else 'morphosyntactically irrelevant'
+                relevance = 'relevant' if s['sentence_relevance'] is True else 'irrelevant'
                 f.write(f'''
 {str_token_sequence}
 {str_POS_sequence}

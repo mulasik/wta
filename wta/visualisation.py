@@ -12,13 +12,16 @@ class Visualisation:
         self.sentence_colors = {
             'unchanged': 'mistyrose',
             'new': 'darkslategrey',
-            'modified through insertion': 'cadetblue',
+            'deleted': 'seashell',
             'modified through deletion': 'lightcoral',
-            'deleted': 'indianred'
+            'modified through insertion': 'cadetblue',
+            'modified through append': 'teal'
         }
         self.transforming_colors = {
-            'deletion': 'indianred',
-            'insertion': 'darkslategrey',
+            'deletion': 'lightcoral',
+            'insertion': 'cadetblue',
+            'append': 'teal',
+            '': 'w'
         }
         self.unrecommended_colors = ['white', 'snow', 'whitesmoke', 'seashell', 'antiquewhite', 'oldlace', 'floralwhite',
                                 'cornsilk',
@@ -31,14 +34,14 @@ class Visualisation:
         sentences_lengths = {}
         for tpsf in tpsfs_to_visualise:
             sentences_lens = []
-            transformation = 'insertion' if tpsf.transforming_sequence.label == 'append' else tpsf.transforming_sequence.label
+            # transformation = 'insertion' if tpsf.transforming_sequence.label == 'append' else tpsf.transforming_sequence.label
             for s in tpsf.sentence_list:
                 if s.text in [sen.text for sen in tpsf.unchanged_sentences]:
                     label = 'unchanged'
                 elif s.text in [sen.text for sen in tpsf.new_sentences]:
                     label = 'new'
                 elif s.text in [sen.text for sen in tpsf.modified_sentences]:
-                    label = f'modified through {transformation}'
+                    label = f'modified through {tpsf.transforming_sequence.label}'
                 elif s.text in [sen.text for sen in tpsf.deleted_sentences]:
                     label = 'deleted'
                 sentences_lens.append((label, len(s.text)))
@@ -74,7 +77,8 @@ class Visualisation:
                 starts += s[1]
 
         for tpsf in tpsfs_to_visualise:
-            lbl = 'insertion' if tpsf.transforming_sequence.label == 'append' else tpsf.transforming_sequence.label
+            # lbl = 'insertion' if tpsf.transforming_sequence.label == 'append' else tpsf.transforming_sequence.label
+            lbl = tpsf.transforming_sequence.label
             transforming_seq_text = tpsf.transforming_sequence.text
             ax2.barh(str(tpsf.revision_id), len(transforming_seq_text), left=0, height=1, label=lbl, color=self.transforming_colors[lbl], edgecolor='white')
 
@@ -161,17 +165,20 @@ class Visualisation:
         sentences_lengths = {}
         for tpsf in tpsfs_to_visualise:
             sentences_lens = []
-            transformation = 'insertion' if tpsf.transforming_sequence.label == 'append' else tpsf.transforming_sequence.label
-            for s in tpsf.sentence_list:
-                if s.text in [sen.text for sen in tpsf.unchanged_sentences]:
-                    label = 'unchanged'
-                elif s.text in [sen.text for sen in tpsf.new_sentences]:
-                    label = 'new'
-                elif s.text in [sen.text for sen in tpsf.modified_sentences]:
-                    label = f'modified through {transformation}'
-                elif s.text in [sen.text for sen in tpsf.deleted_sentences]:
-                    label = 'deleted'
+            if not tpsf.sentence_list:
+                label = 'deleted'
                 sentences_lens.append((label, len(s.text)))
+            else:
+                for s in tpsf.sentence_list:
+                    if s.text in [sen.text for sen in tpsf.unchanged_sentences]:
+                        label = 'unchanged'
+                    elif s.text in [sen.text for sen in tpsf.new_sentences]:
+                        label = 'new'
+                    elif s.text in [sen.text for sen in tpsf.modified_sentences]:
+                        label = f'modified through {tpsf.transforming_sequence.label}'
+                    elif s.text in [sen.text for sen in tpsf.deleted_sentences]:
+                        label = 'deleted'
+                    sentences_lens.append((label, len(s.text)))
             sentences_lengths.update({tpsf.revision_id: sentences_lens})
 
         min_fig_heigth = 15
@@ -181,9 +188,9 @@ class Visualisation:
             text = f'TPSF {key}'
             tpsf_labels.append(text)
 
-        fig_height = len(tpsfs_to_visualise) * 0.80 if len(tpsfs_to_visualise) > 15 else min_fig_heigth
+        fig_height = len(tpsfs_to_visualise) * 0.8  # if len(tpsfs_to_visualise) > 15 else min_fig_heigth
         fig_width = fig_height * 0.8
-        fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(fig_width, fig_height), gridspec_kw={'width_ratios': [4, 1]})
+        fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(fig_width, fig_height), gridspec_kw={'width_ratios': [5, 3]})
 
         plt.yticks(ticks=list(sentences_lengths.keys()), labels=tpsf_labels)
 
@@ -212,21 +219,28 @@ class Visualisation:
         ypos = 0
         for tpsf in tpsfs_to_visualise:
             transforming_sequences = tpsf.irrelevant_ts_aggregated
-            transforming_sequences.append((tpsf.transforming_sequence.text, tpsf.transforming_sequence.label))
             starts = 0
             for ts in transforming_sequences:
-                lbl = 'insertion' if ts[1] == 'append' else ts[1]
-                bar_lbl = 'INS' if lbl == 'insertion' else 'DEL'
+                # lbl = 'insertion' if ts[1] == 'append' else ts[1]
+                lbl = ts[1]
+                if lbl == 'insertion':
+                    bar_lbl = 'ins'
+                elif lbl == 'append':
+                    bar_lbl = 'app'
+                elif lbl == 'deletion':
+                    bar_lbl = 'del'
+                else:
+                    print(f'Attention. Label undefined for the following transforming sequence: {ts}. The transforming sequence will not be visible in the visualisation.')
                 transforming_seq_len = 2
-                ax2.barh(str(tpsf.revision_id), transforming_seq_len, left=starts, height=1, color=self.transforming_colors[lbl], edgecolor='white')  # label=lbl,
-                ax2.text(s=bar_lbl, x=1+starts, y=ypos, color="w", verticalalignment="center", horizontalalignment="center", size=12)
+                ax2.barh(str(tpsf.revision_id), transforming_seq_len, left=starts, height=1, color=self.transforming_colors[lbl], edgecolor='white', label=lbl)  # label=lbl,
+                ax2.text(s=bar_lbl, x=1+starts, y=ypos, color="w", verticalalignment="center", horizontalalignment="center", size=10)
                 starts += transforming_seq_len
             ypos += 1
 
         ax1.set_xlabel('Number of characters')
         # ax2.set_xlabel('Edit operations sequence')
         ax1.set_title('Filtered Text History', pad=5)
-        ax2.set_title('Preceeding\n Edit Operations\n Sequence', pad=5)
+        ax2.set_title('Preceding\n Edit Operations\n Sequence', pad=5)
 
         # legend:
         hand, labl = ax1.get_legend_handles_labels()

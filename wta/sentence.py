@@ -47,8 +47,8 @@ class Sentence:
         self.is_any_tok_oov = False
         self.label = None
         self.transforming_sequence = transforming_sequence
-        self.tagged_tokens = None if self.text is None else nlp_model.tag_words(self.text)
-        self.typos_detected = self.check_sentence_spelling()
+        self.tagged_tokens = None # if self.text is None else nlp_model.tag_words(self.text)
+        self.typos_detected = None
 
         self.nlp_model = nlp_model
 
@@ -68,8 +68,9 @@ class Sentence:
     def set_label(self, label):
         self.label = label
 
-    def set_tagged_tokens(self, tagged_tokens):
+    def set_tagged_tokens_and_typos(self, tagged_tokens):
         self.tagged_tokens = tagged_tokens
+        self.typos_detected = self.check_sentence_spelling()
 
     def set_typos_detected(self, typos_detected):
         self.typos_detected = typos_detected
@@ -94,14 +95,20 @@ class Sentence:
         edit, mismatch_range, relevant = retrieve_mismatch_range_for_sentence_pair(prev_sen, self.text)
         if relevant == 'cur':
             mismatch_text = self.text[mismatch_range[0][0]:mismatch_range[0][-1]]
-        if relevant == 'prev':
+        elif relevant == 'prev':
             mismatch_text = prev_sen[mismatch_range[0][0]:mismatch_range[0][-1]]
+        else:
+            mismatch_text = ''
+            print(f'Warning. The mismatch text is empty. Apparently no mismatch detected. Mismatch range: {mismatch_range}. Relevant sentence: {relevant}.')
         if edit == 'insert':
             label = 'insertion'
         elif edit == 'delete':
             label = 'deletion'
         elif edit == 'replace':
             label = 'insertion' if relevant == 'cur' else 'deletion'
+        else:
+            print('Warning. Empty transforming sequence label.')
+            label = ''
         sen_transforming_sequence = TransformingSequence(mismatch_text, label, self.nlp_model)
         return sen_transforming_sequence
 
