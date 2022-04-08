@@ -7,7 +7,10 @@ from .idfx_parser import IdfxParser
 from .sentence_history import SentenceHistoryGenerator
 from .visualisation import Visualisation
 from .export import (export_tpsfs_to_json, export_tpsfs_to_txt,
-                     export_sentence_history_to_json, export_sentence_history_to_txt)
+                     export_sentence_history_to_json,
+                     export_sentence_history_to_json_simplified,
+                     export_sentence_history_to_txt,
+                     export_sentence_history_to_txt_extended)
 from .stats_generator import generate_statistics
 from .console_output import output_revisions_number
 from .models import SpacyModel
@@ -68,8 +71,12 @@ if __name__ == "__main__":
             # export sentence history
             export_sentence_history_to_json(sentence_history, config['output'], file_name, nlp_model)
             export_sentence_history_to_json(filtered_sentence_history, config['output'], file_name, nlp_model, '_filtered')
+            export_sentence_history_to_json_simplified(sentence_history, config['output'], file_name, nlp_model)
+            export_sentence_history_to_json_simplified(filtered_sentence_history, config['output'], file_name, nlp_model,'_filtered')
             export_sentence_history_to_txt(sentence_history, config['output'], file_name, nlp_model)
             export_sentence_history_to_txt(filtered_sentence_history, config['output'], file_name, nlp_model, '_filtered')
+            export_sentence_history_to_txt_extended(sentence_history, config['output'], file_name, nlp_model)
+            export_sentence_history_to_txt_extended(filtered_sentence_history, config['output'], file_name, nlp_model, '_filtered')
 
             # visualise text and sentence history
             tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0 or len(tpsf.deleted_sentences) > 0)]
