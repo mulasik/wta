@@ -188,7 +188,7 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
 def export_sentence_history_to_json_simplified(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
     json_file = f'{file_name}_sentence_history_simplified{filtered}.json'
-    json_file_path = os.path.join(output_path, json_file)
+    json_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
 
@@ -233,7 +233,7 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 def export_sentence_history_to_txt_extended(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
     txt_file = f'{file_name}_sentence_history_extended{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
     with open(txt_file_path, 'w') as f:
         for id, sens in sentence_history.items():
             f.write(f'''
