@@ -85,13 +85,13 @@ def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: st
             dict_tpsf = export_ecm_tpsf_to_dict(tpsf)
             tpsf_list.append(dict_tpsf)
         json_file = f'{file_name}_text_history_ecm{filtered}.json'
-        json_file_path = os.path.join(output_path, json_file)
+        json_file_path = os.path.join(output_path, f'{file_name}_text_history', json_file)
     elif mode == 'Pause Capturing Mode':
         tpsf_list = []
         for tpsf in tpsfs:
             tpsf_list.append(export_pcm_tpsf_to_dict(tpsf))
         json_file = f'{file_name}_text_history_pcm.json'
-        json_file_path = os.path.join(output_path, json_file)
+        json_file_path = os.path.join(output_path, f'{file_name}_text_history', json_file)
     with open(json_file_path, 'w') as f:
         json.dump(tpsf_list, f)
 
@@ -101,7 +101,7 @@ def export_tpsfs_to_txt(tpsfs: list, output_path: str, file_name: str, nlp_model
     for tpsf in tpsfs:
         tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
     txt_file = f'{file_name}_text_history_ecm{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_text_history', txt_file)
     with open(txt_file_path, 'w') as f:
         for tpsf in tpsf_list:
             result_text = tpsf['result_text']
@@ -118,14 +118,10 @@ Preceeding edits: {preceeding_edits}
 
 def get_aligned_word_pos_sequences(nlp_model, result_text):
     tup_processed = None, None
-    if ( result_text != None ):
-
+    if result_text is not None:
         lst_processed_tokens = nlp_model.nlp(result_text)
-
         str_token_sequence, str_POS_sequence = align_processed_tokens(lst_processed_tokens)
-
         tup_processed = str_token_sequence, str_POS_sequence
-
     return tup_processed
 
 
@@ -157,7 +153,7 @@ def export_sentence_history_to_dict(sentence_history):
 def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     json_file = f'{file_name}_sentence_history{filtered}.json'
-    json_file_path = os.path.join(output_path, json_file)
+    json_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
 
@@ -165,7 +161,7 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
 def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     txt_file = f'{file_name}_sentence_history{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
     with open(txt_file_path, 'w') as f:
         for id, sens in sentence_history.items():
             f.write(f'''
@@ -182,7 +178,7 @@ def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file
 def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     txt_file = f'{file_name}_sentence_history{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
     with open(txt_file_path, 'w') as f:
         for id, sens in sentence_history.items():
             f.write(f'''

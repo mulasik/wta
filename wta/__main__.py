@@ -9,6 +9,7 @@ from .visualisation import Visualisation
 from .export import (export_tpsfs_to_json, export_tpsfs_to_txt,
                      export_sentence_history_to_json, export_sentence_history_to_txt)
 from .stats_generator import generate_statistics
+from .sentence_parser import SentenceParser
 from .console_output import output_revisions_number
 from .models import SpacyModel
 import traceback
@@ -49,11 +50,17 @@ if __name__ == "__main__":
             print(f'\nProcessing the input file {idfx}...\n')
 
             ensure_path(config['output'])
+            file_name = os.path.split(idfx)[-1].replace('.idfx', '')
+            sentence_histories_dir = f'{file_name}_sentence_histories'
+            text_history_dir = f'{file_name}_text_history'
+            stats_dir = f'{file_name}_statistics'
+            ensure_path(os.path.join(config['output'], sentence_histories_dir))
+            ensure_path(os.path.join(config['output'], text_history_dir))
+            ensure_path(os.path.join(config['output'], stats_dir))
 
             # generate text history
             idfx_parser = IdfxParser(idfx, config, nlp_model)
             idfx_parser.run()
-            file_name = os.path.split(idfx)[-1].replace('.idfx', '')
 
             # export text history in PCM and ECM
             export_tpsfs_to_json(idfx_parser.all_tpsfs_ecm, ECM, config['output'], file_name, nlp_model)
@@ -92,8 +99,12 @@ if __name__ == "__main__":
             else:
                 print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
 
-            # generate basic statistics from <...>_output_ecm.json
+            # generate basic statistics from <...>_output_ecm.json and visualise them
             generate_statistics(idfx, config['output'], file_name)
+            sen_parser = SentenceParser(config['output'], file_name)
+            visualisation.visualise_dependency_relations_impact()
+            visualisation.visualise_consituents_impact()
+            visualisation.visualise_syntactic_impact()
 
         except:
             e = sys.exc_info()[0]
