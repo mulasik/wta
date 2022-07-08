@@ -1,4 +1,17 @@
 import difflib
+import os
+import errno
+
+
+def ensure_path(path):
+    try:
+        os.makedirs(path)
+    except OSError as err:
+        if err.errno == errno.EEXIST:
+            pass
+        else:
+            raise
+
 
 def retrieve_mismatch_range_for_sentence_pair(prev_sen: str, cur_sen: str) -> tuple:
     seq_match = difflib.SequenceMatcher(None, prev_sen, cur_sen)
