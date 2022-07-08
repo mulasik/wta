@@ -29,6 +29,25 @@ def export_sentences_to_list(sens):
     return sentence_list
 
 
+def export_sentences_to_list_simplified(sens):
+    sentence_list = []
+    for s in sens:
+        tagged_tokens = None if not s.tagged_tokens else [tt['pos'] for tt in s.tagged_tokens]
+        sen = {
+            'text': s.text,
+            'revision_id': s.revision_id,
+            'pos_in_text': s.pos_in_text,
+            'tagged_tokens': tagged_tokens,
+            'transforming_sequence': {
+                'text': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.text,
+                'label': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.label,
+            },
+            "previous_ts_list": [{'text': ts[0], 'type': ts[1]} for ts in s.irrelevant_ts_aggregated],
+        }
+        sentence_list.append(sen)
+    return sentence_list
+
+
 def export_pcm_tpsf_to_dict(tpsf):
     tpsf_dict = {
         "preceeding_pause": tpsf.preceeding_pause,
@@ -150,10 +169,26 @@ def export_sentence_history_to_dict(sentence_history):
     return sen_hist
 
 
+def export_sentence_history_to_dict_simplified(sentence_history):
+    sen_hist = {}
+    for id, sens in sentence_history.items():
+        sentences = export_sentences_to_list_simplified(sens)
+        sen_hist.update({id: sentences})
+    return sen_hist
+
+
 def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     json_file = f'{file_name}_sentence_history{filtered}.json'
     json_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', json_file)
+    with open(json_file_path, 'w') as f:
+        json.dump(sentence_history, f)
+
+
+def export_sentence_history_to_json_simplified(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
+    sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
+    json_file = f'{file_name}_sentence_history_simplified{filtered}.json'
+    json_file_path = os.path.join(output_path, json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
 
@@ -193,4 +228,26 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 
 ({s['label']} * position {s['pos_in_text']} * {relevance} * TPSF {s['revision_id']})
 ''')
+
+
+def export_sentence_history_to_txt_extended(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
+    sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
+    txt_file = f'{file_name}_sentence_history_extended{filtered}.txt'
+    txt_file_path = os.path.join(output_path, txt_file)
+    with open(txt_file_path, 'w') as f:
+        for id, sens in sentence_history.items():
+            f.write(f'''
+===
+{id}
+===''')
+            for s in sens:
+                f.write(f'''
+tpsf: {s['revision_id']}
+position {s['pos_in_text']}
+sentence version: {s['text']}
+pos tags: {s['tagged_tokens']}
+ts text: {s['transforming_sequence']['text']}
+ts type: {s['transforming_sequence']['label']}
+previous ts list: {s['previous_ts_list']}
+***''')
 
