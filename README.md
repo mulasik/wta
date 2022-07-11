@@ -179,6 +179,7 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 
 If you use THEtool, please cite our paper as follows:
 
+```
 @article{mahlow2022extraction,
   title={Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing},
   author={Mahlow, Cerstin and Ulasik, Malgorzata Anna and Tuggener, Don},
@@ -187,3 +188,4 @@ If you use THEtool, please cite our paper as follows:
   year={2022},
   publisher={Springer}
 }
+```
