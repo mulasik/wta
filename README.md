@@ -174,3 +174,16 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 * it does not contain any tokens of the length 1
 * the edit distance between the sentence and its previous version is larger than 3 (only relevant if the difference between the sentence versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens.)
 
+
+## Citation
+
+If you use THEtool, please cite our paper as follows:
+
+@article{mahlow2022extraction,
+  title={Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing},
+  author={Mahlow, Cerstin and Ulasik, Malgorzata Anna and Tuggener, Don},
+  journal={Reading and Writing},
+  pages={1--40},
+  year={2022},
+  publisher={Springer}
+}
