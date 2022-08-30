@@ -12,7 +12,7 @@ SPELLCHECKING_ENABLED_DEFAULT = False
 PUNCTUATION_INCLUDED_DEFAULT = False
 DEFAULT_LANGUAGE = "German"
 
-VIDEO_CONF0 = {
+VIDEO = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)

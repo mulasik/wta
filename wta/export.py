@@ -29,6 +29,25 @@ def export_sentences_to_list(sens):
     return sentence_list
 
 
+def export_sentences_to_list_simplified(sens):
+    sentence_list = []
+    for s in sens:
+        tagged_tokens = None if not s.tagged_tokens else [tt['pos'] for tt in s.tagged_tokens]
+        sen = {
+            'text': s.text,
+            'revision_id': s.revision_id,
+            'pos_in_text': s.pos_in_text,
+            'tagged_tokens': tagged_tokens,
+            'transforming_sequence': {
+                'text': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.text,
+                'label': None if s.sen_transforming_sequence is None else s.sen_transforming_sequence.label,
+            },
+            "previous_ts_list": [{'text': ts[0], 'type': ts[1]} for ts in s.irrelevant_ts_aggregated],
+        }
+        sentence_list.append(sen)
+    return sentence_list
+
+
 def export_pcm_tpsf_to_dict(tpsf):
     tpsf_dict = {
         "preceeding_pause": tpsf.preceeding_pause,
@@ -85,13 +104,13 @@ def export_tpsfs_to_json(tpsfs: list, mode: str, output_path: str, file_name: st
             dict_tpsf = export_ecm_tpsf_to_dict(tpsf)
             tpsf_list.append(dict_tpsf)
         json_file = f'{file_name}_text_history_ecm{filtered}.json'
-        json_file_path = os.path.join(output_path, json_file)
+        json_file_path = os.path.join(output_path, f'{file_name}_text_history', json_file)
     elif mode == 'Pause Capturing Mode':
         tpsf_list = []
         for tpsf in tpsfs:
             tpsf_list.append(export_pcm_tpsf_to_dict(tpsf))
         json_file = f'{file_name}_text_history_pcm.json'
-        json_file_path = os.path.join(output_path, json_file)
+        json_file_path = os.path.join(output_path, f'{file_name}_text_history', json_file)
     with open(json_file_path, 'w') as f:
         json.dump(tpsf_list, f)
 
@@ -101,7 +120,7 @@ def export_tpsfs_to_txt(tpsfs: list, output_path: str, file_name: str, nlp_model
     for tpsf in tpsfs:
         tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
     txt_file = f'{file_name}_text_history_ecm{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_text_history', txt_file)
     with open(txt_file_path, 'w') as f:
         for tpsf in tpsf_list:
             result_text = tpsf['result_text']
@@ -118,14 +137,10 @@ Preceeding edits: {preceeding_edits}
 
 def get_aligned_word_pos_sequences(nlp_model, result_text):
     tup_processed = None, None
-    if ( result_text != None ):
-
+    if result_text is not None:
         lst_processed_tokens = nlp_model.nlp(result_text)
-
         str_token_sequence, str_POS_sequence = align_processed_tokens(lst_processed_tokens)
-
         tup_processed = str_token_sequence, str_POS_sequence
-
     return tup_processed
 
 
@@ -154,10 +169,26 @@ def export_sentence_history_to_dict(sentence_history):
     return sen_hist
 
 
+def export_sentence_history_to_dict_simplified(sentence_history):
+    sen_hist = {}
+    for id, sens in sentence_history.items():
+        sentences = export_sentences_to_list_simplified(sens)
+        sen_hist.update({id: sentences})
+    return sen_hist
+
+
 def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     json_file = f'{file_name}_sentence_history{filtered}.json'
-    json_file_path = os.path.join(output_path, json_file)
+    json_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', json_file)
+    with open(json_file_path, 'w') as f:
+        json.dump(sentence_history, f)
+
+
+def export_sentence_history_to_json_simplified(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
+    sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
+    json_file = f'{file_name}_sentence_history_simplified{filtered}.json'
+    json_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', json_file)
     with open(json_file_path, 'w') as f:
         json.dump(sentence_history, f)
 
@@ -165,7 +196,7 @@ def export_sentence_history_to_json(sen_hist: dict, output_path: str, file_name:
 def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     txt_file = f'{file_name}_sentence_history{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
     with open(txt_file_path, 'w') as f:
         for id, sens in sentence_history.items():
             f.write(f'''
@@ -182,7 +213,7 @@ def export_sentence_history_to_txt_basics(sen_hist: dict, output_path: str, file
 def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
     sentence_history = export_sentence_history_to_dict(sen_hist)
     txt_file = f'{file_name}_sentence_history{filtered}.txt'
-    txt_file_path = os.path.join(output_path, txt_file)
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
     with open(txt_file_path, 'w') as f:
         for id, sens in sentence_history.items():
             f.write(f'''
@@ -197,4 +228,26 @@ def export_sentence_history_to_txt(sen_hist: dict, output_path: str, file_name: 
 
 ({s['label']} * position {s['pos_in_text']} * {relevance} * TPSF {s['revision_id']})
 ''')
+
+
+def export_sentence_history_to_txt_extended(sen_hist: dict, output_path: str, file_name: str, nlp_model: SpacyModel, filtered=''):
+    sentence_history = export_sentence_history_to_dict_simplified(sen_hist)
+    txt_file = f'{file_name}_sentence_history_extended{filtered}.txt'
+    txt_file_path = os.path.join(output_path, f'{file_name}_sentence_histories', txt_file)
+    with open(txt_file_path, 'w') as f:
+        for id, sens in sentence_history.items():
+            f.write(f'''
+===
+{id}
+===''')
+            for s in sens:
+                f.write(f'''
+tpsf: {s['revision_id']}
+position {s['pos_in_text']}
+sentence version: {s['text']}
+pos tags: {s['tagged_tokens']}
+ts text: {s['transforming_sequence']['text']}
+ts type: {s['transforming_sequence']['label']}
+previous ts list: {s['previous_ts_list']}
+***''')
 
