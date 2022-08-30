@@ -3,6 +3,11 @@ from wta.export import export_ecm_tpsf_to_dict, export_sentence_history_to_dict
 
 
 def output_tpsfs_to_console(tpsfs):
+    """
+
+    :param tpsfs:
+    :return:
+    """
     tpsf_list = []
     for tpsf in tpsfs:
         tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))

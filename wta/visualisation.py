@@ -268,23 +268,23 @@ class Visualisation:
         plt.close()
 
     def visualise_dependency_relations_impact(self):
-        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency', f'{self.file_name}_dependency_relations_impact.json')
+        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency', f'{self.file_name}_dep_transformations.json')
         with open(json_file_path, 'r') as f:
-            dependency_relations_comparison = json.load(f)
+            dependency_transformations = json.load(f)
 
         non_impact_edits_lst = []
         impact_edits_lst = []
-        for sen_versions in dependency_relations_comparison.values():
+        for sen_versions in dependency_transformations.values():
             no_non_impact_edits, no_impact_edits = 0, 0
-            for ver in sen_versions.values():
-                if ver['dependency_relations_impacted'] is False:
+            for ver in sen_versions:
+                if ver['dep_impacted'] is False:
                     no_non_impact_edits += 1
-                elif ver['dependency_relations_impacted'] is True:
+                elif ver['dep_impacted'] is True:
                     no_impact_edits += 1
             non_impact_edits_lst.append(no_non_impact_edits)
             impact_edits_lst.append(no_impact_edits)
 
-        labels = dependency_relations_comparison.keys()
+        labels = dependency_transformations.keys()
 
         plt.rcParams.update({'font.size': 6})
         plt.figure(figsize=(50, 25))
@@ -309,12 +309,12 @@ class Visualisation:
 
         fig.tight_layout()
 
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency', f'{self.file_name}_dep_impact_visualisation.svg')
+        fig_file = json_file_path.replace('.json', '_visualisation.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
     def visualise_consituents_impact(self):
-        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_constituency_impact.json')
+        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations.json')
         with open(json_file_path, 'r') as f:
             constituents_comparison = json.load(f)
 
@@ -322,10 +322,10 @@ class Visualisation:
         impact_edits_lst = []
         for sen_versions in constituents_comparison.values():
             no_non_impact_edits, no_impact_edits = 0, 0
-            for ver in sen_versions.values():
-                if ver['constituents_impacted'] is False:
+            for ver in sen_versions:
+                if ver['const_impacted'] is False:
                     no_non_impact_edits += 1
-                elif ver['constituents_impacted'] is True:
+                elif ver['const_impacted'] is True:
                     no_impact_edits += 1
             non_impact_edits_lst.append(no_non_impact_edits)
             impact_edits_lst.append(no_impact_edits)
@@ -355,13 +355,13 @@ class Visualisation:
 
         fig.tight_layout()
 
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_impact_visualisation.svg')
+        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations_visualisation.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
     def visualise_syntactic_impact(self):
         # constituency
-        json_file_path_c = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_constituency_impact.json')
+        json_file_path_c = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations.json')
         with open(json_file_path_c, 'r') as f:
             c_comparison = json.load(f)
         c_sens_impact_values = {}
@@ -369,7 +369,7 @@ class Visualisation:
         c_no_edits_with_impact = 0
         c_no_edits_wo_impact = 0
         for sen_id, vals in c_comparison.items():
-            sen_ver_impact_values = [v['constituents_impacted'] for v in vals.values() if v['constituents_impacted'] is not None]
+            sen_ver_impact_values = [v['const_impacted'] for v in vals if v['const_impacted'] is not None]
             c_sens_impact_values[i_c] = sen_ver_impact_values
             i_c += 1
             for v in sen_ver_impact_values:
@@ -379,7 +379,7 @@ class Visualisation:
                     c_no_edits_wo_impact += 1
         # dependency
         json_file_path_d = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency',
-                                      f'{self.file_name}_dependency_relations_impact.json')
+                                      f'{self.file_name}_dep_transformations.json')
         with open(json_file_path_d, 'r') as f:
             d_comparison = json.load(f)
         d_sens_impact_values = {}
@@ -387,7 +387,7 @@ class Visualisation:
         d_no_edits_with_impact = 0
         d_no_edits_wo_impact = 0
         for sen_id, vals in d_comparison.items():
-            sen_ver_impact_values = [v['dependency_relations_impacted'] for v in vals.values() if v['dependency_relations_impacted'] is not None]
+            sen_ver_impact_values = [v['dep_impacted'] for v in vals if v['dep_impacted'] is not None]
             d_sens_impact_values[i_d] = sen_ver_impact_values
             i_d += 1
             for v in sen_ver_impact_values:

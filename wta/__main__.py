@@ -13,9 +13,11 @@ from .export import (export_tpsfs_to_json, export_tpsfs_to_txt,
                      export_sentence_history_to_txt_extended)
 from .stats_generator import generate_statistics
 from .sentence_parser import SentenceParser
+from .transformation_classifier import DependencyTransformationClassifier, ConsituencyTransformationClassifier
 from .console_output import output_revisions_number
 from .models import SpacyModel
 import traceback
+
 
 def load_path(dotted_path):
     parts = dotted_path.split('.')
@@ -50,7 +52,7 @@ if __name__ == "__main__":
 
     for idfx in config['xml']:
         try:
-            print(f'\nProcessing the input file {idfx}...\n')
+            print(f'\nProcessing the input file {idfx}...')
 
             ensure_path(config['output'])
             file_name = os.path.split(idfx)[-1].replace('.idfx', '')
@@ -62,6 +64,7 @@ if __name__ == "__main__":
             ensure_path(os.path.join(config['output'], stats_dir))
 
             # generate text history
+            print('\n== KEYSTROKE LOGS PROCESSING ==')
             idfx_parser = IdfxParser(idfx, config, nlp_model)
             idfx_parser.run()
 
@@ -96,7 +99,7 @@ if __name__ == "__main__":
 
             # generate filtered outputs
             idfx_parser.filter_tpsfs_ecm()
-            if len(idfx_parser.filtered_tpsfs_ecm) > 0:
+            if idfx_parser.filtered_tpsfs_ecm:
                 export_tpsfs_to_json(idfx_parser.filtered_tpsfs_ecm, ECM, config['output'], file_name, nlp_model, '_filtered')
                 export_tpsfs_to_txt(idfx_parser.filtered_tpsfs_ecm, config['output'], file_name, nlp_model, '_filtered')
                 output_revisions_number(idfx_parser.filtered_tpsfs_ecm, ECM, True)
@@ -108,7 +111,12 @@ if __name__ == "__main__":
 
             # generate basic statistics from <...>_output_ecm.json and visualise them
             generate_statistics(idfx, config['output'], file_name)
+
+            # perform sentence parsing and identify syntactic impact
+            print('\n== SENTENCE SYNTACTIC PARSING ==')
             sen_parser = SentenceParser(config['output'], file_name)
+            dep_trans_classifier = DependencyTransformationClassifier(sen_parser.sen_history_dependency_relations, sen_parser.sen_parses_path, sen_parser.file_name)
+            const_trans_classifier = ConsituencyTransformationClassifier(sen_parser.sen_history_constituency, sen_parser.sen_parses_path, sen_parser.file_name)
             visualisation.visualise_dependency_relations_impact()
             visualisation.visualise_consituents_impact()
             visualisation.visualise_syntactic_impact()
