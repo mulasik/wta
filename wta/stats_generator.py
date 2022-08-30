@@ -196,7 +196,7 @@ def visualise_insertion_content(data_ecm, output_dir, filename):
     vals = [t[1] for t in sorted_ts_content]
     plt.rcParams.update({'font.size': 35})
     plt.figure(figsize=(20, 15))
-    plt.pie(vals, labels=lbls, colors=assign_color_to_pos(lbls))
+    plt.pie(vals, labels=lbls, colors=assign_color_to_pos(lbls), normalize=False)  # TODO check the normalization impact
     # plt.title('Number edit operations per part of speech')
     fig_file = os.path.join(output_dir, f'{filename}_statistics', f'{filename}_ts_content_stats_ins.svg')
     plt.savefig(fig_file, bbox_inches='tight')
@@ -239,7 +239,6 @@ def visualise_transforming_sequences_tokens(data_ecm, output_dir, filename):
             if tpsf['edit']['transforming_sequence']["label"] == 'deletion':
                 no_edited_tokens = no_edited_tokens * -1
             ts_tokens.append(no_edited_tokens)
-    print(f'Number text vertsions: {len(data_ecm)}')
     colors = ['cadetblue' if e >= 0 else 'lightcoral' for e in ts_tokens]
     plt.rcParams.update({'font.size': 12})
     plt.figure(figsize=(20, 15))
