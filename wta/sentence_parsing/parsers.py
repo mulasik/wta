@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from wta.sentence_parsing.models import Parsers, Grammars, ModelMapping
+from .models import Parsers, Grammars, ModelMapping
 
 
 class BaseParserAdapter(ABC):
