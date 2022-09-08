@@ -6,12 +6,12 @@ from abc import ABC, abstractmethod
 class Statistics(ABC):
     """
     Statistics contain:
-        Events
-        - Number events, number keystrokes, replacements and inserts
-        Text versions
+        Basic statistics
         - Edit Capturing Mode: number text revisions (all)
         - Pause Capturing Mode: number text revisions (all)
         - Edit Capturing Mode: number text revisions (filtered)
+        Events
+        - Number events, number keystrokes, replacements and inserts
         Pauses
         - Pauses (avg, min, max)
         Transforming sequences
@@ -37,7 +37,6 @@ class Statistics(ABC):
 class BasicStatistics(Statistics):
 
     def __init__(self, texthis, texthis_filtered, texthis_pcm):
-        super().__init__()
         self.texthis = texthis
         self.texthis_filtered = texthis_filtered
         self.texthis_pcm = texthis_pcm
@@ -55,7 +54,6 @@ class BasicStatistics(Statistics):
 class EventStatistics(Statistics):
 
     def __init__(self, idfx: str):
-        super().__init__()
         self.idfx = idfx
         self.data = self.retrieve_stats()
 
@@ -83,7 +81,6 @@ class EventStatistics(Statistics):
 class PauseStatistics(Statistics):
 
     def __init__(self, texthis: dict):
-        super().__init__()
         self.texthis = texthis
         self.data = self.retrieve_stats()
 
@@ -106,7 +103,6 @@ class PauseStatistics(Statistics):
 class TSStatistics(Statistics):
 
     def __init__(self, texthis: dict):
-        super().__init__()
         self.texthis = texthis
         self.data = self.retrieve_stats()
 
@@ -145,7 +141,7 @@ class TSStatistics(Statistics):
         return data
 
 
-class SentenceStatistics:
+class SentenceStatistics(Statistics):
 
     def __init__(self, texthis: dict, senhis: dict):
         self.texthis = texthis
@@ -180,16 +176,4 @@ class SentenceStatistics:
             'num_unchanged_sens': num_unchanged_sens
         }
         return data
-
-
-class StatisticsFactory:
-
-    @classmethod
-    def run(self, idfx: str, texthis: dict, texthis_filtered: dict, texthis_pcm: dict, senhis: dict):
-        b_stats = BasicStatistics(texthis, texthis_filtered, texthis_pcm)
-        e_stats = EventStatistics(idfx)
-        p_stats = PauseStatistics(texthis)
-        ts_stats = TSStatistics(texthis)
-        sen_stats = SentenceStatistics(texthis, senhis)
-        return b_stats, e_stats, p_stats, ts_stats, sen_stats
 
