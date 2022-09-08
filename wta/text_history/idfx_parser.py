@@ -1,7 +1,9 @@
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-from .tpsf import TpsfEcm, TpsfPcm
+from wta.text_history.tpsf import TpsfEcm, TpsfPcm
+
+import settings
 
 
 class IdfxParser:
@@ -24,11 +26,11 @@ class IdfxParser:
     NAV = 'navigating without editing'
     FINAL = 'final text revision'
 
-    def __init__(self, idfx, config, nlp_model):
+    def __init__(self, idfx):
         self.idfx = idfx
-        self.pause_duration = config['pause_duration']
-        self.config = config
-        self.nlp_model = nlp_model
+        self.pause_duration = settings.config['pause_duration']
+        self.config = settings.config
+        self.nlp_model = settings.nlp_model
         self.all_tpsfs_ecm = []  # accumulates the revisions of TPSF based on edit operations
         self.all_tpsfs_pcm = []  # accumulates the revisions of TPSF based on pause duration
         self.filtered_tpsfs_ecm = []

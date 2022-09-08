@@ -1,10 +1,16 @@
-from .transforming_sequence import TransformingSequence
-from .sentence_tokenizer import SentenceTokenizer
-from .sentence_classifier import SentenceClassifier
-from .relevance_evaluator import RelevanceEvaluator
+from wta.text_history.transforming_sequence import TransformingSequence
+from wta.sentence_histories.sentence_tokenizer import SentenceTokenizer
+from wta.sentence_histories.sentence_classifier import SentenceClassifier
+from wta.relevance_evaluator import RelevanceEvaluator
 
 
-class TpsfEcm:
+class Tpsf:
+
+    def to_dict(self):
+        pass
+
+
+class TpsfEcm(Tpsf):
 
     # Edit operation types:
     DEL = 'deletion'
@@ -141,8 +147,48 @@ Unchanged sentences:    {[(s.label, s.text) for s in self.unchanged_sentences]}
 
         '''
 
+    def to_dict(self):
+        tpsf_dict = {
+            "revision_id": self.revision_id,
+            "event_description": self.event_description,
+            "prev_text_version": self.prev_text_version,
+            "preceeding_pause": self.preceeding_pause,
+            "result_text": self.result_text,
+            "edit": {
+                "edit_start_position": self.edit_start_position,
+                "transforming_sequence": {
+                    "label": '' if self.transforming_sequence is None else self.transforming_sequence.label,
+                    "text": '' if self.transforming_sequence is None else self.transforming_sequence.text,
+                    "tokens": '' if self.transforming_sequence is None else self.transforming_sequence.tagged_tokens
+                },
+                "irrelevant_ts_aggregated": self.irrelevant_ts_aggregated
+            },
+            "sentences": {
+                "previous_sentence_list": [s.to_dict() for s in self.previous_sentence_list],
+                "current_sentence_list": [s.to_dict() for s in self.sentence_list],
+                "delta_current_previous": [s.to_dict() for s in self.delta_current_previous],
+                "delta_previous_current": [s.to_dict() for s in self.delta_previous_current],
+                "new_sentences": [s.to_dict() for s in self.new_sentences],
+                "modified_sentences": [s.to_dict() for s in self.modified_sentences],
+                "deleted_sentences": [s.to_dict() for s in self.deleted_sentences],
+                "unchanged_sentences": [s.to_dict() for s in self.unchanged_sentences],
+            },
+            "relevance_evaluation": self.relevance_eval_results,
+            "relevance": self.relevance
+        }
+        return tpsf_dict
 
-class TpsfPcm:
+    def to_text(self):
+        preceeding_edits = self.irrelevant_ts_aggregated
+        preceeding_edits.append((self.transforming_sequence.text, self.transforming_sequence.label))
+        return f"""
+TPSF version {self.revision_id}:
+{self.result_text}
+Preceeding edits: {preceeding_edits}
+"""
+
+
+class TpsfPcm(Tpsf):
 
     def __init__(self, output_chars, pause, final):
         if final is True:
@@ -154,5 +200,18 @@ class TpsfPcm:
     def __str__(self):
         return f'''
 {self.result_text}
-        '''
+'''
+
+    def to_dict(self):
+        tpsf_dict = {
+            "preceeding_pause": self.preceeding_pause,
+            "result_text": self.result_text,
+        }
+        return tpsf_dict
+
+    def to_text(self):
+        return f"""
+Preceding pause: {self.preceeding_pause}
+{self.result_text}
+"""
 

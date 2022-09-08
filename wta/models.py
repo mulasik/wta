@@ -1,24 +1,26 @@
 from .utils.nlp import check_edit_distance
 import language_tool_python
 
+from .sentence_parsing.models import Languages
+
 
 class SpacyModel:
 
     def __init__(self, lang):
         import spacy
-        if lang == 'German':
+        if lang == Languages.DE:
             from spacy.lang.de import German
             self.nlp = German()
             print('Loading Spacy model for German...')
             self.nlp = spacy.load("de_core_news_md")
             self.tool = language_tool_python.LanguageTool('de-DE')
-        elif lang == 'English':
+        elif lang == Languages.EN:
             from spacy.lang.en import English
             self.nlp = English()
             print('Loading Spacy model for English...')
             self.nlp = spacy.load("en_core_web_md")
             self.tool = language_tool_python.LanguageTool('en-US')
-        elif lang == 'Greek':
+        elif lang == Languages.GR:
             from spacy.lang.el import Greek
             self.nlp = Greek()
             print('Loading Spacy model for Greek...')

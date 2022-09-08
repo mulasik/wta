@@ -1,10 +1,12 @@
-from .utils.nlp import (contains_end_punctuation_at_the_end,
-                        retrieve_end_punctuation,
-                        is_short_sequence,
-                        starts_with_lowercase_letter,
-                        retrieve_mismatch_range_for_sentence_pair)
-from wta.transforming_sequence import TransformingSequence
+from wta.utils.nlp import (contains_end_punctuation_at_the_end,
+                           retrieve_end_punctuation,
+                           is_short_sequence,
+                           starts_with_lowercase_letter,
+                           retrieve_mismatch_range_for_sentence_pair)
+from wta.text_history.transforming_sequence import TransformingSequence
 import json
+
+import settings
 
 
 class SentenceCandidate:
@@ -87,9 +89,6 @@ class Sentence:
     def set_revision_relevance(self, revision_relevance):
         self.revision_relevance = revision_relevance
 
-    def to_json(self):
-        return json.dumps(self, default=lambda o: o.__dict__)
-
     def retrieve_sen_transforming_sequence(self):
         prev_sen = '' if self.previous_sentence is None else self.previous_sentence.text
         edit, mismatch_range, relevant = retrieve_mismatch_range_for_sentence_pair(prev_sen, self.text)
@@ -122,4 +121,91 @@ class Sentence:
 
     def __str__(self):
         return f'{self.text}'
+
+    def to_json(self):
+        return json.dumps(self, default=lambda o: o.__dict__)
+
+    def to_dict(self, mode='normal'):
+        s_dict = {
+            'text': self.text,
+            'pos_in_text': self.pos_in_text,
+            'start_index': self.start_index,
+            'end_index': self.end_index,
+            'label': self.label,
+            'revision_id': self.revision_id,
+            'tagged_tokens': self.tagged_tokens,
+            'sentence_relevance': self.sentence_relevance,
+            'transforming_sequence': {
+                'text': None if self.sen_transforming_sequence is None else self.sen_transforming_sequence.text,
+                'label': None if self.sen_transforming_sequence is None else self.sen_transforming_sequence.label,
+                'tagged_tokens': None if self.sen_transforming_sequence is None else self.sen_transforming_sequence.tagged_tokens
+            },
+            "previous_ts_list": self.irrelevant_ts_aggregated,
+            'previous_sentence': {
+                'text': None if self.previous_sentence is None else self.previous_sentence.text
+            }
+        }
+        if mode in ['simplified', 'extended']:
+            tagged_tokens = None if not self.tagged_tokens else [tt['pos'] for tt in self.tagged_tokens]
+            s_dict.update({
+                'tagged_tokens': tagged_tokens,
+                'transforming_sequence': {
+                    'text': None if self.sen_transforming_sequence is None else self.sen_transforming_sequence.text,
+                    'label': None if self.sen_transforming_sequence is None else self.sen_transforming_sequence.label,
+                },
+                "previous_ts_list": [{'text': ts[0], 'type': ts[1]} for ts in self.irrelevant_ts_aggregated],
+            })
+        return s_dict
+
+    def to_text(self, mode='normal'):
+        s = self.to_dict(mode)
+        if mode == 'normal':
+            str_token_sequence, str_POS_sequence = self.get_aligned_word_pos_sequences(s["text"])
+            relevance = 'relevant' if s['sentence_relevance'] is True else 'irrelevant'
+            str = f'''
+{str_token_sequence}
+{str_POS_sequence}
+
+({s['label']} * position {s['pos_in_text']} * {relevance} * TPSF {s['revision_id']})
+'''
+        elif mode == 'extended':
+            str = f'''
+tpsf: {s['revision_id']}
+position {s['pos_in_text']}
+sentence version: {s['text']}
+pos tags: {s['tagged_tokens']}
+ts text: {s['transforming_sequence']['text']}
+ts type: {s['transforming_sequence']['label']}
+previous ts list: {s['previous_ts_list']}
+***'''
+        elif mode == 'basic':
+            str = f'''
+{s["text"]}
+{s["irrelevant_ts_aggregated"]}
+{s['transforming_sequence']['text'], s['transforming_sequence']['label']}
+'''
+        return str
+
+    def get_aligned_word_pos_sequences(self, result_text):
+        tup_processed = None, None
+        if result_text is not None:
+            lst_processed_tokens = settings.nlp_model.nlp(result_text)
+            str_token_sequence, str_pos_sequence = self.align_processed_tokens(lst_processed_tokens)
+            tup_processed = str_token_sequence, str_pos_sequence
+        return tup_processed
+
+    @staticmethod
+    def align_processed_tokens(lst_processed_tokens):
+        tup_processed = None, None
+        if lst_processed_tokens is not None:
+            str_token_sequence = ""
+            str_pos_sequence = ""
+            for token in lst_processed_tokens:
+                str_token = token.text_with_ws
+                str_pos = token.pos_
+                n_feature_max_length = len(str_token) if len(str_token) > len(str_pos) + 1 else len(str_pos) + 1
+                str_token_sequence += f"{str_token: <{n_feature_max_length}}"
+                str_pos_sequence += f"{str_pos: <{n_feature_max_length}}"
+            tup_processed = str_token_sequence, str_pos_sequence
+        return tup_processed
 

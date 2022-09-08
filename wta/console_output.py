@@ -1,5 +1,5 @@
 import json
-from wta.export import export_ecm_tpsf_to_dict, export_sentence_history_to_dict
+from wta.storage import BaseStorage
 
 
 def output_tpsfs_to_console(tpsfs):
@@ -10,12 +10,12 @@ def output_tpsfs_to_console(tpsfs):
     """
     tpsf_list = []
     for tpsf in tpsfs:
-        tpsf_list.append(export_ecm_tpsf_to_dict(tpsf))
+        tpsf_list.append(BaseStorage.tpsf_to_dict(tpsf))
     print(json.dumps(tpsf_list, indent=5))
 
 
 def output_sentence_history_to_console(sen_hist):
-    sentence_history = export_sentence_history_to_dict(sen_hist)
+    sentence_history = BaseStorage.sentence_histories_to_dict(sen_hist)
     print(json.dumps(sentence_history, indent=5))
 
 

@@ -1,4 +1,4 @@
-from .utils.nlp import check_overlap_with_seq_beginning, calculate_sequence_similarity
+from wta.utils.nlp import check_overlap_with_seq_beginning, calculate_sequence_similarity
 import unicodedata
 
 

@@ -3,13 +3,18 @@ import matplotlib.colors as pltc
 import os
 import numpy as np
 import json
+import operator
+
+import settings
+import paths
+from .storage import Names
 
 
 class Visualisation:
 
-    def __init__(self, output_directory, file_name, filtered=''):
-        self.output_directory = output_directory
-        self.file_name = file_name
+    def __init__(self, filtered=''):
+        self.output_directory = settings.config['output']
+        self.filename = settings.filename
         self.filtered = filtered
         self.sentence_colors = {
             'unchanged': 'mistyrose',
@@ -108,7 +113,7 @@ class Visualisation:
         ax2.legend(handout2, lablout2, loc="upper right")
 
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.02)
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_text_history', f'{self.file_name}_text_history_visualisation{self.filtered}.svg')
+        fig_file = os.path.join(paths.texthis_visual_dir, f'{self.filename}_{Names.TEXTHIS}_{Names.VISUAL}{self.filtered}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
@@ -159,7 +164,7 @@ class Visualisation:
 
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.01)
         plt.tight_layout()
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_history_visualisation{self.filtered}.svg')
+        fig_file = os.path.join(paths.senhis_visual_dir, f'{self.filename}_{Names.SENHIS}_{Names.VISUAL}{self.filtered}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
@@ -263,12 +268,12 @@ class Visualisation:
         ax2.legend(handout2, lablout2, loc="upper right")
 
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.02)
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_text_history', f'{self.file_name}_text_history_visualisation{self.filtered}.svg')
+        fig_file = os.path.join(paths.texthis_visual_dir, f'{self.filename}_{Names.TEXTHIS}_{Names.VISUAL}{self.filtered}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
     def visualise_dependency_relations_impact(self):
-        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency', f'{self.file_name}_dep_transformations.json')
+        json_file_path = os.path.join(paths.dependency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_dependency.json')
         with open(json_file_path, 'r') as f:
             dependency_transformations = json.load(f)
 
@@ -314,7 +319,7 @@ class Visualisation:
         plt.close()
 
     def visualise_consituents_impact(self):
-        json_file_path = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations.json')
+        json_file_path = os.path.join(paths.constituency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_constituency.json')
         with open(json_file_path, 'r') as f:
             constituents_comparison = json.load(f)
 
@@ -355,13 +360,13 @@ class Visualisation:
 
         fig.tight_layout()
 
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations_visualisation.svg')
+        fig_file = os.path.join(paths.constituency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
     def visualise_syntactic_impact(self):
         # constituency
-        json_file_path_c = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'constituency', f'{self.file_name}_const_transformations.json')
+        json_file_path_c = os.path.join(paths.constituency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.CONST}.json')
         with open(json_file_path_c, 'r') as f:
             c_comparison = json.load(f)
         c_sens_impact_values = {}
@@ -378,8 +383,7 @@ class Visualisation:
                 elif v is False:
                     c_no_edits_wo_impact += 1
         # dependency
-        json_file_path_d = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', 'dependency',
-                                      f'{self.file_name}_dep_transformations.json')
+        json_file_path_d = os.path.join(paths.dependency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.DEP}.json')
         with open(json_file_path_d, 'r') as f:
             d_comparison = json.load(f)
         d_sens_impact_values = {}
@@ -458,7 +462,7 @@ class Visualisation:
 
         fig.tight_layout()
 
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', f'{self.file_name}_syntactic_impact_visualisation.svg')
+        fig_file = os.path.join(paths.senhis_parses_dir, f'{self.filename}_syntactic_impact_{Names.VISUAL}.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
@@ -473,9 +477,157 @@ class Visualisation:
         ax2.pie(d_vals, colors=['indianred', 'teal'], autopct='%1.1f%%')
         ax2.set_title('DEPENDENCY')
 
-        fig_file = os.path.join(self.output_directory, f'{self.file_name}_sentence_histories', f'{self.file_name}_sentence_parses', f'{self.file_name}_syntactic_impact_visualisation_pie.svg')
+        fig_file = os.path.join(paths.senhis_parses_dir, f'{self.filename}_syntactic_impact_{Names.VISUAL}_pie.svg')
         plt.savefig(fig_file, bbox_inches='tight')
         plt.close()
 
+    def assign_color_to_number_versions(self, number_versions):
+        colors = []
+        for nv in number_versions:
+            if nv == 1:
+                colors.append('grey')
+            if 1 < nv <= 10:
+                colors.append('pink')
+            if 10 < nv <= 15:
+                colors.append('indianred')
+            if 15 < nv <= 20:
+                colors.append('firebrick')
+            if nv > 20:
+                colors.append('darkred')
+        return colors
 
+    def visualise_sentence_edit_operations(self, sentence_data):
+        sen_ids = []
+        i = 0
+        number_versions = []
+        for sens in sentence_data.values():
+            sen_ids.append(str(i))
+            number_versions.append(len(sens))
+            i += 1
+        plt.rcParams.update({'font.size': 12})
+        plt.figure(figsize=(15, 7))
+        plt.bar(sen_ids, number_versions, color=self.assign_color_to_number_versions(number_versions))
+        # plt.title('Number edit operations per sentence')
+        # plt.xlabel('Sentence ID')
+        # plt.ylabel('Number edit operations')
+        plt.yticks(range(1, 31))  # for SIG
+        # plt.yticks(range(1, max(number_versions)+1))
+        fig_file = os.path.join(paths.stats_dir, f'{settings.filename}_sentence_stats.svg')
+        plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
+
+    def visualise_transforming_sequences_labels(self, data_ecm):
+        appended_tokens = 0
+        inserted_tokens = 0
+        deleted_tokens = 0
+        for tpsf in data_ecm:
+            if tpsf.transforming_sequence.label == 'append':
+                appended_tokens += len(tpsf.transforming_sequence.tagged_tokens)
+            if tpsf.transforming_sequence.label == 'insertion':
+                inserted_tokens += len(tpsf.transforming_sequence.tagged_tokens)
+            if tpsf.transforming_sequence.label == 'deletion':
+                deleted_tokens += len(tpsf.transforming_sequence.tagged_tokens)
+        plt.rcParams.update({'font.size': 35})
+        plt.figure(figsize=(20, 15))
+        plt.pie([appended_tokens, inserted_tokens, deleted_tokens], labels=['appends', 'insertions', 'deletions'],
+                colors=['teal', 'lightcoral', 'cadetblue'])
+        # plt.title('Edit operations types')
+        fig_file = os.path.join(paths.stats_dir, f'{settings.filename}_ts_labels_stats.svg')
+        plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
+
+    def visualise_deletion_content(self, data_ecm):
+        ts_content = {}
+        for tpsf in data_ecm:
+            if tpsf.transforming_sequence.label in ['deletion']:
+                for t in tpsf.transforming_sequence.tagged_tokens:
+                    if t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] not in ts_content.keys():
+                        ts_content.update({t['pos']: 1})
+                    elif t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] in ts_content.keys():
+                        ts_content[t['pos']] += 1
+        sorted_ts_content = sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)
+        lbls = [t[0] for t in sorted_ts_content]
+        vals = [t[1] for t in sorted_ts_content]
+        plt.rcParams.update({'font.size': 35})
+        plt.figure(figsize=(20, 15))
+        plt.pie(vals, labels=lbls, colors=self.assign_color_to_pos(lbls))
+        # plt.title('Number edit operations per part of speech')
+        fig_file = os.path.join(paths.stats_dir, f'{settings.filename}_ts_content_stats_del.svg')
+        plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
+
+    def visualise_insertion_content(self, data_ecm):
+        ts_content = {}
+        for tpsf in data_ecm:
+            if tpsf.transforming_sequence.label in ['insertion']:
+                for t in tpsf.transforming_sequence.tagged_tokens:
+                    if t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] not in ts_content.keys():
+                        ts_content.update({t['pos']: 1})
+                    elif t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] in ts_content.keys():
+                        ts_content[t['pos']] += 1
+        sorted_ts_content = sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)
+        lbls = [t[0] for t in sorted_ts_content]
+        vals = [t[1] for t in sorted_ts_content]
+        plt.rcParams.update({'font.size': 35})
+        plt.figure(figsize=(20, 15))
+        plt.pie(vals, labels=lbls, colors=self.assign_color_to_pos(lbls),
+                normalize=False)  # TODO check the normalization impact
+        # plt.title('Number edit operations per part of speech')
+        fig_file = os.path.join(paths.stats_dir, f'{settings.filename}_ts_content_stats_ins.svg')
+        plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
+
+    def assign_color_to_pos(self, pos_list):
+        color_mapping = {
+            'NOUN': 'lightcoral',
+            'DET': 'darkred',
+            'ADP': 'orange',
+            'ADV': 'darkgreen',
+            'PRON': 'darkcyan',
+            'VERB': 'skyblue',
+            'PART': 'slateblue',
+            'AUX': 'indigo',
+            'ADJ': 'purple',
+            'PROPN': 'mediumvioletred',
+            'CCONJ': 'lightblue',
+            'SCONJ': 'pink',
+            'NUM': 'gold',
+            'OTHER': 'silver'
+        }
+        colors = []
+        for pos in pos_list:
+            if pos in color_mapping:
+                colors.append(color_mapping[pos])
+            else:
+                colors.append(color_mapping['OTHER'])
+        return colors
+
+    def visualise_transforming_sequences_tokens(self, data_ecm):
+        tpsf_ids = []
+        ts_tokens = []
+        for tpsf in data_ecm:
+            if tpsf.transforming_sequence.tagged_tokens != '':
+                tpsf_ids.append(tpsf.revision_id)
+                no_edited_tokens = len(tpsf.transforming_sequence.tagged_tokens)
+                if tpsf.transforming_sequence.label == 'deletion':
+                    no_edited_tokens = no_edited_tokens * -1
+                ts_tokens.append(no_edited_tokens)
+        colors = ['cadetblue' if e >= 0 else 'lightcoral' for e in ts_tokens]
+        plt.rcParams.update({'font.size': 12})
+        plt.figure(figsize=(20, 15))
+        plt.ylim(-15, 60)  # for SIG
+        plt.bar(tpsf_ids, ts_tokens, color=colors)
+        # plt.title('Number added versus removed tokens per text version')
+        plt.xlabel('Text version ID')
+        plt.ylabel('Number added and removed tokens')
+        fig_file = os.path.join(paths.stats_dir, f'{settings.filename}_ts_tokens_stats.svg')
+        plt.savefig(fig_file, bbox_inches='tight')
+        plt.close()
+
+    def visualise_statistics(self, texthis, senhis):
+        self.visualise_sentence_edit_operations(senhis)
+        self.visualise_transforming_sequences_tokens(texthis)
+        self.visualise_deletion_content(texthis)
+        self.visualise_insertion_content(texthis)
+        self.visualise_transforming_sequences_labels(texthis)
 

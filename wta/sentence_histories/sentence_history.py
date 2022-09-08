@@ -1,13 +1,17 @@
 import uuid
-from .sentence import Sentence
-from .utils.nlp import retrieve_match_range, retrieve_affected_tokens
+
 from tqdm import tqdm
+
+import settings
+
+from .sentence import Sentence
+
 
 class SentenceHistoryGenerator:
 
-    def __init__(self, tpsfs, nlp_model):
+    def __init__(self, tpsfs):
         self.tpsfs = tpsfs
-        self.nlp_model = nlp_model
+        self.nlp_model = settings.nlp_model
         self.sentence_history = {}
         self.generate_sentence_history()
         self.filtered_sentence_history = {}
