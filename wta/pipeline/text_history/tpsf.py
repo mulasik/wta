@@ -1,6 +1,6 @@
-from wta.text_history.transforming_sequence import TransformingSequence
-from wta.sentence_histories.sentence_tokenizer import SentenceTokenizer
-from wta.sentence_histories.sentence_classifier import SentenceClassifier
+from wta.pipeline.text_history.transforming_sequence import TransformingSequence
+from wta.pipeline.sentence_histories.sentence_tokenizer import SentenceTokenizer
+from wta.pipeline.sentence_histories.sentence_classifier import SentenceClassifier
 from wta.relevance_evaluator import RelevanceEvaluator
 
 

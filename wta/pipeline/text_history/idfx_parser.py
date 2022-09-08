@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-from wta.text_history.tpsf import TpsfEcm, TpsfPcm
+from wta.pipeline.text_history.tpsf import TpsfEcm, TpsfPcm
 
 import settings
 
@@ -206,7 +206,7 @@ class IdfxParser:
 
                         # if a char insertion is directly followed by a replacement,
                         # the same char occurs in two subsequent events: keyboard and replacement
-                        # one of the double chars needs to be removed from output chars and from inserted sequence
+                        # one of the double chars needs to be removed from output_handler chars and from inserted sequence
                         try:
                             next_event = events[i + 1]['type']
                         except IndexError:
@@ -238,7 +238,7 @@ class IdfxParser:
                         try:
                             removed_sequence += output_chars[pos - 1]
                         except IndexError:
-                            print('Apparently the number of output characters detected so far does not correspond to the position of the cursor.')
+                            print('Apparently the number of output_handler characters detected so far does not correspond to the position of the cursor.')
                         del output_chars[pos - 1]
                         backspace_count += 1
 

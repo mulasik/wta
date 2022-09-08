@@ -3,7 +3,7 @@ from wta.utils.nlp import (contains_end_punctuation_at_the_end,
                            is_short_sequence,
                            starts_with_lowercase_letter,
                            retrieve_mismatch_range_for_sentence_pair)
-from wta.text_history.transforming_sequence import TransformingSequence
+from wta.pipeline.text_history.transforming_sequence import TransformingSequence
 import json
 
 import settings

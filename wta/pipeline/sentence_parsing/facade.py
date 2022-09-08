@@ -1,4 +1,4 @@
-from wta.sentence_parsing.parsers import Supar
+from wta.pipeline.sentence_parsing.parsers import Supar
 from .models import Parsers
 
 
