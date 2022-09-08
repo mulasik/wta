@@ -10,4 +10,9 @@ wta.tar
 /myconfig.py
 /xml_content_check.py
 /tests.py
-/wta/scripts/
+/wta/scripts
+.DS_Store
+.idea/
+docs/.DS_Store
+docs/charts/.DS_Store
+wta/.DS_Store
