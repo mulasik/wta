@@ -1,0 +1,15 @@
+texthis_dir = None
+texthis_json_dir = None
+texthis_txt_dir = None
+texthis_visual_dir = None
+stats_dir = None
+senhis_dir = None
+senhis_json_dir = None
+senhis_txt_dir = None
+senhis_visual_dir = None
+senhis_parses_dir = None
+dependency_senhis_parses_dir = None
+constituency_senhis_parses_dir = None
+transhis_dir = None
+dependency_transhis_dir = None
+constituency_transhis_dir = None
