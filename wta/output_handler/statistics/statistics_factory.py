@@ -1,8 +1,8 @@
-from wta.output_handler.statistics import (BasicStatistics,
-                                           EventStatistics,
-                                           PauseStatistics,
-                                           TSStatistics,
-                                           SentenceStatistics)
+from .statistics import (BasicStatistics,
+                        EventStatistics,
+                        PauseStatistics,
+                        TSStatistics,
+                        SentenceStatistics)
 
 
 class StatisticsFactory:
