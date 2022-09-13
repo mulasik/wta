@@ -18,7 +18,7 @@ VIDEO = {
         for f in os.listdir(VIDEO_DATA_DIR)
         if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("N")
     ],
-    "output": os.path.join("output_data", "video", "conf0"),
+    "output_dir": os.path.join("output_data", "video", "conf0"),
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -34,7 +34,7 @@ VIDEO_CONF1 = {
         for f in os.listdir(VIDEO_DATA_DIR)
         if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
     ],
-    "output": os.path.join("output_data", "video"),
+    "output_dir": os.path.join("output_data", "video"),
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -50,7 +50,7 @@ VIDEO_CONF2 = {
         for f in os.listdir(VIDEO_DATA_DIR)
         if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
     ],
-    "output": os.path.join("output_data", "video"),
+    "output_dir": os.path.join("output_data", "video"),
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -66,7 +66,7 @@ VIDEO_CONF3 = {
         for f in os.listdir(VIDEO_DATA_DIR)
         if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("R")
     ],
-    "output": os.path.join("output_data", "video"),
+    "output_dir": os.path.join("output_data", "video"),
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
