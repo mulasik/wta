@@ -6,17 +6,15 @@ import traceback
 from importlib import import_module
 
 import settings
-from wta.text_history.idfx_parser import IdfxParser
+from wta.pipeline.text_history.idfx_parser import IdfxParser
 from .models import SpacyModel
-from wta.sentence_histories.sentence_history import SentenceHistoryGenerator
-from .statistics import StatisticsFactory
-from .sentence_parsing.parsers import Parsers
-from .sentence_parsing.facade import ParsingFacade
-from wta.transformation_histories.transformation_factory import (DependencyTransformationFactory,
-                                                                 ConsituencyTransformationFactory)
-from .sentence_parsing.models import Grammars
-from .visualisation import Visualisation
-from .storage import StorageSettings, Json, Txt
+from wta.pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
+from wta.pipeline.statistics.statistics_factory import StatisticsFactory
+from wta.pipeline.sentence_parsing.parsers import Parsers
+from wta.pipeline.sentence_parsing.facade import ParsingFacade
+from wta.pipeline.sentence_parsing.models import Grammars
+from wta.output_handler.plots.senhis_plot import SenhisPlot
+from wta.output_handler.storage.output_factory import TexthisOutputFactory, SenhisOutputFactory, StatsOutputFactory, ParseOutputFactory
 
 
 def load_path(dotted_path):
@@ -51,72 +49,36 @@ if __name__ == "__main__":
         try:
             filename = os.path.split(idfx)[-1].replace('.idfx', '')
             settings.filename = filename
-            StorageSettings.set_paths()
 
             print(f'\nProcessing the input file {idfx}...')
 
-            # generate text history
-            print('\n== KEYSTROKE LOGS PROCESSING ==')
+            # GENERATE TEXTHIS
+            print('\n== KEYSTROKE LOGS PROCESSING & TEXT HISTORY GENERATION ==')
             idfx_parser = IdfxParser(idfx)
             idfx_parser.run()
-
-            # export text history in PCM and ECM
-            json_storage = Json()
-            txt_storage = Txt()
-            json_storage.process_texthis(idfx_parser.all_tpsfs_ecm, 'ecm')
-            txt_storage.process_texthis(idfx_parser.all_tpsfs_ecm, 'ecm')
-            json_storage.process_texthis(idfx_parser.all_tpsfs_pcm, 'pcm')
-
-            # generate sentence history
-            sentence_history_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
-            sentence_history = sentence_history_generator.sentence_history
-            filtered_sentence_history = sentence_history_generator.filtered_sentence_history
-
-            # export sentence history
-            json_storage.process_senhis(sentence_history)
-            json_storage.process_senhis(filtered_sentence_history, filtered=True)
-            json_storage.process_senhis(sentence_history, view_mode='simplified')
-            json_storage.process_senhis(filtered_sentence_history, view_mode='simplified', filtered=True)
-
-            txt_storage.process_senhis(sentence_history)
-            txt_storage.process_senhis(filtered_sentence_history, filtered=True)
-            txt_storage.process_senhis(sentence_history, view_mode='extended')
-            txt_storage.process_senhis(filtered_sentence_history, view_mode='extended', filtered=True)
-
-            # visualise text and sentence history
-            tpsfs_to_visualise = [tpsf for tpsf in idfx_parser.all_tpsfs_ecm if (
-                        len(tpsf.new_sentences) > 0 or len(tpsf.modified_sentences) > 0 or len(
-                    tpsf.deleted_sentences) > 0)]
-            visualisation = Visualisation()
-            visualisation.visualise_text_history(tpsfs_to_visualise)
-            visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
-
-            # generate filtered outputs
             idfx_parser.filter_tpsfs_ecm()
-            if idfx_parser.filtered_tpsfs_ecm:
-                json_storage.process_texthis(idfx_parser.filtered_tpsfs_ecm, 'ecm', filtered=True)
-                txt_storage.process_texthis(idfx_parser.filtered_tpsfs_ecm, 'ecm', filtered=True)
-                visualisation_filtered = Visualisation('_filtered')
-                visualisation_filtered.visualise_filtered_text_history(idfx_parser.filtered_tpsfs_ecm)
-                visualisation_filtered.visualise_sentence_history(idfx_parser.filtered_tpsfs_ecm, sentence_history)
-            else:
-                print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
+            texthis = idfx_parser.all_tpsfs_ecm
+            texthis_pcm = idfx_parser.all_tpsfs_pcm
+            texthis_fltr = idfx_parser.filtered_tpsfs_ecm
+            TexthisOutputFactory.run(texthis, texthis_pcm, texthis_fltr)
 
-            # generate basic statistics from <...>_output_ecm.json and visualise them
-            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatisticsFactory.run(idfx, idfx_parser.all_tpsfs_ecm, idfx_parser.filtered_tpsfs_ecm, idfx_parser.all_tpsfs_pcm, sentence_history)
-            txt_storage.process_stats(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx)
-            visualisation.visualise_statistics(idfx_parser.all_tpsfs_ecm, sentence_history)
+            # GENERATE SENHIS
+            print('\n== SENTENCE HISTORIES GENERATION ==')
+            senhis_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
+            senhis = senhis_generator.sentence_history
+            senhis_fltr = senhis_generator.filtered_sentence_history
+            SenhisOutputFactory.run(senhis, senhis_fltr)
 
-            # perform sentence parsing and identify syntactic impact
-            print('\n== SENTENCE SYNTACTIC PARSING ==')
-            dep_parser = ParsingFacade(sentence_history, Parsers.SUPAR, config['language'], Grammars.DEP)
+            # PARSE SENHIS
+            print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
+            dep_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.DEP)
             dep_parser.run()
-            txt_storage.process_dependency_parses(dep_parser.senhis_parses)
-            const_parser = ParsingFacade(sentence_history, Parsers.SUPAR, config['language'], Grammars.CONST)
+            const_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.CONST)
             const_parser.run()
-            txt_storage.process_constituency_parses(const_parser.senhis_parses)
+            ParseOutputFactory.run(dep_parser.senhis_parses, const_parser.senhis_parses)
 
-            # generate transformation histories
+            # GENERATE TRANSHIS
+            print('\n== TRANSFORMATION HISTORIES GENERATION ==')
             # dep_trans_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
             # json_storage.process_transhis(dep_trans_classifier.transformation_history, 'dependency')
             # const_trans_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
@@ -124,6 +86,27 @@ if __name__ == "__main__":
             # visualisation.visualise_dependency_relations_impact()
             # visualisation.visualise_consituents_impact()
             # visualisation.visualise_syntactic_impact()
+
+            # GENERATE STATS
+            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatisticsFactory.run(idfx, texthis, texthis_fltr, texthis_pcm, senhis)
+            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx)
+
+
+            #  PLOT
+            tpsfs_to_visualise = [tpsf for tpsf in texthis if (
+                    len(tpsf.new_sentences) > 0
+                    or len(tpsf.modified_sentences) > 0
+                    or len(tpsf.deleted_sentences) > 0)]
+            visualisation = SenhisPlot(tpsfs_to_visualise, senhis)
+            plt = visualisation.run()
+            # visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
+            # if idfx_parser.filtered_tpsfs_ecm:
+            # visualisation_filtered = VisualBase('_filtered')
+            # visualisation_filtered.visualise_filtered_text_history(idfx_parser.filtered_tpsfs_ecm)
+            # visualisation_filtered.visualise_sentence_history(idfx_parser.filtered_tpsfs_ecm, sentence_history)
+            # else:
+            # print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
+            # visualisation.visualise_statistics(idfx_parser.all_tpsfs_ecm, sentence_history)
 
         except:
             e = sys.exc_info()[0]

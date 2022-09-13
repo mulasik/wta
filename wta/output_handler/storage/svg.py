@@ -1,16 +1,18 @@
-from wta.output_handler.storage.base import BaseStorage, TranshisStorage, StatsStorage
+import os
+
+import paths
+from wta.output_handler.storage.names import Names
 
 
-class Svg(BaseStorage, TranshisStorage, StatsStorage):
+class Svg:
 
-    def process_texthis(self, tpsfs: list, mode: str, filtered=False):
-        ...
+    def __init__(self, plot, filename):
+        self.plot = plot
+        self.filename = filename
 
-    def process_senhis(self, sen_hist: dict, view_mode='normal', filtered=False):
-        ...
+    def process_senhis(self, filtered=False):
+        filtered = '' if not filtered else '_filtered'
+        fig_file = os.path.join(paths.senhis_visual_dir, f'{self.filename}_{Names.SENHIS}_{Names.VISUAL}{filtered}.svg')
+        self.plot.savefig(fig_file, bbox_inches='tight')
+        self.plot.close()
 
-    def process_transhis(self, transhis: dict, grammar: str):
-        ...
-
-    def process_stats(self):
-        ...

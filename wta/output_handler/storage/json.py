@@ -3,36 +3,60 @@ import os
 
 import paths
 import settings
-from wta.output_handler.storage.base import BaseStorage, TranshisStorage, Names
+from wta.output_handler.storage.names import Names
 
 
-class Json(BaseStorage, TranshisStorage):
+class Json:
 
-    def process_texthis(self, tpsfs: list, mode: str, filtered=False):
-        tpsf_list = [tpsf.to_dict() for tpsf in tpsfs]
+    def preprocess_data(self):
+        pass
+
+    def to_json(self):
+        with open(self.filepath, 'w') as f:
+            json.dump(self.data, f)
+
+
+class TexthisJson(Json):
+
+    def __init__(self, data, mode='ecm', filtered=False):
+        self.data = self.preprocess_data(data)
+        self.mode = mode
         filter_label = '' if not filtered else '_filtered'
-        json_file = f'{settings.filename}_{Names.TEXTHIS}_{mode}{filter_label}.json'
-        json_file_path = os.path.join(paths.texthis_json_dir, json_file)
-        with open(json_file_path, 'w') as f:
-            json.dump(tpsf_list, f)
+        json_file = f'{settings.filename}_{Names.TEXTHIS}_{self.mode}{filter_label}.json'
+        self.filepath = os.path.join(paths.texthis_json_dir, json_file)
 
-    def process_senhis(self, senhis: dict, view_mode='normal', filtered=False):
-        view_mode_name = '' if view_mode == 'normal' else f'_{view_mode}'
+    def preprocess_data(self, texthis):
+        return [tpsf.to_dict() for tpsf in texthis]
+
+
+class SenhisJson(Json):
+
+    def __init__(self, data, view_mode='normal', filtered=False):
+        self.view_mode = '' if view_mode == 'normal' else f'_{view_mode}'
+        self.data = self.preprocess_data(data)
         filter_label = '' if not filtered else '_filtered'
-        json_file = f'{settings.filename}_{Names.SENHIS}{view_mode_name}{filter_label}.json'
-        json_file_path = os.path.join(paths.senhis_json_dir, json_file)
+        json_file = f'{settings.filename}_{Names.SENHIS}{self.view_mode}{filter_label}.json'
+        self.filepath = os.path.join(paths.senhis_json_dir, json_file)
+
+    def preprocess_data(self, senhis):
         _senhis = {}
         for id, sens in senhis.items():
-            _senhis[id] = [s.to_dict(view_mode) for s in sens]
-        with open(json_file_path, 'w') as f:
-            json.dump(_senhis, f)
+            _senhis[id] = [s.to_dict(self.view_mode) for s in sens]
+        return _senhis
 
-    def process_transhis(self, transhis: dict, grammar: str):
+
+class TranshisJson(Json):
+
+    def __init__(self, data, grammar):
+        self.data = self.preprocess_data(data)
+        self.grammar = grammar
         json_file = f'{settings.filename}_{Names.TRANSHIS}_{grammar}.json'
         output_dir = paths.dependency_transhis_dir if grammar == 'dependency' else paths.constituency_transhis_dir
-        json_file_path = os.path.join(output_dir, json_file)
+        self.filepath = os.path.join(output_dir, json_file)
+
+    def preprocess_data(self, transhis):
         _transhis = {}
         for sen_id, th in transhis.items():
             _transhis[sen_id] = [t.__dict__ for t in th]
-        with open(json_file_path, 'w') as f:
-            json.dump(_transhis, f)
+        return _transhis
+
