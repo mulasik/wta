@@ -6,14 +6,20 @@ class TransformationClass:
     WORD_MODIFICATION = 'word-level modification'
 
 
-class DependencyTransformation:
+class Transformation:
 
-    def __init__(self, current_version_id, current_dep_rels, prev_version_id, prev_dep_rels, dep_impacted, word_modified):
-        self.current_version_id = current_version_id
-        self.current_dep_rels = current_dep_rels
-        self.prev_version_id = prev_version_id
-        self.prev_dep_rels = prev_dep_rels
-        self.dep_impacted = dep_impacted
+    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, syntactic_impact):
+        self.cur_senver_id = cur_senver_id
+        self.cur_parsed_sen = cur_parsed_sen
+        self.prev_senver_id = prev_senver_id
+        self.prev_parsed_sen = prev_parsed_sen
+        self.syntactic_impact = syntactic_impact
+
+
+class DependencyTransformation(Transformation):
+
+    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, dep_impacted, word_modified):
+        super().__init__(cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, dep_impacted)
         self.word_modified = word_modified
         self.transformation_class = self.classify()
 
@@ -22,17 +28,17 @@ class DependencyTransformation:
         Classifies the transformation performed between two sentence versions.
         :return: a string containing transformation class
         """
-        if self.dep_impacted:
-            unchanged = [r for r in self.current_dep_rels if r in self.prev_dep_rels]
-            delta_prev_cur = [r for r in self.prev_dep_rels if r not in unchanged]
-            delta_cur_prev = [r for r in self.current_dep_rels if r not in unchanged]
+        if self.syntactic_impact:
+            unchanged = [r for r in self.cur_parsed_sen if r in self.prev_parsed_sen]
+            delta_prev_cur = [r for r in self.prev_parsed_sen if r not in unchanged]
+            delta_cur_prev = [r for r in self.cur_parsed_sen if r not in unchanged]
             if len(delta_prev_cur) > 0 and len(delta_cur_prev) == 0:
                 return TransformationClass.REDUCTION
             elif len(delta_prev_cur) == 0 and len(delta_cur_prev) > 0:
                 return TransformationClass.EXTENSION
             elif len(delta_prev_cur) > 0 and len(delta_cur_prev) > 0:
                 return TransformationClass.MODIFICATION
-        if not self.dep_impacted and self.word_modified:
+        if not self.syntactic_impact and self.word_modified:
             return TransformationClass.WORD_MODIFICATION
 
     def find_best_match(self, word, word_list):
@@ -76,15 +82,10 @@ class DependencyTransformation:
         return equal_attrs
 
 
-class ConstituencyTransformation:
+class ConstituencyTransformation(Transformation):
 
-    def __init__(self, current_version_id, current_contituents, prev_version_id, prev_constituents, const_impacted):
-        self.current_version_id = current_version_id
-        self.current_contituents = current_contituents
-        self.prev_version_id = prev_version_id
-        self.prev_constituents = prev_constituents
-        self.const_impacted = const_impacted
-        self.transformation_class = None
+    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, const_impacted):
+        super().__init__(cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, const_impacted)
 
 
 

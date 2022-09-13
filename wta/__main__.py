@@ -14,7 +14,8 @@ from wta.pipeline.sentence_parsing.parsers import Parsers
 from wta.pipeline.sentence_parsing.facade import ParsingFacade
 from wta.pipeline.sentence_parsing.models import Grammars
 from wta.output_handler.plots.senhis_plot import SenhisPlot
-from wta.output_handler.storage.output_factory import TexthisOutputFactory, SenhisOutputFactory, StatsOutputFactory, ParseOutputFactory
+from wta.output_handler.storage.output_factory import TexthisOutputFactory, SenhisOutputFactory, StatsOutputFactory, ParseOutputFactory, TranshisOutputFactory
+from wta.pipeline.transformation_histories.transformation_factory import DependencyTransformationFactory, ConsituencyTransformationFactory
 
 
 def load_path(dotted_path):
@@ -79,10 +80,9 @@ if __name__ == "__main__":
 
             # GENERATE TRANSHIS
             print('\n== TRANSFORMATION HISTORIES GENERATION ==')
-            # dep_trans_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
-            # json_storage.process_transhis(dep_trans_classifier.transformation_history, 'dependency')
-            # const_trans_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
-            # json_storage.process_transhis(const_trans_classifier.transformation_history, Grammars.CONST)
+            dep_transhis_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
+            const_transhis_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
+            TranshisOutputFactory.run(dep_transhis_classifier.transhis, const_transhis_classifier.transhis)
             # visualisation.visualise_dependency_relations_impact()
             # visualisation.visualise_consituents_impact()
             # visualisation.visualise_syntactic_impact()
