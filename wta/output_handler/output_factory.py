@@ -2,7 +2,7 @@ import os
 
 import paths
 import settings
-from wta.output_handler.storage.names import Names
+from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
 from wta.output_handler.storage.json import TexthisJson, SenhisJson, TranshisJson
 from wta.output_handler.storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt

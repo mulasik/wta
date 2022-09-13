@@ -5,7 +5,7 @@ import json
 
 import settings
 import paths
-from wta.output_handler.storage.names import Names
+from wta.output_handler.names import Names
 
 
 class TranshisPlot:

@@ -2,7 +2,7 @@ import os
 
 import paths
 import settings
-from wta.output_handler.storage.names import Names
+from wta.output_handler.names import Names
 
 
 class Svg:
