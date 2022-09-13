@@ -1,5 +1,4 @@
 import argparse
-import errno
 import os
 import sys
 import traceback
@@ -9,13 +8,14 @@ import settings
 from wta.pipeline.text_history.idfx_parser import IdfxParser
 from .models import SpacyModel
 from wta.pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
-from wta.pipeline.statistics.statistics_factory import StatisticsFactory
+from wta.pipeline.statistics.statistics_factory import StatsFactory
 from wta.pipeline.sentence_parsing.parsers import Parsers
 from wta.pipeline.sentence_parsing.facade import ParsingFacade
 from wta.pipeline.sentence_parsing.models import Grammars
-from wta.output_handler.plots.senhis_plot import SenhisPlot
-from wta.output_handler.storage.output_factory import TexthisOutputFactory, SenhisOutputFactory, StatsOutputFactory, ParseOutputFactory, TranshisOutputFactory
-from wta.pipeline.transformation_histories.transformation_factory import DependencyTransformationFactory, ConsituencyTransformationFactory
+from wta.output_handler.output_factory import (TexthisOutputFactory, SenhisOutputFactory,
+                                               StatsOutputFactory, ParseOutputFactory, TranshisOutputFactory)
+from wta.pipeline.transformation_histories.transformation_factory import (DependencyTransformationFactory,
+                                                                          ConsituencyTransformationFactory)
 
 
 def load_path(dotted_path):
@@ -23,16 +23,6 @@ def load_path(dotted_path):
     module = import_module('.'.join(parts[:-1]))
     attr = getattr(module, parts[-1])
     return attr
-
-
-def ensure_path(path):
-    try:
-        os.makedirs(path)
-    except OSError as err:
-        if err.errno == errno.EEXIST:
-            pass
-        else:
-            raise
 
 
 if __name__ == "__main__":
@@ -68,7 +58,7 @@ if __name__ == "__main__":
             senhis_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
             senhis = senhis_generator.sentence_history
             senhis_fltr = senhis_generator.filtered_sentence_history
-            SenhisOutputFactory.run(senhis, senhis_fltr)
+            SenhisOutputFactory.run(texthis, texthis_fltr, senhis, senhis_fltr)
 
             # PARSE SENHIS
             print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
@@ -83,32 +73,15 @@ if __name__ == "__main__":
             dep_transhis_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
             const_transhis_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
             TranshisOutputFactory.run(dep_transhis_classifier.transhis, const_transhis_classifier.transhis)
-            # visualisation.visualise_dependency_relations_impact()
-            # visualisation.visualise_consituents_impact()
-            # visualisation.visualise_syntactic_impact()
 
             # GENERATE STATS
-            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatisticsFactory.run(idfx, texthis, texthis_fltr, texthis_pcm, senhis)
-            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx)
-
-
-            #  PLOT
-            tpsfs_to_visualise = [tpsf for tpsf in texthis if (
-                    len(tpsf.new_sentences) > 0
-                    or len(tpsf.modified_sentences) > 0
-                    or len(tpsf.deleted_sentences) > 0)]
-            visualisation = SenhisPlot(tpsfs_to_visualise, senhis)
-            plt = visualisation.run()
-            # visualisation.visualise_sentence_history(tpsfs_to_visualise, sentence_history)
-            # if idfx_parser.filtered_tpsfs_ecm:
-            # visualisation_filtered = VisualBase('_filtered')
-            # visualisation_filtered.visualise_filtered_text_history(idfx_parser.filtered_tpsfs_ecm)
-            # visualisation_filtered.visualise_sentence_history(idfx_parser.filtered_tpsfs_ecm, sentence_history)
-            # else:
-            # print(f"No relevant tpsfs found for: {idfx}", file=sys.stderr)
-            # visualisation.visualise_statistics(idfx_parser.all_tpsfs_ecm, sentence_history)
+            print('\n== STATISTICS GENERATION ==')
+            print('Generating statistics...')
+            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory.run(idfx, texthis, texthis_fltr, texthis_pcm, senhis)
+            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis)
 
         except:
             e = sys.exc_info()[0]
             traceback.print_exc()
             print(f"Failed for {idfx}", file=sys.stderr)
+

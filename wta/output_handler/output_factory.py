@@ -4,8 +4,13 @@ import paths
 import settings
 from wta.output_handler.storage.names import Names
 from wta.utils.other import ensure_path
-from .json import TexthisJson, SenhisJson, TranshisJson
-from .txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
+from wta.output_handler.storage.json import TexthisJson, SenhisJson, TranshisJson
+from wta.output_handler.storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
+from wta.output_handler.storage.svg import TexthisSvg, SenhisSvg
+from wta.output_handler.plots.texthis_plot import TexthisPlot, FilteredTexthisPlot
+from wta.output_handler.plots.senhis_plot import SenhisPlot
+from wta.output_handler.plots.transhis_plot import TranshisPlot
+from wta.output_handler.plots.stats_plot import StatsPlot
 
 
 class StorageSettings:
@@ -49,12 +54,16 @@ class TexthisOutputFactory(OutputFactory):
         TexthisJson(texthis_fltr, filtered=True).to_json()
         TexthisTxt(texthis).to_txt()
         TexthisTxt(texthis_fltr, filtered=True).to_txt()
+        texthis_plot = TexthisPlot(texthis).plot_data()
+        fltr_texthis_plot = FilteredTexthisPlot(texthis_fltr).plot_data()
+        TexthisSvg(texthis_plot).to_svg()
+        TexthisSvg(fltr_texthis_plot, filtered=True).to_svg()
 
 
 class SenhisOutputFactory(OutputFactory):
 
     @classmethod
-    def run(cls, senhis, senhis_fltr):
+    def run(cls, texthis, texthis_fltr, senhis, senhis_fltr):
         StorageSettings.set_paths()
         SenhisJson(senhis).to_json()
         SenhisJson(senhis, 'simplified').to_json()
@@ -64,14 +73,10 @@ class SenhisOutputFactory(OutputFactory):
         SenhisTxt(senhis_fltr, filtered=True).to_txt()
         SenhisTxt(senhis, view_mode='extended').to_txt()
         SenhisTxt(senhis, view_mode='extended', filtered=True).to_txt()
-
-
-class StatsOutputFactory(OutputFactory):
-
-    @classmethod
-    def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx):
-        StorageSettings.set_paths()
-        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_txt()
+        senhis_plot = SenhisPlot(texthis, senhis).plot_data()
+        fltr_senhis_plot = SenhisPlot(texthis_fltr, senhis_fltr).plot_data()
+        SenhisSvg(senhis_plot).to_svg()
+        SenhisSvg(fltr_senhis_plot, filtered=True).to_svg()
 
 
 class ParseOutputFactory(OutputFactory):
@@ -88,4 +93,14 @@ class TranshisOutputFactory(OutputFactory):
     def run(cls, dep_transhis, const_transhis):
         TranshisJson(dep_transhis, 'dependency').to_json()
         TranshisJson(const_transhis, 'constituency').to_json()
+        TranshisPlot().plot_data()
+
+
+class StatsOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis):
+        StorageSettings.set_paths()
+        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_txt()
+        StatsPlot().plot_data(texthis, senhis)
 
