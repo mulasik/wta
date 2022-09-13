@@ -5,7 +5,7 @@ from .statistics import (BasicStatistics,
                         SentenceStatistics)
 
 
-class StatisticsFactory:
+class StatsFactory:
 
     @classmethod
     def run(cls, idfx: str, texthis: dict, texthis_filtered: dict, texthis_pcm: dict, senhis: dict):
