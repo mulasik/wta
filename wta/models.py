@@ -1,7 +1,7 @@
 from .utils.nlp import check_edit_distance
 import language_tool_python
 
-from .sentence_parsing.models import Languages
+from wta.pipeline.sentence_parsing.models import Languages
 
 
 class SpacyModel:

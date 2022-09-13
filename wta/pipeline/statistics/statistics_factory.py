@@ -8,7 +8,7 @@ from .statistics import (BasicStatistics,
 class StatisticsFactory:
 
     @classmethod
-    def run(self, idfx: str, texthis: dict, texthis_filtered: dict, texthis_pcm: dict, senhis: dict):
+    def run(cls, idfx: str, texthis: dict, texthis_filtered: dict, texthis_pcm: dict, senhis: dict):
         b_stats = BasicStatistics(texthis, texthis_filtered, texthis_pcm)
         e_stats = EventStatistics(idfx)
         p_stats = PauseStatistics(texthis)
