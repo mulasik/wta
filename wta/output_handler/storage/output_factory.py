@@ -4,7 +4,7 @@ import paths
 import settings
 from wta.output_handler.storage.names import Names
 from wta.utils.other import ensure_path
-from .json import TexthisJson, SenhisJson
+from .json import TexthisJson, SenhisJson, TranshisJson
 from .txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
 
 
@@ -36,7 +36,7 @@ class OutputFactory:
 
     @classmethod
     def run(cls):
-        pass
+        raise NotImplementedError
 
 
 class TexthisOutputFactory(OutputFactory):
@@ -80,4 +80,12 @@ class ParseOutputFactory(OutputFactory):
     def run(cls, dep_senhis_parses, const_senhis_parses):
         DepParsesTxt(dep_senhis_parses).to_txt()
         ConstParsesTxt(const_senhis_parses).to_txt()
+
+
+class TranshisOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, dep_transhis, const_transhis):
+        TranshisJson(dep_transhis, 'dependency').to_json()
+        TranshisJson(const_transhis, 'constituency').to_json()
 
