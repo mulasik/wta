@@ -13,8 +13,6 @@ class TexthisPlot(BasePlot):
                 or len(tpsf.modified_sentences) > 0
                 or len(tpsf.deleted_sentences) > 0)]
         self.sen_lengths = self.preprocess_data()
-        self.output_directory = settings.config['output_dir']
-        self.filename = settings.filename
         self.filtered = ''
 
     def preprocess_data(self):

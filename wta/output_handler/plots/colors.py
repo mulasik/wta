@@ -38,6 +38,11 @@ class Colors:
         'honeydew', 'aliceblue', 'mintcream', 'azure', 'ghostwhite', 'lavenderblush', 'beige', 'bisque', 'black'
     ]]
 
+    BOOL_COLORS = {
+        True: 'indianred',
+        False: 'teal'
+    }
+
     @classmethod
     def assign_colors_to_sens(cls, senhis):
         """

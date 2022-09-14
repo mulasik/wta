@@ -4,10 +4,10 @@ import paths
 import settings
 from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
-from wta.output_handler.storage.json import TexthisJson, SenhisJson, TranshisJson
-from wta.output_handler.storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
-from wta.output_handler.storage.svg import TexthisSvg, FilteredTexthisSvg, SenhisSvg
-from wta.output_handler.plots.transhis_plot import TranshisPlot
+from .storage.json import TexthisJson, SenhisJson, TranshisJson
+from .storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
+from .storage.svg import TexthisSvg, FilteredTexthisSvg, SenhisSvg, DepTranshisSvg, ConstTranshisSvg, SynBarTranshisSvg, SynPieTranshisSvg
+
 from wta.output_handler.plots.stats_plot import StatsPlot
 
 
@@ -87,7 +87,10 @@ class TranshisOutputFactory(OutputFactory):
     def run(cls, dep_transhis, const_transhis):
         TranshisJson(dep_transhis, 'dependency').to_file()
         TranshisJson(const_transhis, 'constituency').to_file()
-        TranshisPlot().plot_data()
+        DepTranshisSvg(dep_transhis).to_file()
+        ConstTranshisSvg(const_transhis).to_file()
+        SynBarTranshisSvg(dep_transhis, const_transhis).to_file()
+        SynPieTranshisSvg(dep_transhis, const_transhis).to_file()
 
 
 class StatsOutputFactory(OutputFactory):

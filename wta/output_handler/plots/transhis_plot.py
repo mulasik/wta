@@ -1,144 +1,91 @@
 import matplotlib.pyplot as plt
 import os
 import numpy as np
-import json
 
 import settings
 import paths
-from wta.output_handler.names import Names
+from ..names import Names
+from .base import BasePlot
+from .colors import Colors
 
 
-class TranshisPlot:
+class TranshisPlot(BasePlot):
 
-    def __init__(self):
+    def preprocess_data(self, data):
+        non_impact_edits_lst = []
+        impact_edits_lst = []
+        for sen_versions in data.values():
+            no_non_impact_edits, no_impact_edits = 0, 0
+            for ver in sen_versions:
+                if ver.syntactic_impact is False:
+                    no_non_impact_edits += 1
+                elif ver.syntactic_impact is True:
+                    no_impact_edits += 1
+            non_impact_edits_lst.append(no_non_impact_edits)
+            impact_edits_lst.append(no_impact_edits)
+        return non_impact_edits_lst, impact_edits_lst
+
+    def create_figure(self):
+        plt.rcParams.update({'font.size': 6})
+        plt.figure(figsize=(50, 25))
+        fig, ax = plt.subplots()
+        plt.xticks(range(0, len(self.labels) + 1))
+        plt.yticks(range(0, max([max(self.data[0]), max(self.data[1])]) + 1))
+        ax.set_ylabel('Number edits')
+        ax.set_xlabel('Sentence ID')
+        ax.set_title('Edits with and without impact on dependency relations')
+        fig.tight_layout()
+        return ax
+
+    def plot_data(self, ax):
+        x = np.arange(len(self.labels))  # the label locations
+        width = 0.3  # the width of the bars
+        ax.bar(x - width / 2, self.data[0], width, label='Edits without impact', color='cadetblue')
+        ax.bar(x + width / 2, self.data[1], width, label='Edits with impact', color='lightcoral')
+
+    def set_legend(self, ax):
+        ax.legend()
+
+    def run(self):
+        ax = self.create_figure()
+        self.plot_data(ax)
+        self.set_legend(ax)
+        return plt
+
+
+class DepTranshisPlot(TranshisPlot):
+
+    def __init__(self, dep_transhis):
+        self.dep_transhis = dep_transhis
+        self.data = self.preprocess_data(dep_transhis)
+        self.labels = self.dep_transhis.keys()
+
+
+class ConstTranshisPlot(TranshisPlot):
+
+    def __init__(self, const_transhis):
+        self.dep_transhis = const_transhis
+        self.data = self.preprocess_data(const_transhis)
+        self.labels = const_transhis.keys()
+
+
+class SynBarTranshisPlot(BasePlot):
+
+    def __init__(self, dep_transhis, const_transhis):
         self.output_directory = settings.config['output_dir']
         self.filename = settings.filename
+        self.dep_transhis = dep_transhis
+        self.const_transhis = const_transhis
+        self.data = self.preprocess_data()
 
-    def plot_data(self):
-        self.visualise_dependency_relations_impact()
-        self.visualise_consituents_impact()
-        self.visualise_syntactic_impact()
-
-    def visualise_dependency_relations_impact(self):
-        json_file_path = os.path.join(paths.dependency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_dependency.json')
-        with open(json_file_path, 'r') as f:
-            dependency_transformations = json.load(f)
-
-        non_impact_edits_lst = []
-        impact_edits_lst = []
-        for sen_versions in dependency_transformations.values():
-            no_non_impact_edits, no_impact_edits = 0, 0
-            for ver in sen_versions:
-                if ver['syntactic_impact'] is False:
-                    no_non_impact_edits += 1
-                elif ver['syntactic_impact'] is True:
-                    no_impact_edits += 1
-            non_impact_edits_lst.append(no_non_impact_edits)
-            impact_edits_lst.append(no_impact_edits)
-
-        labels = dependency_transformations.keys()
-
-        plt.rcParams.update({'font.size': 6})
-        plt.figure(figsize=(50, 25))
-
-        x = np.arange(len(labels))  # the label locations
-        width = 0.3  # the width of the bars
-
-        fig, ax = plt.subplots()
-        ax.bar(x - width / 2, non_impact_edits_lst, width, label='Edits without impact', color='cadetblue')
-        ax.bar(x + width / 2, impact_edits_lst, width, label='Edits with impact', color='lightcoral')
-
-        # Add some text for labels, title and custom x-axis tick labels, etc.
-        plt.xticks(range(0, len(labels) + 1))
-        plt.yticks(range(0, max([max(non_impact_edits_lst), max(impact_edits_lst)]) + 1))
-        ax.set_ylabel('Number edits')
-        ax.set_xlabel('Sentence ID')
-        # ax.set_title('Edits with and without impact on dependency relations')
-        # ax.legend()
-
-        # ax.bar_label(rects1, padding=3)
-        # ax.bar_label(rects2, padding=3)
-
-        fig.tight_layout()
-
-        fig_file = json_file_path.replace('.json', '_visualisation.svg')
-        plt.savefig(fig_file, bbox_inches='tight')
-        plt.close()
-
-    def visualise_consituents_impact(self):
-        json_file_path = os.path.join(paths.constituency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_constituency.json')
-        with open(json_file_path, 'r') as f:
-            constituents_comparison = json.load(f)
-
-        non_impact_edits_lst = []
-        impact_edits_lst = []
-        for sen_versions in constituents_comparison.values():
-            no_non_impact_edits, no_impact_edits = 0, 0
-            for ver in sen_versions:
-                if ver['syntactic_impact'] is False:
-                    no_non_impact_edits += 1
-                elif ver['syntactic_impact'] is True:
-                    no_impact_edits += 1
-            non_impact_edits_lst.append(no_non_impact_edits)
-            impact_edits_lst.append(no_impact_edits)
-
-        labels = constituents_comparison.keys()
-
-        plt.rcParams.update({'font.size': 6})
-        plt.figure(figsize=(50, 25))
-
-        x = np.arange(len(labels))  # the label locations
-        width = 0.3  # the width of the bars
-
-        fig, ax = plt.subplots()
-        ax.bar(x - width / 2, non_impact_edits_lst, width, label='Edits without impact', color='cadetblue')
-        ax.bar(x + width / 2, impact_edits_lst, width, label='Edits with impact', color='lightcoral')
-
-        # Add some text for labels, title and custom x-axis tick labels, etc.
-        plt.xticks(range(0, len(labels) + 1))
-        plt.yticks(range(0, max([max(non_impact_edits_lst), max(impact_edits_lst)]) + 1))
-        ax.set_ylabel('Number edits')
-        ax.set_xlabel('Sentence ID')
-        # ax.set_title('Edits with and without impact on dependency relations')
-        # ax.legend()
-
-        # ax.bar_label(rects1, padding=3)
-        # ax.bar_label(rects2, padding=3)
-
-        fig.tight_layout()
-
-        fig_file = os.path.join(paths.constituency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg')
-        plt.savefig(fig_file, bbox_inches='tight')
-        plt.close()
-
-    def visualise_syntactic_impact(self):
-        # constituency
-        json_file_path_c = os.path.join(paths.constituency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.CONST}.json')
-        with open(json_file_path_c, 'r') as f:
-            c_comparison = json.load(f)
-        c_sens_impact_values = {}
-        i_c = 0
-        c_no_edits_with_impact = 0
-        c_no_edits_wo_impact = 0
-        for sen_id, vals in c_comparison.items():
-            sen_ver_impact_values = [v['syntactic_impact'] for v in vals if v['syntactic_impact'] is not None]
-            c_sens_impact_values[i_c] = sen_ver_impact_values
-            i_c += 1
-            for v in sen_ver_impact_values:
-                if v is True:
-                    c_no_edits_with_impact += 1
-                elif v is False:
-                    c_no_edits_wo_impact += 1
+    def preprocess_data(self):
         # dependency
-        json_file_path_d = os.path.join(paths.dependency_transhis_dir, f'{self.filename}_{Names.TRANSHIS}_{Names.DEP}.json')
-        with open(json_file_path_d, 'r') as f:
-            d_comparison = json.load(f)
         d_sens_impact_values = {}
         i_d = 0
         d_no_edits_with_impact = 0
         d_no_edits_wo_impact = 0
-        for sen_id, vals in d_comparison.items():
-            sen_ver_impact_values = [v['syntactic_impact'] for v in vals if v['syntactic_impact'] is not None]
+        for sen_id, vals in self.dep_transhis.items():
+            sen_ver_impact_values = [v.syntactic_impact for v in vals if v.syntactic_impact is not None]
             d_sens_impact_values[i_d] = sen_ver_impact_values
             i_d += 1
             for v in sen_ver_impact_values:
@@ -146,13 +93,25 @@ class TranshisPlot:
                     d_no_edits_with_impact += 1
                 elif v is False:
                     d_no_edits_wo_impact += 1
+        # constituency
+        c_sens_impact_values = {}
+        i_c = 0
+        c_no_edits_with_impact = 0
+        c_no_edits_wo_impact = 0
+        for sen_id, vals in self.const_transhis.items():
+            sen_ver_impact_values = [v.syntactic_impact for v in vals if v.syntactic_impact is not None]
+            c_sens_impact_values[i_c] = sen_ver_impact_values
+            i_c += 1
+            for v in sen_ver_impact_values:
+                if v is True:
+                    c_no_edits_with_impact += 1
+                elif v is False:
+                    c_no_edits_wo_impact += 1
+        return d_sens_impact_values, d_no_edits_with_impact, d_no_edits_wo_impact, c_sens_impact_values, c_no_edits_with_impact, c_no_edits_wo_impact
 
-        color_mapping = {
-            True: 'indianred',
-            False: 'teal'
-        }
+    def create_figure(self):
 
-        labels = c_sens_impact_values.keys()
+        labels = self.data[3].keys()
 
         plt.rcParams.update({'font.size': 30})
         # TODO plt.figure(figsize=(30, 25))
@@ -161,69 +120,76 @@ class TranshisPlot:
                                        gridspec_kw={'width_ratios': [1, 1]})
 
         # TODO fig, ax = plt.subplots()
-
-        for id, impact_values in c_sens_impact_values.items():
-            starts = 0
-            for iv in impact_values:
-                lbl = f'Edit with syntactic impact' if iv is True else f'Edit without syntactic impact'
-                ax1.barh(id, 1, left=starts, height=1, color=color_mapping[iv], edgecolor='white', label=lbl)
-                starts += 1
-
-        for id, impact_values in d_sens_impact_values.items():
-            starts = 0
-            for iv in impact_values:
-                lbl = f'Edit with syntactic impact' if iv is True else f'Edit without syntactic impact'
-                ax2.barh(id, 1, left=starts, height=1, color=color_mapping[iv], edgecolor='white', label=lbl)
-                starts += 1
-
         # removed for SIG:
         # c_max_no_edits = max([len(vals) for vals in c_sens_impact_values.values()])
         # plt.xticks(range(0, c_max_no_edits + 1))^
         plt.yticks(range(0, len(labels) + 1))
 
+        ax1.set_title('CONSTITUENCY')
         ax1.set_xticks(range(0, 30))  # for SIG
         ax1.set_ylim(len(labels) + 1, -1)
-        ax1.set_xlabel('Number edits')
+        ax1.set_xlabel('Number transformations')
         ax1.set_ylabel('Sentence ID')
-        # hand, labl = ax1.get_legend_handles_labels()
-        # handout = []
-        # lablout = []
-        # for h, l in zip(hand, labl):
-        #     if l not in lablout:
-        #         lablout.append(l)
-        #         handout.append(h)
-        # ax1.legend(handout, lablout, loc="upper right")
-        ax1.set_title('CONSTITUENCY')
 
-        ax2.set_xticks(range(0, 30))  # for SIG
-        ax2.set_xlabel('Number edits')
-        # hand, labl = ax2.get_legend_handles_labels()
-        # handout = []
-        # lablout = []
-        # for h, l in zip(hand, labl):
-        #     if l not in lablout:
-        #         lablout.append(l)
-        #         handout.append(h)
-        # ax2.legend(handout, lablout, loc="upper right")
         ax2.set_title('DEPENDENCY')
+        ax2.set_xticks(range(0, 30))  # for SIG
+        ax2.set_xlabel('Number transformations')
 
         fig.tight_layout()
+        return ax1, ax2
 
-        fig_file = os.path.join(paths.transhis_dir, f'{self.filename}_syntactic_impact_{Names.VISUAL}.svg')
-        plt.savefig(fig_file, bbox_inches='tight')
-        plt.close()
+    def plot_data(self, ax1, ax2):
+        for id, impact_values in self.data[3].items():
+            starts = 0
+            for iv in impact_values:
+                lbl = f'Edit with syntactic impact' if iv is True else f'Edit without syntactic impact'
+                ax1.barh(id, 1, left=starts, height=1, color=Colors.BOOL_COLORS[iv], edgecolor='white', label=lbl)
+                starts += 1
+        for id, impact_values in self.data[0].items():
+            starts = 0
+            for iv in impact_values:
+                lbl = f'Edit with syntactic impact' if iv is True else f'Edit without syntactic impact'
+                ax2.barh(id, 1, left=starts, height=1, color=Colors.BOOL_COLORS[iv], edgecolor='white', label=lbl)
+                starts += 1
 
-        c_vals = [c_no_edits_with_impact, c_no_edits_wo_impact]
-        d_vals = [d_no_edits_with_impact, d_no_edits_wo_impact]
-        lbls = [f'syntactic impact', f'no syntactic impact']
+    def set_legend(self, ax1, ax2):
+        hand, labl = ax1.get_legend_handles_labels()
+        handout = []
+        lablout = []
+        for h, l in zip(hand, labl):
+            if l not in lablout:
+                lablout.append(l)
+                handout.append(h)
+        ax1.legend(handout, lablout, loc="upper right")
+        hand, labl = ax2.get_legend_handles_labels()
+        handout = []
+        lablout = []
+        for h, l in zip(hand, labl):
+            if l not in lablout:
+                lablout.append(l)
+                handout.append(h)
+        ax2.legend(handout, lablout, loc="upper right")
+
+    def run(self):
+        ax1, ax2 = self.create_figure()
+        self.plot_data(ax1, ax2)
+        self.set_legend(ax1, ax2)
+        return plt
+
+
+class SynPieTranshisPlot(SynBarTranshisPlot):
+
+    def create_figure(self):
+        lbls = [f'syntactic impact', f'no syntactic impact']  #TODO add labels
         plt.rcParams.update({'font.size': 35})
-        fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(40, 20),
-                                       gridspec_kw={'width_ratios': [1, 1]})
-        ax1.pie(c_vals, colors=['indianred', 'teal'], autopct='%1.1f%%')
+        fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(40, 20), gridspec_kw={'width_ratios': [1, 1]})
         ax1.set_title('CONSTITUENCY')
-        ax2.pie(d_vals, colors=['indianred', 'teal'], autopct='%1.1f%%')
         ax2.set_title('DEPENDENCY')
+        return ax1, ax2
 
-        fig_file = os.path.join(paths.transhis_dir, f'{self.filename}_syntactic_impact_{Names.VISUAL}_pie.svg')
-        plt.savefig(fig_file, bbox_inches='tight')
-        plt.close()
+    def plot_data(self, ax1, ax2):
+        d_vals = [self.data[1], self.data[2]]
+        c_vals = [self.data[4], self.data[5]]
+        ax1.pie(c_vals, colors=['indianred', 'teal'], autopct='%1.1f%%')
+        ax2.pie(d_vals, colors=['indianred', 'teal'], autopct='%1.1f%%')
+

@@ -6,6 +6,7 @@ from wta.output_handler.names import Names
 from .base import BaseStorage
 from ..plots.texthis_plot import TexthisPlot, FilteredTexthisPlot
 from ..plots.senhis_plot import SenhisPlot
+from ..plots.transhis_plot import DepTranshisPlot, ConstTranshisPlot, SynBarTranshisPlot, SynPieTranshisPlot
 
 
 class Svg(BaseStorage):
@@ -47,4 +48,44 @@ class SenhisSvg(Svg):
 
     def preprocess_data(self, texthis, senhis):
         return SenhisPlot(texthis, senhis).plot_data()
+
+
+class DepTranshisSvg(Svg):
+
+    def __init__(self, dep_transhis):
+        self.plot = self.preprocess_data(dep_transhis)
+        self.filepath = os.path.join(paths.dependency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_{Names.DEP}_{Names.VISUAL}.svg')
+
+    def preprocess_data(self, dep_transhis):
+        return DepTranshisPlot(dep_transhis).run()
+
+
+class ConstTranshisSvg(Svg):
+
+    def __init__(self, const_transhis):
+        self.plot = self.preprocess_data(const_transhis)
+        self.filepath = os.path.join(paths.constituency_transhis_dir, f'{settings.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg')
+
+    def preprocess_data(self, const_transhis):
+        return ConstTranshisPlot(const_transhis).run()
+
+
+class SynBarTranshisSvg(Svg):
+
+    def __init__(self, dep_transhis, const_transhis):
+        self.plot = self.preprocess_data(dep_transhis, const_transhis)
+        self.filepath = os.path.join(paths.transhis_dir, f'{settings.filename}_syntactic_impact_{Names.VISUAL}_bar.svg')
+
+    def preprocess_data(self, dep_transhis, const_transhis):
+        return SynBarTranshisPlot(dep_transhis, const_transhis).run()
+
+
+class SynPieTranshisSvg(Svg):
+
+    def __init__(self, dep_transhis, const_transhis):
+        self.plot = self.preprocess_data(dep_transhis, const_transhis)
+        self.filepath = os.path.join(paths.transhis_dir, f'{settings.filename}_syntactic_impact_{Names.VISUAL}_pie.svg')
+
+    def preprocess_data(self, dep_transhis, const_transhis):
+        return SynPieTranshisPlot(dep_transhis, const_transhis).run()
 
