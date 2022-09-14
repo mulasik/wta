@@ -6,9 +6,7 @@ from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
 from wta.output_handler.storage.json import TexthisJson, SenhisJson, TranshisJson
 from wta.output_handler.storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
-from wta.output_handler.storage.svg import TexthisSvg, SenhisSvg
-from wta.output_handler.plots.texthis_plot import TexthisPlot, FilteredTexthisPlot
-from wta.output_handler.plots.senhis_plot import SenhisPlot
+from wta.output_handler.storage.svg import TexthisSvg, FilteredTexthisSvg, SenhisSvg
 from wta.output_handler.plots.transhis_plot import TranshisPlot
 from wta.output_handler.plots.stats_plot import StatsPlot
 
@@ -49,15 +47,13 @@ class TexthisOutputFactory(OutputFactory):
     @classmethod
     def run(cls, texthis, texthis_pcm, texthis_fltr):
         StorageSettings.set_paths()
-        TexthisJson(texthis).to_json()
-        TexthisJson(texthis_pcm, mode='pcm').to_json()
-        TexthisJson(texthis_fltr, filtered=True).to_json()
-        TexthisTxt(texthis).to_txt()
-        TexthisTxt(texthis_fltr, filtered=True).to_txt()
-        texthis_plot = TexthisPlot(texthis).plot_data()
-        fltr_texthis_plot = FilteredTexthisPlot(texthis_fltr).plot_data()
-        TexthisSvg(texthis_plot).to_svg()
-        TexthisSvg(fltr_texthis_plot, filtered=True).to_svg()
+        TexthisJson(texthis).to_file()
+        TexthisJson(texthis_pcm, mode='pcm').to_file()
+        TexthisJson(texthis_fltr, filtered=True).to_file()
+        TexthisTxt(texthis).to_file()
+        TexthisTxt(texthis_fltr, filtered=True).to_file()
+        TexthisSvg(texthis).to_file()
+        FilteredTexthisSvg(texthis_fltr).to_file()
 
 
 class SenhisOutputFactory(OutputFactory):
@@ -65,34 +61,32 @@ class SenhisOutputFactory(OutputFactory):
     @classmethod
     def run(cls, texthis, texthis_fltr, senhis, senhis_fltr):
         StorageSettings.set_paths()
-        SenhisJson(senhis).to_json()
-        SenhisJson(senhis, 'simplified').to_json()
-        SenhisJson(senhis_fltr, filtered=True).to_json()
-        SenhisJson(senhis_fltr, 'simplified', filtered=True).to_json()
-        SenhisTxt(senhis).to_txt()
-        SenhisTxt(senhis_fltr, filtered=True).to_txt()
-        SenhisTxt(senhis, view_mode='extended').to_txt()
-        SenhisTxt(senhis, view_mode='extended', filtered=True).to_txt()
-        senhis_plot = SenhisPlot(texthis, senhis).plot_data()
-        fltr_senhis_plot = SenhisPlot(texthis_fltr, senhis_fltr).plot_data()
-        SenhisSvg(senhis_plot).to_svg()
-        SenhisSvg(fltr_senhis_plot, filtered=True).to_svg()
+        SenhisJson(senhis).to_file()
+        SenhisJson(senhis, 'simplified').to_file()
+        SenhisJson(senhis_fltr, filtered=True).to_file()
+        SenhisJson(senhis_fltr, 'simplified', filtered=True).to_file()
+        SenhisTxt(senhis).to_file()
+        SenhisTxt(senhis_fltr, filtered=True).to_file()
+        SenhisTxt(senhis, view_mode='extended').to_file()
+        SenhisTxt(senhis, view_mode='extended', filtered=True).to_file()
+        SenhisSvg(texthis, senhis).to_file()
+        SenhisSvg(texthis_fltr, senhis_fltr, filtered=True).to_file()
 
 
 class ParseOutputFactory(OutputFactory):
 
     @classmethod
     def run(cls, dep_senhis_parses, const_senhis_parses):
-        DepParsesTxt(dep_senhis_parses).to_txt()
-        ConstParsesTxt(const_senhis_parses).to_txt()
+        DepParsesTxt(dep_senhis_parses).to_file()
+        ConstParsesTxt(const_senhis_parses).to_file()
 
 
 class TranshisOutputFactory(OutputFactory):
 
     @classmethod
     def run(cls, dep_transhis, const_transhis):
-        TranshisJson(dep_transhis, 'dependency').to_json()
-        TranshisJson(const_transhis, 'constituency').to_json()
+        TranshisJson(dep_transhis, 'dependency').to_file()
+        TranshisJson(const_transhis, 'constituency').to_file()
         TranshisPlot().plot_data()
 
 
@@ -101,6 +95,6 @@ class StatsOutputFactory(OutputFactory):
     @classmethod
     def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis):
         StorageSettings.set_paths()
-        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_txt()
+        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_file()
         StatsPlot().plot_data(texthis, senhis)
 

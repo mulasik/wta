@@ -3,15 +3,16 @@ import os
 import paths
 import settings
 from wta.output_handler.names import Names
+from .base import BaseStorage
 from wta.utils.other import ensure_path
 
 
-class Txt:
+class Txt(BaseStorage):
 
     def preprocess_data(self):
         pass
 
-    def to_txt(self):
+    def to_file(self):
         with open(self.filepath, 'w') as f:
             f.write(self.output_str)
 
@@ -121,7 +122,7 @@ class ParsesTxt(Txt):
     def generate_str(self, parsed_sen):
         raise NotImplementedError
 
-    def to_txt(self):
+    def to_file(self):
         for o in self.output:
             with open(o[0], 'w') as f:
                 f.write(o[1])

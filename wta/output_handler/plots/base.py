@@ -1,17 +1,25 @@
-import settings
+from abc import ABC, abstractmethod
 
 
-class BasePlot:
+class BasePlot(ABC):
 
-    def __init__(self, data, filtered=False):
-        self.output_directory = settings.config['output_dir']
-        self.filename = settings.filename
-        self.filtered = '' if not filtered else '_filtered'
-        self.data = self.preprocess_data(data)
-
+    @abstractmethod
     def preprocess_data(self):
         pass
 
+    @abstractmethod
+    def create_figure(self):
+        pass
+
+    @abstractmethod
     def plot_data(self):
+        pass
+
+    @abstractmethod
+    def set_legend(self):
+        pass
+
+    @abstractmethod
+    def run(self):
         pass
 

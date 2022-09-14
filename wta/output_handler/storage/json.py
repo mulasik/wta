@@ -4,14 +4,15 @@ import os
 import paths
 import settings
 from wta.output_handler.names import Names
+from .base import BaseStorage
 
 
-class Json:
+class Json(BaseStorage):
 
     def preprocess_data(self):
         pass
 
-    def to_json(self):
+    def to_file(self):
         with open(self.filepath, 'w') as f:
             json.dump(self.data, f)
 
