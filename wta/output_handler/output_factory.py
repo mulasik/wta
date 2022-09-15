@@ -28,7 +28,7 @@ class StorageSettings:
         paths.senhis_parses_dir = os.path.join(paths.senhis_dir, Names.SENPAR)
         paths.dependency_senhis_parses_dir = os.path.join(paths.senhis_parses_dir, Names.DEP)
         paths.constituency_senhis_parses_dir = os.path.join(paths.senhis_parses_dir, Names.CONST)
-        paths.transhis_dir = os.path.join(paths.senhis_dir, Names.TRANSHIS)
+        paths.transhis_dir = os.path.join(settings.config['output_dir'], Names.TRANSHIS)
         paths.dependency_transhis_dir = os.path.join(paths.transhis_dir, Names.DEP)
         paths.constituency_transhis_dir = os.path.join(paths.transhis_dir, Names.CONST)
         paths_to_ensure = [d for d in dir(paths) if d.endswith('_dir')]
