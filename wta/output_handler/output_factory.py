@@ -6,9 +6,10 @@ from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
 from .storage.json import TexthisJson, SenhisJson, TranshisJson
 from .storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
-from .storage.svg import TexthisSvg, FilteredTexthisSvg, SenhisSvg, DepTranshisSvg, ConstTranshisSvg, SynBarTranshisSvg, SynPieTranshisSvg
-
-from wta.output_handler.plots.stats_plot import StatsPlot
+from .storage.svg import (TexthisSvg, FilteredTexthisSvg,
+                          SenhisSvg,
+                          DepTranshisSvg, ConstTranshisSvg, SynBarTranshisSvg, SynPieTranshisSvg,
+                          SenEditSvg, TsLabelsSvg, TsTokensSvg, DeletionsSvg, InsertionsSvg)
 
 
 class StorageSettings:
@@ -99,5 +100,9 @@ class StatsOutputFactory(OutputFactory):
     def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis):
         StorageSettings.set_paths()
         StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_file()
-        StatsPlot().plot_data(texthis, senhis)
+        SenEditSvg(texthis, senhis).to_file()
+        TsTokensSvg(texthis, senhis).to_file()
+        TsLabelsSvg(texthis, senhis).to_file()
+        DeletionsSvg(texthis, senhis).to_file()
+        InsertionsSvg(texthis, senhis).to_file()
 

@@ -7,6 +7,7 @@ from .base import BaseStorage
 from ..plots.texthis_plot import TexthisPlot, FilteredTexthisPlot
 from ..plots.senhis_plot import SenhisPlot
 from ..plots.transhis_plot import DepTranshisPlot, ConstTranshisPlot, SynBarTranshisPlot, SynPieTranshisPlot
+from ..plots.stats_plot import SenEditPlot, TsLabelsPlot, TsTokensPlot, DeletionsPlot, InsertionsPlot
 
 
 class Svg(BaseStorage):
@@ -47,7 +48,7 @@ class SenhisSvg(Svg):
         self.filepath = os.path.join(paths.senhis_visual_dir, f'{settings.filename}_{Names.SENHIS}_{Names.VISUAL}{filtered_lbl}.svg')
 
     def preprocess_data(self, texthis, senhis):
-        return SenhisPlot(texthis, senhis).plot_data()
+        return SenhisPlot(texthis, senhis).run()
 
 
 class DepTranshisSvg(Svg):
@@ -88,4 +89,54 @@ class SynPieTranshisSvg(Svg):
 
     def preprocess_data(self, dep_transhis, const_transhis):
         return SynPieTranshisPlot(dep_transhis, const_transhis).run()
+
+
+class SenEditSvg(Svg):
+
+    def __init__(self, texthis, senhis):
+        self.plot = self.preprocess_data(texthis, senhis)
+        self.filepath = os.path.join(paths.stats_dir, f'{settings.filename}_sentence_edits_stats.svg')
+
+    def preprocess_data(self, texthis, senhis):
+        return SenEditPlot(texthis, senhis).run()
+
+
+class TsLabelsSvg(Svg):
+
+    def __init__(self, texthis, senhis):
+        self.plot = self.preprocess_data(texthis, senhis)
+        self.filepath = os.path.join(paths.stats_dir, f'{settings.filename}_ts_labels_stats.svg')
+
+    def preprocess_data(self, texthis, senhis):
+        return TsLabelsPlot(texthis, senhis).run()
+
+
+class TsTokensSvg(Svg):
+
+    def __init__(self, texthis, senhis):
+        self.plot = self.preprocess_data(texthis, senhis)
+        self.filepath = os.path.join(paths.stats_dir, f'{settings.filename}_ts_tokens_stats.svg')
+
+    def preprocess_data(self, texthis, senhis):
+        return TsTokensPlot(texthis, senhis).run()
+
+
+class DeletionsSvg(Svg):
+
+    def __init__(self, texthis, senhis):
+        self.plot = self.preprocess_data(texthis, senhis)
+        self.filepath = os.path.join(paths.stats_dir, f'{settings.filename}_deletions_stats.svg')
+
+    def preprocess_data(self, texthis, senhis):
+        return DeletionsPlot(texthis, senhis).run()
+
+
+class InsertionsSvg(Svg):
+
+    def __init__(self, texthis, senhis):
+        self.plot = self.preprocess_data(texthis, senhis)
+        self.filepath = os.path.join(paths.stats_dir, f'{settings.filename}_insertions_stats.svg')
+
+    def preprocess_data(self, texthis, senhis):
+        return InsertionsPlot(texthis, senhis).run()
 
