@@ -64,7 +64,6 @@ class ActionAggregator:
         counter = 0
         prev_act_type = None
         for i, act in enumerate(actions):
-            # print(f'{type(act).__name__}\n{act.__dict__}')
             act_type = type(act).__name__
             if act_type != prev_act_type or act_type in ['Replacement', 'Pasting', 'Navigation'] or abs(act.startpos - actions[i-1].startpos) != 1:
                 action_groups[f'{act_type}_{counter}'] = [act]

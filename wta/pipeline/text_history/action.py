@@ -18,7 +18,7 @@ class Action:
         self.endpos = endpos
 
 
-class Append(Action):
+class KeyboardAction(Action):
 
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
         super().__init__(content, startpos, endpos)
@@ -28,44 +28,34 @@ class Append(Action):
         self.pause = pause
 
 
-class Insertion(Action):
+class Append(KeyboardAction):
 
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos)
-        self.keyname = keyname
-        self.starttime = starttime
-        self.endtime = endtime
-        self.pause = pause
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
 
 
-class Navigation(Action):
+class Insertion(KeyboardAction):
 
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos)
-        self.keyname = keyname
-        self.starttime = starttime
-        self.endtime = endtime
-        self.pause = pause
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
 
 
-class Deletion(Action):
+class Navigation(KeyboardAction):
 
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos)
-        self.keyname = keyname
-        self.starttime = starttime
-        self.endtime = endtime
-        self.pause = pause
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
 
 
-class Midletion(Action):
+class Deletion(KeyboardAction):
 
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos)
-        self.keyname = keyname
-        self.starttime = starttime
-        self.endtime = endtime
-        self.pause = pause
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+
+
+class Midletion(KeyboardAction):
+
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
 
 
 class Replacement(Action):
