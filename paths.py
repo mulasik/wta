@@ -1,3 +1,7 @@
+events_dir = None
+actions_dir = None
+tss_dir = None
+tpsfs_dir = None
 texthis_dir = None
 texthis_json_dir = None
 texthis_txt_dir = None

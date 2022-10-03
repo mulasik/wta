@@ -5,7 +5,7 @@ import settings
 from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
 from .storage.json import TexthisJson, SenhisJson, TranshisJson
-from .storage.txt import TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
+from .storage.txt import EventsTxt, ActionsTxt, ActionGroupsTxt, TssTxt, TpsfsTxt, TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
 from .storage.svg import (TexthisSvg, FilteredTexthisSvg,
                           SenhisSvg,
                           DepTranshisSvg, ConstTranshisSvg, SynBarTranshisSvg, SynPieTranshisSvg,
@@ -16,6 +16,10 @@ class StorageSettings:
 
     @classmethod
     def set_paths(cls):
+        paths.events_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.EVENTS)
+        paths.actions_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.ACTIONS)
+        paths.tss_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.TSS)
+        paths.tpsfs_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.TPSFS)
         paths.texthis_dir = os.path.join(settings.config['output_dir'], Names.TEXTHIS)
         paths.texthis_json_dir = os.path.join(paths.texthis_dir, Names.JSON)
         paths.texthis_txt_dir = os.path.join(paths.texthis_dir, Names.TXT)
@@ -41,6 +45,46 @@ class OutputFactory:
     @classmethod
     def run(cls):
         raise NotImplementedError
+
+
+class EventsOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, events):
+        StorageSettings.set_paths()
+        EventsTxt(events).to_file()
+
+
+class ActionsOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, actions):
+        StorageSettings.set_paths()
+        ActionsTxt(actions).to_file()
+
+
+class ActionGroupsOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, action_groups):
+        StorageSettings.set_paths()
+        ActionGroupsTxt(action_groups).to_file()
+
+
+class TssOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, tss):
+        StorageSettings.set_paths()
+        TssTxt(tss).to_file()
+
+
+class TpsfsOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, tpsfs):
+        StorageSettings.set_paths()
+        TpsfsTxt(tpsfs).to_file()
 
 
 class TexthisOutputFactory(OutputFactory):

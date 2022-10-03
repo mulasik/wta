@@ -17,6 +17,76 @@ class Txt(BaseStorage):
             f.write(self.output_str)
 
 
+class EventsTxt(Txt):
+
+    def __init__(self, data):
+        self.output_str = self.preprocess_data(data)
+        txt_file = f'{settings.filename}_{Names.EVENTS}.txt'
+        self.filepath = os.path.join(paths.events_dir, txt_file)
+
+    def preprocess_data(self, events) -> str:
+        output_str = ''
+        for event in events:
+            output_str += f'{type(event).__name__}: {event.__dict__["content"]} {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
+        return output_str
+
+
+class ActionsTxt(Txt):
+
+    def __init__(self, data):
+        self.output_str = self.preprocess_data(data)
+        txt_file = f'{settings.filename}_{Names.ACTIONS}.txt'
+        self.filepath = os.path.join(paths.actions_dir, txt_file)
+
+    def preprocess_data(self, actions) -> str:
+        output_str = ''
+        for a in actions:
+            output_str += f'{type(a).__name__} ({a.startpos}:{a.endpos}) *{a.content}*\n\n'
+        return output_str
+
+
+class ActionGroupsTxt(Txt):
+
+    def __init__(self, data):
+        self.output_str = self.preprocess_data(data)
+        txt_file = f'{settings.filename}_{Names.ACTION_GROUPS}.txt'
+        self.filepath = os.path.join(paths.actions_dir, txt_file)
+
+    def preprocess_data(self, action_groups) -> str:
+        output_str = ''
+        for at, aa in action_groups.items():
+            output_str += f'{at} * len {len(aa)} * ({aa[0].startpos}:{aa[-1].endpos}) \n*{"".join([a.__dict__["content"] for a in aa])}*\n\n'
+        return output_str
+
+
+class TssTxt(Txt):
+
+    def __init__(self, data):
+        self.output_str = self.preprocess_data(data)
+        txt_file = f'{settings.filename}_{Names.TSS}.txt'
+        self.filepath = os.path.join(paths.tss_dir, txt_file)
+
+    def preprocess_data(self, tss) -> str:
+        output_str = ''
+        for ts in tss:
+            output_str += f'{ts.label} ({ts.startpos}-{ts.endpos}): "{ts.text}"\n\n'
+        return output_str
+
+
+class TpsfsTxt(Txt):
+
+    def __init__(self, data):
+        self.output_str = self.preprocess_data(data)
+        txt_file = f'{settings.filename}_{Names.TPSFS}.txt'
+        self.filepath = os.path.join(paths.tpsfs_dir, txt_file)
+
+    def preprocess_data(self, tpsfs) -> str:
+        output_str = ''
+        for tpsf in tpsfs:
+            output_str += f'{tpsf[4]}\n\n\n'
+        return output_str
+
+
 class TexthisTxt(Txt):
 
     def __init__(self, data, mode='ecm', filtered=False):

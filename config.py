@@ -1,6 +1,8 @@
 import os
 
-DATA_DIR = "example_data"
+from wta.pipeline.sentence_parsing.models import Languages
+
+DATA_DIR = "input_data"
 VIDEO_DATA_DIR = os.path.join(DATA_DIR, "video")
 
 
@@ -10,13 +12,14 @@ DEFAULT_TS_MIN_TOKENS_NUMBER = 2
 EDIT_DIST_COMBINED_WITH_TOK_NUMBER_DEFAULT = False
 SPELLCHECKING_ENABLED_DEFAULT = False
 PUNCTUATION_INCLUDED_DEFAULT = False
-DEFAULT_LANGUAGE = "German"
+DEFAULT_LANGUAGE = Languages.DE
+
 
 VIDEO = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("N")
+        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
     ],
     "output_dir": os.path.join("output_data", "video", "conf0"),
     "pause_duration": DEFAULT_PAUSE_DURATION,

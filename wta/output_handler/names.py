@@ -1,5 +1,11 @@
 class Names:
 
+    PREPROCESSING = 'preprocessing'
+    EVENTS = 'events'
+    ACTIONS = 'actions'
+    ACTION_GROUPS = 'action_groups'
+    TSS = 'tss'
+    TPSFS = 'tpsfs'
     TEXTHIS = 'text_history'
     JSON = 'json'
     TXT = 'txt'
