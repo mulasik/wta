@@ -8,8 +8,8 @@ GREEK_PHASE1.log
 wta.tar
 /venv/
 /myconfig.py
-/xml_content_check.py
-/tests.py
+/wta/scripts/xml_content_check.py
+/wta/scripts/tests.py
 /wta/scripts
 .DS_Store
 .idea/
