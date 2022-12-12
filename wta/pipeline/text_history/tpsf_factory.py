@@ -1,9 +1,18 @@
 from tqdm import tqdm
 
+from .tpsf import TpsfECM
+
 
 class TpsfFactory:
+
+    def run(self):
+        pass
+
+
+class ECMFactory(TpsfFactory):
     """
-    A class to retrieve text versions based on transforming sequences (TSs).
+    A class to retrieve text versions (TPSFs) in Edit Capturing Mode (ECM).
+    TPSFs are generated based on transforming sequences (TSs).
     There are 4 types of TSs where text is produced:
     - append
     - insertion
@@ -19,36 +28,53 @@ class TpsfFactory:
 
     @staticmethod
     def run(tss):
+        """
+        Generates a list of objects of type Tpsf based on a list of transforming sequences.
+        Args:
+            tss: a list of objects of type TransformingSequence
+        Returns:
+            a list of objects of type Tpsf
+        """
         output = []
         tpsfs = []
         tss = [ts for ts in tss if ts.label != 'navigation']
         tss = tqdm(tss, 'Extracting tpsfs')
         for ts in tss:
-            # print(ts.label)
             if ts.label in ['append', 'insertion', 'pasting']:
                 startpos = ts.startpos
                 for char in ts.text:
-                    # print(f'Will insert *{char}* at {startpos}')
                     output.insert(startpos, char)
                     startpos += 1
-                # print(len(output), 'POS:', ts.startpos, ts.endpos)
             elif ts.label in ['deletion', 'midletion']:
                 text = output[ts.startpos:ts.endpos + 1]
-                ts.set_text(text)
-                # print(f'Will remove *{output[ts.startpos:ts.endpos + 1]}* at {ts.startpos}-{ts.endpos}')
+                ts.set_text(''.join(text))
                 del output[ts.startpos:ts.endpos + 1]
-                # print(len(output), 'POS:', ts.startpos, ts.endpos)
             elif ts.label == 'replacement':
-                # print(f'Will remove *{output[ts.startpos:ts.endpos + 1]}* at {ts.startpos}-{ts.endpos}')
                 del output[ts.startpos:ts.endpos + 1]
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
                     startpos += 1
-                # print(len(output), 'POS:', ts.startpos, ts.endpos)
-            tpsfs.append((ts.text, ts.startpos, ts.endpos, ts.label, "".join(output)))
-            # print(f'*{"".join(output)}*')
-        # print('FINAL OUTPUT')
-        # print(f'*{"".join(output)}*')
-        return tss, tpsfs
+            content = "".join(output)
+            tpsf = TpsfECM(0, content, ts, None)
+            tpsfs.append(tpsf)
+        return tpsfs
+
+
+class PCMFactory(TpsfFactory):
+    """
+    A class to retrieve text versions (TPSFs) in Pause Capturing Mode (PCM).
+    TPSFs are generated based on the event list.
+    The trigger is the duration of a pause
+    between the start time of pressing the key in the previous event
+    and start time of pressing the key in the current event.
+    The maximal duration which triggers TPSF generation is provided in the configuration file.
+    In the IDFX file, the time is provided only for KeyboardEvents,
+    so TPSF generation in PCM is limited.
+    """
+
+    @staticmethod
+    def run(events):
+        # TODO
+        ...
 

@@ -33,7 +33,7 @@ class ActionAggregator:
     A class for aggregating Action objects.
     Aggregating actions enables identification of transforming sequences in the next pipeline step.
     Aggregation is triggered if the actions are of the same type
-    and the actions are executed at consecutive positions
+    and the actions are executed at consecutive positions,
     and they are of one of the following types:
     - append (consecutive means startpos, startpos+1, startpos+2, ...)
     - insertion (consecutive means startpos, startpos+1, startpos+2, ...)

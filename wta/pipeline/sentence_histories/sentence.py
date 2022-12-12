@@ -3,7 +3,7 @@ from wta.utils.nlp import (contains_end_punctuation_at_the_end,
                            is_short_sequence,
                            starts_with_lowercase_letter,
                            retrieve_mismatch_range_for_sentence_pair)
-from wta.pipeline.text_history.transforming_sequence import TransformingSequence
+from wta.pipeline.text_history.ts import TransformingSequence
 import json
 
 import settings
@@ -108,7 +108,7 @@ class Sentence:
         else:
             print('Warning. Empty transforming sequence label.')
             label = ''
-        sen_transforming_sequence = TransformingSequence(mismatch_text, label, self.nlp_model)
+        sen_transforming_sequence = TransformingSequence(mismatch_text, label, mismatch_range[0][0], mismatch_range[0][-1], None, None, None, None)
         return sen_transforming_sequence
 
     def check_sentence_spelling(self):

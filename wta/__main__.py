@@ -5,22 +5,13 @@ import traceback
 from importlib import import_module
 
 import settings
-from .models import SpacyModel
+from wta.language_models.spacy import SpacyModel
 from .pipeline.text_history.event_factory import EventFactory
 from .pipeline.text_history.action_factory import ActionFactory, ActionAggregator
 from .pipeline.text_history.ts_factory import TsFactory
-from .pipeline.text_history.tpsf_factory import  TpsfFactory
-from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
-from .pipeline.statistics.statistics_factory import StatsFactory
-from .pipeline.sentence_parsing.parsers import Parsers
-from .pipeline.sentence_parsing.facade import ParsingFacade
-from .pipeline.sentence_parsing.models import Grammars
+from .pipeline.text_history.tpsf_factory import ECMFactory
 from .output_handler.output_factory import (EventsOutputFactory, ActionsOutputFactory, ActionGroupsOutputFactory,
-                                            TssOutputFactory, TpsfsOutputFactory,
-                                            TexthisOutputFactory, SenhisOutputFactory,
-                                            StatsOutputFactory, ParseOutputFactory, TranshisOutputFactory)
-from .pipeline.transformation_histories.transformation_factory import (DependencyTransformationFactory,
-                                                                          ConsituencyTransformationFactory)
+                                            TssOutputFactory, TpsfsOutputFactory)
 
 
 def load_path(dotted_path):
@@ -57,7 +48,7 @@ if __name__ == "__main__":
             action_groups = ActionAggregator.run(actions)
             ActionGroupsOutputFactory.run(action_groups)
             tss = TsFactory().run(action_groups)
-            tss, tpsfs = TpsfFactory().run(tss)
+            tpsfs = ECMFactory().run(tss)
             TssOutputFactory.run(tss)
             TpsfsOutputFactory.run(tpsfs)
 

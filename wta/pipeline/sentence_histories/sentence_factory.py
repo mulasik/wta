@@ -1,14 +1,14 @@
+import settings
 from .sentence import SentenceCandidate, Sentence
 
 
-class SentenceTokenizer:
+class SentenceFactory:
 
-    def __init__(self, text, revision_id, transforming_sequence, nlp_model):
+    def __init__(self, text, revision_id, transforming_sequence):
 
         self.revision_id = revision_id
         self.transforming_sequence = transforming_sequence
-        self.nlp_model = nlp_model
-
+        self.nlp_model = settings.nlp_model
         self.sentences = [] if text == '' else self.transform_into_sentence_list(text)
 
     def verify_sentence_segmentation(self, sentence_list):

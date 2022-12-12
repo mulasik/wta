@@ -26,9 +26,9 @@ class EventFactory:
         """
         Creates a list of Event objects.
         Args:
-            idfx: an xml file containing the keystroke logs
+            idfx: xml file containing the keystroke logs
         Returns:
-            a list of Event objects
+            list of Event objects
         """
         soup = BeautifulSoup(open(idfx), features="lxml")
         idfx_events = soup.find_all('event')

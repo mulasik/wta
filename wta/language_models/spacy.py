@@ -1,4 +1,4 @@
-from .utils.nlp import check_edit_distance
+from wta.utils.nlp import check_edit_distance
 import language_tool_python
 
 from wta.pipeline.sentence_parsing.models import Languages

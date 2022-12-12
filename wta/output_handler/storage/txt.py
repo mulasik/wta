@@ -69,7 +69,7 @@ class TssTxt(Txt):
     def preprocess_data(self, tss) -> str:
         output_str = ''
         for ts in tss:
-            output_str += f'{ts.label} ({ts.startpos}-{ts.endpos}): "{ts.text}"\n\n'
+            output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}, dur: {ts.duration}, pause: {ts.preceding_pause}): "{ts.text}"\n\n'
         return output_str
 
 
@@ -83,7 +83,7 @@ class TpsfsTxt(Txt):
     def preprocess_data(self, tpsfs) -> str:
         output_str = ''
         for tpsf in tpsfs:
-            output_str += f'{tpsf[4]}\n\n\n'
+            output_str += f'{tpsf.content}\n\n\n'
         return output_str
 
 

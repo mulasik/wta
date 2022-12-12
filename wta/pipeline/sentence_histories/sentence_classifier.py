@@ -1,15 +1,16 @@
 from wta.utils.nlp import check_overlap_with_seq_beginning, calculate_sequence_similarity
 import unicodedata
 
+import settings
+
 
 class SentenceClassifier:
 
-    def __init__(self, prev_sens, sens, transforming_sequence, nlp_model):
+    def __init__(self, prev_sens, sens, transforming_sequence):
         self.prev_sens = prev_sens
         self.sens = sens
         self.transforming_sequence = transforming_sequence
-        self.nlp_model = nlp_model
-
+        self.nlp_model = settings.nlp_model
         self.delta_current_previous = []
         self.delta_previous_current = []
         self.new_sentences, self.modified_sentences, self.deleted_sentences, self.unchanged_sentences = [], [], [], []
