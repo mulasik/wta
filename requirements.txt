@@ -9,6 +9,7 @@ nltk
 matplotlib
 language-tool-python==2.5.4
 supar
+syntok
 
 # Spacy's model for German
 https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.0.0/de_core_news_md-3.0.0.tar.gz#egg=de_core_news_md
