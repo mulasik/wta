@@ -235,9 +235,9 @@ class IdfxParser:
                             removed_sequence = ''
                         try:
                             removed_sequence += output_chars[pos - 1]
+                            del output_chars[pos - 1]
                         except IndexError:
                             print('Apparently the number of output characters detected so far does not correspond to the position of the cursor.')
-                        del output_chars[pos - 1]
                         backspace_count += 1
 
                 # CHAR DELETION: removing chars with delete
