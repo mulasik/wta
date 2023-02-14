@@ -22,8 +22,7 @@ def load_path(dotted_path):
     return attr
 
 
-if __name__ == "__main__":
-
+def run() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('config')
     args = parser.parse_args(sys.argv[1:])
@@ -88,3 +87,6 @@ if __name__ == "__main__":
             traceback.print_exc()
             print(f"Failed for {idfx}", file=sys.stderr)
 
+
+if __name__ == "__main__":
+    run()
