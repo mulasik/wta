@@ -21,11 +21,13 @@ class SpacyModel:
             self.nlp = spacy.load("en_core_web_md")
             self.tool = language_tool_python.LanguageTool('en-US')
         elif lang == Languages.GR:
-            from spacy.lang.el import Greek
+            from spacy.lang.el import Greekte
             self.nlp = Greek()
             print('Loading Spacy model for Greek...')
             self.nlp = spacy.load("el_core_news_md")
             self.tool = language_tool_python.LanguageTool('el-GR')
+        else:
+            print('FAILURE: Could not recognize the language.')
 
     def tag_words(self, text: str) -> list:
         doc = self.nlp(text)
@@ -47,18 +49,33 @@ class SpacyModel:
             })
         return tags
 
-    def segment_sentences(self, text: str) -> list:
+    def segment_text(self, text: str) -> list:
         doc = self.nlp(text)
         sentences = []
+        # Attention:
+        # Spacy handles single whitespaces at the beginning and at the end differently
+        # then sequences of multiple whitespaces at the beginning and at the end
+        # A single whitespace:
+        # ' Hello everybody! ' after segmentation will return a sentence [' Hello everybody!']
+        # >>> only the initial single whitespace is part of the sentence, the trailing whitespace is cut off
+        # A sequence of multiple whitespaces:
+        # '  Hello everybody!  I missed you a lot  ' will return ['  Hello everybody!  ', 'I missed you a lot  ']
+        # >>> the multiple whitespaces between the sentences or at the end are attached to the preceding sentence.
+        # If there is no preceding sentence the multiple whitespaces are attached to the first sentence.
+        # Missing whitespace between sentences:
+        # ' Hello everybody!I missed you a lot ' will return [' Hello everybody!I missed you a lot ']
+        # >>> If the whitespace is missing, the sequence is interpreted as one sentence!
+        # whitespace_ returns the trailing space character if present.
+        # is_sent_start	Does the token start a sentence? bool or None if unknown. Defaults to True for the first token in the Doc.
+        # is_sent_end	Does the token end a sentence? bool or None if unknown.
         for sent in doc.sents:
-            sent_text = sent.text.strip()
-            sentences.append(sent_text)
+            sentences.append(sent.text_with_ws)
         return sentences
 
     def collect_additional_tokens_tags(self, text: str) -> tuple:
         doc = self.nlp(text)
         for token in doc:
-            return token.text, token.shape_, token.is_alpha, token.is_stop, token.has_vector, token.vector_norm
+            return token.content, token.shape_, token.is_alpha, token.is_stop, token.has_vector, token.vector_norm
 
     def check_if_same_words(self, editted_word: str, result_word: str) -> bool:
         if editted_word and result_word:

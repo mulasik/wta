@@ -71,12 +71,12 @@ class TsLabelsPlot(StatsPlot):
     def preprocess_data(self):
         appended_tokens, inserted_tokens, deleted_tokens = 0, 0, 0
         for tpsf in self.texthis:
-            if tpsf.transforming_sequence.label == 'append':
-                appended_tokens += len(tpsf.transforming_sequence.tagged_tokens)
-            if tpsf.transforming_sequence.label == 'insertion':
-                inserted_tokens += len(tpsf.transforming_sequence.tagged_tokens)
-            if tpsf.transforming_sequence.label == 'deletion':
-                deleted_tokens += len(tpsf.transforming_sequence.tagged_tokens)
+            if tpsf.ts.label == 'append':
+                appended_tokens += len(tpsf.ts.tagged_tokens)
+            if tpsf.ts.label == 'insertion':
+                inserted_tokens += len(tpsf.ts.tagged_tokens)
+            if tpsf.ts.label == 'deletion':
+                deleted_tokens += len(tpsf.ts.tagged_tokens)
         return [appended_tokens, inserted_tokens, deleted_tokens]
 
     def create_figure(self):
@@ -98,10 +98,10 @@ class TsTokensPlot(StatsPlot):
     def preprocess_data(self):
         tpsf_ids, ts_tokens = [], []
         for tpsf in self.texthis:
-            if tpsf.transforming_sequence.tagged_tokens != '':
+            if tpsf.ts.tagged_tokens != '':
                 tpsf_ids.append(tpsf.revision_id)
-                no_edited_tokens = len(tpsf.transforming_sequence.tagged_tokens)
-                if tpsf.transforming_sequence.label == 'deletion':
+                no_edited_tokens = len(tpsf.ts.tagged_tokens)
+                if tpsf.ts.label == 'deletion':
                     no_edited_tokens = no_edited_tokens * -1
                 ts_tokens.append(no_edited_tokens)
         return tpsf_ids, ts_tokens
@@ -127,8 +127,8 @@ class DeletionsPlot(StatsPlot):
     def preprocess_data(self):
         ts_content = {}
         for tpsf in self.texthis:
-            if tpsf.transforming_sequence.label in ['deletion']:
-                for t in tpsf.transforming_sequence.tagged_tokens:
+            if tpsf.ts.label in ['deletion']:
+                for t in tpsf.ts.tagged_tokens:
                     if t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] not in ts_content.keys():
                         ts_content.update({t['pos']: 1})
                     elif t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] in ts_content.keys():
@@ -156,8 +156,8 @@ class InsertionsPlot(StatsPlot):
     def preprocess_data(self):
         ts_content = {}
         for tpsf in self.texthis:
-            if tpsf.transforming_sequence.label in ['insertion']:
-                for t in tpsf.transforming_sequence.tagged_tokens:
+            if tpsf.ts.label in ['insertion']:
+                for t in tpsf.ts.tagged_tokens:
                     if t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] not in ts_content.keys():
                         ts_content.update({t['pos']: 1})
                     elif t['pos'] not in ['X', 'SPACE', 'PUNCT'] and t['pos'] in ts_content.keys():

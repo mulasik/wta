@@ -16,7 +16,7 @@ class TransformingSequence:
     - pasting
     """
 
-    def __init__(self, text, label, startpos, endpos, starttime, endtime, duration, preceding_pause):
+    def __init__(self, text, label, startpos, endpos, starttime, endtime, duration, preceding_pause, rplcmt_textlen):
         """
         Initializes an object of type TransformingSequence (TS).
         Args:
@@ -37,10 +37,11 @@ class TransformingSequence:
         self.endtime = endtime
         self.duration = duration
         self.preceding_pause = preceding_pause
-        self.tagged_tokens = None if text is None else settings.nlp_model.tag_words(self.text)
+        self.tagged_tokens = []  # if text is None or text == '' else settings.nlp_model.tag_words(self.text)
         self.contains_punctuation = True if 'PUNCT' in [tok['pos'] for tok in self.tagged_tokens] else False
         self.contains_end_punctuation_in_the_middle = contains_end_punctuation_in_the_middle(self.text)
         self.ts_relevance = None
+        self.rplcmt_textlen = rplcmt_textlen
 
     def set_text(self, text):
         self.text = text

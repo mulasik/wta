@@ -28,3 +28,21 @@ class EventCategories:
     NAV = 'navigating without editing'
     FINAL = 'final text revision'
 
+
+class TSLabels:
+    APP = 'append'
+    INS = 'insertion'
+    NAV = 'navigation'
+    DEL = 'deletion'
+    MID = 'midletion'
+    REPL = 'replacement'
+    PAST = 'pasting'
+
+
+class SenLabels:
+
+    MOD = 'modified'
+    DEL = 'deleted'
+    NEW = 'new'
+    UNC_PRE = 'unchanged_pre'
+    UNC_POST = 'unchanged_post'

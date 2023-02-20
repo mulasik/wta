@@ -1,8 +1,7 @@
 from .base import BaseEvent
-from ..action import Append, Insertion, Navigation, Deletion, Midletion
-from wta.pipeline.text_history.names import KeyNames, EventTypes
+from ..action import Append, Insertion, Pasting, Navigation, Deletion, Midletion
+from wta.pipeline.names import EventTypes
 
-# Document length in the idfx file == position + 1.
 CHAR_NUMBER_DIFF_PRODUCTION = 1
 CHAR_NUMBER_DIFF_DDELETION = 1
 # Document length in the idfx file == position + 1.
@@ -60,14 +59,18 @@ class ProductionKeyboardEvent(KeyboardEvent):
         self.char_number_diff = CHAR_NUMBER_DIFF_PRODUCTION
 
     def to_action(self):
+        cur_textlen = self.textlen - self.char_number_diff
         # if the next event is a replacement, the keyboard event is part of the replacement
         if type(self.next_evnt).__name__ == EventTypes.RE:
             pass
+        # if more than 1 character has been produced at one go, the action is pasting
+        elif len(self.content) > 1:
+            return Pasting(self.content, self.startpos, self.endpos)
         # if position is smaller then text length
-        elif self.startpos < self.textlen-self.char_number_diff:
-            return Insertion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause)
+        elif len(self.content) == 1 and self.startpos < cur_textlen:
+            return Insertion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
         else:
-            return Append(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause)
+            return Append(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
 
 
 class DeletionKeyboardEvent(KeyboardEvent):
@@ -76,12 +79,13 @@ class DeletionKeyboardEvent(KeyboardEvent):
         super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
 
     def to_action(self):
+        cur_textlen = self.textlen - self.char_number_diff
         if type(self.next_evnt).__name__ == EventTypes.RE:
             pass
-        elif self.startpos < self.textlen-self.char_number_diff:
-            return Midletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause)
+        elif self.startpos < cur_textlen:
+            return Midletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
         else:
-            return Deletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause)
+            return Deletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
 
 
 class BDeletionKeyboardEvent(DeletionKeyboardEvent):
@@ -107,5 +111,5 @@ class NavigationKeyboardEvent(KeyboardEvent):
         self.endpos = self.next_evnt.startpos
 
     def to_action(self):
-        return Navigation(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause)
+        return Navigation(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, self.textlen)
 

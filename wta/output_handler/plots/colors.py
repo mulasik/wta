@@ -4,17 +4,24 @@ from matplotlib import colors as pltc
 class Colors:
 
     SEN_COLORS = {
-        'unchanged': 'mistyrose',
+        'unchanged_pre': 'mistyrose',
+        'unchanged_post': 'mistyrose',
         'new': 'darkslategrey',
         'deleted': 'seashell',
         'modified through deletion': 'lightcoral',
-        'modified through insertion': 'cadetblue',
-        'modified through append': 'teal'
+        'modified through midletion': 'darkred',
+        'modified through insertion': 'teal',
+        'modified through append': 'cadetblue',
+        'modified through replacement': 'tan',
+        'modified through pasting': 'orange'
     }
     TS_COLORS = {
         'deletion': 'lightcoral',
-        'insertion': 'cadetblue',
-        'append': 'teal',
+        'midletion': 'darkred',
+        'insertion': 'teal',
+        'append': 'cadetblue',
+        'replacement': 'tan',
+        'pasting': 'orange',
         '': 'w'
     }
     POS_COLORS = {

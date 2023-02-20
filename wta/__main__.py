@@ -10,8 +10,9 @@ from .pipeline.text_history.event_factory import EventFactory
 from .pipeline.text_history.action_factory import ActionFactory, ActionAggregator
 from .pipeline.text_history.ts_factory import TsFactory
 from .pipeline.text_history.tpsf_factory import ECMFactory
+from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
 from .output_handler.output_factory import (EventsOutputFactory, ActionsOutputFactory, ActionGroupsOutputFactory,
-                                            TssOutputFactory, TpsfsOutputFactory)
+                                            TssOutputFactory, TpsfsOutputFactory, TexthisOutputFactory, TexthisFltrOutputFactory)
 
 
 def load_path(dotted_path):
@@ -48,25 +49,21 @@ if __name__ == "__main__":
             action_groups = ActionAggregator.run(actions)
             ActionGroupsOutputFactory.run(action_groups)
             tss = TsFactory().run(action_groups)
-            tpsfs = ECMFactory().run(tss)
             TssOutputFactory.run(tss)
+            tpsfs = ECMFactory().run(tss)
             TpsfsOutputFactory.run(tpsfs)
+            TexthisOutputFactory.run(tpsfs)  # + texthis_pcm
+            # TODO: create text history in pause capturing mode, texthis_pcm = idfx_parser.all_tpsfs_pcm
+            # TODO: filter text history, texthis_fltr = ECMFactory().filter(texthis)
+            # TODO: export filtered text history, TexthisFltrOutputFactory.run(texthis_fltr)
 
-
-            # idfx_parser.filter_tpsfs_ecm()
-            # texthis = idfx_parser.all_tpsfs_ecm
-            # texthis_pcm = idfx_parser.all_tpsfs_pcm
-            # texthis_fltr = idfx_parser.filtered_tpsfs_ecm
-            # TexthisOutputFactory.run(texthis, texthis_pcm, texthis_fltr)
-            #
-            # # GENERATE SENHIS
+            # TODO: GENERATE SENHIS
             # print('\n== SENTENCE HISTORIES GENERATION ==')
-            # senhis_generator = SentenceHistoryGenerator(idfx_parser.all_tpsfs_ecm)
-            # senhis = senhis_generator.sentence_history
+            # senhis = SentenceHistoryGenerator().run(tpsfs)
             # senhis_fltr = senhis_generator.filtered_sentence_history
             # SenhisOutputFactory.run(texthis, texthis_fltr, senhis, senhis_fltr)
             #
-            # # PARSE SENHIS
+            # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
             # dep_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.DEP)
             # dep_parser.run()
@@ -74,13 +71,13 @@ if __name__ == "__main__":
             # const_parser.run()
             # ParseOutputFactory.run(dep_parser.senhis_parses, const_parser.senhis_parses)
             #
-            # # GENERATE TRANSHIS
+            # TODO: GENERATE TRANSHIS
             # print('\n== TRANSFORMATION HISTORIES GENERATION ==')
             # dep_transhis_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
             # const_transhis_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
             # TranshisOutputFactory.run(dep_transhis_classifier.transhis, const_transhis_classifier.transhis)
             #
-            # # GENERATE STATS
+            # TODO: GENERATE STATS
             # print('\n== STATISTICS GENERATION ==')
             # print('Generating statistics...')
             # b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory.run(idfx, texthis, texthis_fltr, texthis_pcm, senhis)

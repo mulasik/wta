@@ -4,6 +4,7 @@ from tqdm import tqdm
 class ActionFactory:
     """
     A class for generating Action objects and storing them in a list.
+    Action corresponds to event. There are as many actions as events.
     """
 
     @staticmethod
@@ -25,6 +26,8 @@ class ActionFactory:
             if evnt.to_action() is not None:
                 a = evnt.to_action()
                 actions.append(a)
+            else:
+                print(f'INFO: No action found for event {type(evnt).__name__} *{evnt.content}* at pos {evnt.startpos}-{evnt.endpos}')
         return actions
 
 
@@ -47,11 +50,11 @@ class ActionAggregator:
     """
 
     @staticmethod
-    def run(actions) -> dict:
+    def run(acts) -> dict:
         """
         Aggregates Action objects based on specific criteria.
         Args:
-            actions: a list of Action objects
+            acts: a list of Action objects
         Returns:
             A dict containing action group identifiers as keys and lists of Action objects as values.
         """
@@ -60,22 +63,28 @@ class ActionAggregator:
         #     if a:
         #         print(type(a).__name__, a.__dict__)
         # print()
-        action_groups = {}
+        act_groups = {}
         counter = 0
         prev_act_type = None
-        for i, act in enumerate(actions):
+        for i, act in enumerate(acts):
             act_type = type(act).__name__
-            if act_type != prev_act_type or act_type in ['Replacement', 'Pasting', 'Navigation'] or abs(act.startpos - actions[i-1].startpos) != 1:
-                action_groups[f'{act_type}_{counter}'] = [act]
+            non_consecutive_act = abs(act.startpos - acts[i-1].startpos) > 1
+            consecutive_del = abs(act.startpos - acts[i-1].startpos) == 0 and act.textlen < acts[i-1].textlen
+            # if the action type has just changed
+            # or this is an action of type 'Replacement', 'Pasting' or 'Navigation'
+            # or it is not a consecutive action
+            # (absolute diff between startpos of the currect action and startpos of the prev action is more than 1)
+            # neither is a consecutive deletion with delete
+            if act_type != prev_act_type or act_type in ['Replacement', 'Pasting', 'Navigation'] or (non_consecutive_act and not consecutive_del):
+                act_groups[f'{act_type}_{counter}'] = [act]
                 current_act_type = f'{act_type}_{counter}'
                 counter += 1
-            elif act_type == prev_act_type and abs(act.startpos - actions[i-1].startpos) == 1:
-                action_groups[current_act_type].append(act)
+            elif act_type == prev_act_type and abs(act.startpos - acts[i - 1].startpos) == 1:
+                act_groups[current_act_type].append(act)
+            else:
+                print(f'INFO: The action of type {act_type} does not meet pre-defined criteria for aggregation. '
+                      f'It will be added to the action groups as a separate single-item group.')
+                act_groups[current_act_type] = [act]
             prev_act_type = act_type
-        # print('ACTION GROUPS')
-        # for at, aa in action_groups.items():
-        #     print(at, len(aa), aa[0].startpos, aa[-1].endpos)
-        #     print([a.__dict__['content'] for a in aa])
-        # print()
-        return action_groups
+        return act_groups
 

@@ -20,49 +20,51 @@ class Action:
 
 class KeyboardAction(Action):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
         super().__init__(content, startpos, endpos)
         self.keyname = keyname
         self.starttime = starttime
         self.endtime = endtime
         self.pause = pause
+        self.textlen = textlen
 
 
 class Append(KeyboardAction):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
 
 
 class Insertion(KeyboardAction):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
 
 
 class Navigation(KeyboardAction):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
 
 
 class Deletion(KeyboardAction):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
 
 
 class Midletion(KeyboardAction):
 
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause)
+    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
 
 
 class Replacement(Action):
 
-    def __init__(self, content, startpos, endpos, rplcmt_endpos):
+    def __init__(self, content, startpos, endpos, rplcmt_endpos, rplcmt_textlen):
         super().__init__(content, startpos, endpos)
         self.rplcmt_endpos = rplcmt_endpos
+        self.textlen = rplcmt_textlen
 
 
 class Pasting(Action):

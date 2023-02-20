@@ -3,69 +3,59 @@ import uuid
 from tqdm import tqdm
 
 import settings
+from itertools import zip_longest
 
-from .sentence import Sentence
+from .text_unit import TextUnit
+from ..names import SenLabels
 
 
 class SentenceHistoryGenerator:
 
-    def __init__(self, tpsfs):
-        self.tpsfs = tpsfs
-        self.nlp_model = settings.nlp_model
-        self.sentence_history = {}
-        self.generate_sentence_history()
-        self.filtered_sentence_history = {}
-        self.filter_sentence_history()
-
-    def generate_sentence_history(self):
+    def run(self, tpsfs):
+        sentence_history = {}
         global_new_sens = []
-        progress = tqdm(self.tpsfs, 'Generating sentence history')
-        for tpsf in progress:
-            revision_relevance = tpsf.relevance
-            new_sens = tpsf.new_sentences
-            modified_sens = tpsf.modified_sentences
-            del_sens = tpsf.deleted_sentences
-            unchanged_sens = tpsf.unchanged_sentences
-            for ns in new_sens:
-                global_new_sens_texts = [ns.text for ns in global_new_sens]
-                if ns.text in global_new_sens_texts:
-                    ns.set_label('reinserted')
-                    for id, sens in self.sentence_history.items():
-                        texts = [s.text for s in sens]
-                        if ns.text in texts:
-                            existing_id = id
-                            ns.set_revision_relevance(revision_relevance)
-                            self.sentence_history[existing_id].append(ns)
-                else:
+        progress = tqdm(tpsfs, 'Generating sentence histories')
+        for i, tpsf in enumerate(tpsfs):
+            print([(tu.state.upper(), tu.text) for tu in tpsf.textunits])
+            if i == 0:
+                for tu in tpsf.textunits:
                     uid = uuid.uuid1().int
-                    ns.set_revision_relevance(revision_relevance)
-                    self.sentence_history[uid] = [ns]
-                global_new_sens.append(ns)
-            for es in modified_sens:
-                es.set_revision_relevance(revision_relevance)
-                for id, sens in self.sentence_history.items():
-                    sens_texts = [sen.text for sen in sens]
-                    if es.previous_sentence.text in sens_texts:
-                        self.sentence_history[id].append(es)
-            for ds in del_sens:
-                for id, sens in self.sentence_history.items():
-                    sens_texts = [sen.text for sen in sens]
-                    if ds.text in sens_texts:
-                        if ds.label == 'deleted_due_to_merge':
-                            label = 'deleted_due_to_merge'
+                    sentence_history[uid] = [tu]
+                    tu.set_id(uid)
+            elif i > 0 and len(tpsf.textunits) == len(tpsfs[i-1].textunits):
+                print(f'Number of sentences ({len(tpsf.textunits)}) has not changed.')
+                for ctu, ptu in zip(tpsf.textunits, tpsfs[i-1].textunits):
+                    ctu.set_id(ptu.tu_id)
+            elif i > 0 and len(tpsf.textunits) < len(tpsfs[i-1].textunits):
+                print(f'Sentence deletion detected: from {len(tpsfs[i-1].textunits)} to {len(tpsf.textunits)}')
+                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i-1].textunits):
+                    if ctu.state == SenLabels.UNC_PRE:
+                        ctu.set_id(ptu.tu_id)
+                    elif ctu.state == SenLabels.MOD:
+                        ...
+            elif i > 0 and len(tpsf.textunits) > len(tpsfs[i-1].textunits):
+                print(f'Sentence creation detected: from {len(tpsfs[i - 1].textunits)} to {len(tpsf.textunits)}')
+                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i-1].textunits):
+                    if ctu.state == SenLabels.UNC_PRE:
+                        try:
+                            ctu.set_id(ptu.tu_id)
+                        except AttributeError:
+                            continue
+                    elif ctu.state == SenLabels.NEW:
+                        if ctu.text in global_new_sens:
+                            for id, sens in sentence_history.items():
+                                texts = [s.text for s in sens]
+                                if ctu.text in texts:
+                                    sentence_history[id].append(ctu)
+                                    ctu.set_id(id)
                         else:
-                            label = 'deleted'
-                        sentence_remains = Sentence(None, None, None, ds.revision_id, None, None, self.nlp_model)
-                        sentence_remains.set_label(label)
-                        sentence_remains.set_revision_relevance(revision_relevance)
-                        self.sentence_history[id].append(sentence_remains)
-            for us in unchanged_sens:
-                us.set_revision_relevance(revision_relevance)
-                for id, sens in self.sentence_history.items():
-                    sens_texts = [sen.text for sen in sens]
-                    if us.text in sens_texts:
-                        self.sentence_history[id].append(us)
-        self.sentence_history = self.eliminate_duplicates(self.sentence_history)
+                            uid = uuid.uuid1().int
+                            sentence_history[uid] = [ctu]
+                            ctu.set_id(uid)
+                        global_new_sens.append(ctu.text)
+            else:
+                ...  # TODO
+        # return self.eliminate_duplicates(sentence_history)
 
     def eliminate_duplicates(self, sentence_history):
         sentence_history_duplicates_eliminated = {}
@@ -78,22 +68,4 @@ class SentenceHistoryGenerator:
                     continue
             sentence_history_duplicates_eliminated[id] = sens_duplicates_eliminated
         return sentence_history_duplicates_eliminated
-
-    def filter_sentence_history(self):
-        progress = tqdm(self.sentence_history.items(), 'Filtering sentence history')
-        irrelevant_ts_aggregated = []
-        for id, sen_versions in progress:
-            self.filtered_sentence_history[id] = []
-            for senid, sv in enumerate(sen_versions):
-                if sv.sentence_relevance is True:
-                    sv.set_irrelevant_ts_aggregated(irrelevant_ts_aggregated)
-                    self.filtered_sentence_history[id].append(sv)
-                    irrelevant_ts_aggregated = []
-                else:
-                    if sv.sen_transforming_sequence is not None:
-                        irrelevant_ts_aggregated.append((sv.sen_transforming_sequence.text, sv.sen_transforming_sequence.label))
-                if senid == len(sen_versions)-1 and sv is not None and sv not in self.filtered_sentence_history[id]:
-                    sv.set_irrelevant_ts_aggregated(irrelevant_ts_aggregated)
-                    self.filtered_sentence_history[id].append(sv)
-                    irrelevant_ts_aggregated = []
 

@@ -6,15 +6,13 @@ import settings
 
 class SentenceClassifier:
 
-    def __init__(self, prev_sens, sens, transforming_sequence):
+    def __init__(self, prev_sens, sens, ts):
         self.prev_sens = prev_sens
         self.sens = sens
-        self.transforming_sequence = transforming_sequence
+        self.ts = ts
         self.nlp_model = settings.nlp_model
-        self.delta_current_previous = []
-        self.delta_previous_current = []
-        self.new_sentences, self.modified_sentences, self.deleted_sentences, self.unchanged_sentences = [], [], [], []
-
+        self.delta_current_previous, self.delta_previous_current = [], []
+        self.new_sentences, self.modified_sentences, self.deleted_sentences, self.unchanged_sentences, self.transposed_sentences = [], [], [], [], []
         self.classify_sentence_level_changes()
 
     def classify_sentence_level_changes(self):
@@ -22,99 +20,99 @@ class SentenceClassifier:
         if not self.prev_sens:
             self.new_sentences = [s for s in self.sens]
             for s in self.new_sentences:
-                s.set_label('new')
-                sen_tagged_tokens = self.nlp_model.tag_words(s.text)
+                sen_tagged_tokens = self.nlp_model.tag_words(s.content)
                 s.set_tagged_tokens_and_typos(sen_tagged_tokens)
         # if there is previous TPSF version
         else:
             # sentences which already existed in the previous TPSF:
-            self.unchanged_sentences = [sen for sen in self.prev_sens if sen.text in [ps.text for ps in self.sens]]
-            for us in self.unchanged_sentences:
-                us.set_label('unchanged')
-                for s in self.sens:
-                    if us.text == s.text:
-                        s.set_tagged_tokens_and_typos(us.tagged_tokens)
+            self.set_unchanged_sentences()
             # sentences which didn't occur in the previous TPSF but do occur in the current TPSF:
-            self.delta_current_previous = [sen for sen in self.sens if sen.text not in [ps.text for ps in self.prev_sens]]
+            self.delta_current_previous = [sen for sen in self.sens if sen.content not in [ps.content for ps in self.prev_sens]]
             for dcp in self.delta_current_previous:
-                sen_tagged_tokens = self.nlp_model.tag_words(dcp.text)
+                sen_tagged_tokens = self.nlp_model.tag_words(dcp.content)
                 dcp.set_tagged_tokens_and_typos(sen_tagged_tokens)
             # sentences which occurred in the previous TPSF but don't occur in the current sentences:
-            self.delta_previous_current = [s for s in self.prev_sens if s.text not in [cs.text for cs in self.sens]]
+            self.delta_previous_current = [s for s in self.prev_sens if s.content not in [cs.content for cs in self.sens]]
             # match sentences from the deltas
             if len(self.delta_current_previous) > 0 or len(self.delta_previous_current) > 0:
                 self.compare_deltas()
 
     def compare_deltas(self):
         if len(self.delta_previous_current) == 0 and len(self.delta_current_previous) > 0:
-            affected_text = ' '.join([s.text for s in self.delta_current_previous]).replace('  ', ' ')
-            if self.transforming_sequence.text.strip() in affected_text.strip():
+            affected_text = ' '.join([s.content for s in self.delta_current_previous]).replace('  ', ' ')
+            if self.ts.text.strip() in affected_text.strip():
                 self.new_sentences = self.delta_current_previous
                 for s in self.new_sentences:
                     s.set_label('new')
             else:
                 print('Warning. The current text version does not contain the transforming sequence (insertion operation).')
         elif len(self.delta_previous_current) > 0 and len(self.delta_current_previous) == 0:
-            affected_text = ' '.join([s.text for s in self.delta_previous_current]).replace('  ', ' ')
-            if self.transforming_sequence.text.strip() in affected_text.strip():
+            affected_text = ' '.join([s.content for s in self.delta_previous_current]).replace('  ', ' ')
+            if self.ts.text.strip() in affected_text.strip():
                 self.deleted_sentences = self.delta_previous_current
                 for s in self.deleted_sentences:
                     s.set_label('deleted')
             else:
                 print('Warning. The previous text version does not contain the transforming sequence (deletion operation).')
         elif len(self.delta_previous_current) == len(self.delta_current_previous) != 0:
-            if self.transforming_sequence.label in ['insertion', 'append']:
-                normalized_transforming_seq_text = unicodedata.normalize('NFD', self.transforming_sequence.text)
+            if self.ts.label in ['insertion', 'append']:
+                normalized_transforming_seq_text = unicodedata.normalize('NFD', self.ts.text)
                 for cp in self.delta_current_previous:
-                    normalized_cp_text = unicodedata.normalize('NFD', cp.text)
+                    normalized_cp_text = unicodedata.normalize('NFD', cp.content)
                     if normalized_transforming_seq_text.strip() not in normalized_cp_text:
                         overlaps, s1_beginning, index = check_overlap_with_seq_beginning(normalized_transforming_seq_text, normalized_cp_text)
                         normalized_transforming_seq_text = normalized_transforming_seq_text[index:]
-                    cp_wo_transforming_seq = cp.text.replace(self.transforming_sequence.text, '')
+                    cp_wo_transforming_seq = cp.content.replace(self.ts.text, '')
                     for pc in self.delta_previous_current:
-                        if cp_wo_transforming_seq.strip() == pc.text.strip():
+                        if cp_wo_transforming_seq.strip() == pc.content.strip():
                             cp.set_previous_text_version(pc)
                             cp.set_label('modified')
                             self.modified_sentences.append(cp)
                         else:
-                            if calculate_sequence_similarity(cp.text, pc.text) > 0.75:
+                            if calculate_sequence_similarity(cp.content, pc.content) > 0.75:
                                 cp.set_previous_text_version(pc)
                                 cp.set_label('modified')
                                 self.modified_sentences.append(cp)
                             else:
-                                pc_extended = pc.text + self.transforming_sequence.text
-                                if pc_extended.strip() == cp.text.strip():
+                                pc_extended = pc.content + self.ts.text
+                                if pc_extended.strip() == cp.content.strip():
                                     cp.set_previous_text_version(pc)
                                     cp.set_label('modified')
                                     self.modified_sentences.append(cp)
                                 else:
-                                    pc_extended = pc.text + ' ' + self.transforming_sequence.text
-                                    if pc_extended.strip() == cp.text.strip():
+                                    pc_extended = pc.content + ' ' + self.ts.text
+                                    if pc_extended.strip() == cp.content.strip():
                                         cp.set_previous_text_version(pc)
                                         cp.set_label('modified')
                                         self.modified_sentences.append(cp)
                                     else:
-                                        if cp.text not in [s.text for s in self.unchanged_sentences]:
+                                        if cp.content not in [s.content for s in self.unchanged_sentences]:
                                             cp.set_label('unchanged')
                                             self.unchanged_sentences.append(cp)
             else:
                 for pc in self.delta_previous_current:
                     for cp in self.delta_current_previous:
-                        if pc.text.replace(self.transforming_sequence.text.strip(), '').strip() == cp.text.strip():
+                        if pc.content.replace(self.ts.text.strip(), '').strip() == cp.content.strip():
                             cp.set_previous_text_version(pc)
                             cp.set_label('modified')
                             self.modified_sentences.append(cp)
-                        elif pc.text.replace(self.transforming_sequence.text, '').strip() == cp.text.strip():
+                        elif pc.content.replace(self.ts.text, '').strip() == cp.content.strip():
                             cp.set_previous_text_version(pc)
                             cp.set_label('modified')
                             self.modified_sentences.append(cp)
-                        elif calculate_sequence_similarity(pc.text, cp.text) > 0.75:
+                        elif calculate_sequence_similarity(pc.content, cp.content) > 0.75:
                             cp.set_previous_text_version(pc)
                             cp.set_label('modified')
                             self.modified_sentences.append(cp)
-                        elif pc.text.strip() == self.transforming_sequence.text.strip():
+                        elif pc.content.strip() == self.ts.text.strip() and self.ts.label != 'pasting':
                             cp.set_label('new')
                             self.new_sentences.append(cp)
+                        elif pc.content.strip() == self.ts.text.strip() and self.ts.label == 'pasting':
+                            cp.set_label('pasted')  # TODO deal with pasted and transposed
+                            self.new_sentences.append(cp)
+                        elif self.ts.label == 'pasting' and cp.content.replace(self.ts.text.strip(), '').strip() == pc.content.strip():
+                            cp.set_label('modified')
+                            self.modified_sentences.append(cp)
                         else:
                             cp.set_label('erroneous_automatic_segmentation_detected')
                             self.unchanged_sentences.append(cp)
@@ -136,13 +134,13 @@ class SentenceClassifier:
                     for s in self.delta_current_previous:
                         # If the previous sentence is contained in the current sentence,
                         # the current sentence is a modification of the previous one.
-                        if previous_sentence.text.strip('.!?\n') in s.text.strip():
+                        if previous_sentence.content.strip('.!?\n') in s.content.strip():
                             s.set_previous_text_version(previous_sentence)
                             s.set_label('modified')
                             self.modified_sentences.append(s)
                         # If the current sentence is contained in the previous sentence,
                         # the current sentence must be a result of a split.
-                        elif s.text.strip('.!?\n') in previous_sentence.text.strip():
+                        elif s.content.strip('.!?\n') in previous_sentence.content.strip():
                             if previous_sentence_set is False:
                                 s.set_previous_text_version(previous_sentence)
                                 s.set_label('split_result')
@@ -166,7 +164,7 @@ class SentenceClassifier:
                     for s in self.delta_previous_current:
                         # If the current sentence is contained in the previous sentence,
                         # the current sentence is a modification of the previous one.
-                        if s.text.strip('.?!') in current_sentence.text.strip():
+                        if s.content.strip('.?!') in current_sentence.content.strip():
                             if current_sentence not in self.modified_sentences:
                                 current_sentence.set_previous_text_version(s)
                                 current_sentence.set_label('merge_result')
@@ -184,16 +182,16 @@ class SentenceClassifier:
         for sl in shorter_list:
             false_segmentation_candidates[sl] = []
             for ll in longer_list:
-                if ll.text in sl.text:
+                if ll.content in sl.content:
                     false_segmentation_candidates[sl].append(ll)
         for sl_sen, ll_sens in false_segmentation_candidates.items():
             if len(ll_sens) > 0:
                 print('Potential incorrect segmentations:')
                 for ll_sen in ll_sens:
                     print(f'> {ll_sen}')
-                longest_sen_length = max([len(ll_sen.text) for ll_sen in ll_sens])
+                longest_sen_length = max([len(ll_sen.content) for ll_sen in ll_sens])
                 for ll_sen in ll_sens:
-                    if len(ll_sen.text) == longest_sen_length:
+                    if len(ll_sen.content) == longest_sen_length:
                         prev_sen = ll_sen
                         prev_sen.set_label('modified')
                     else:
@@ -208,4 +206,21 @@ class SentenceClassifier:
                 new_sen = sl_sen
                 new_sen.set_label('new')
                 self.new_sentences.append(new_sen)
+
+    def set_unchanged_sentences(self):
+        unchanged_sentences = {s.content: [s] for s in self.sens if s.content in [ps.content for ps in self.prev_sens]}
+        for ps in self.prev_sens:
+            if ps.content in unchanged_sentences.keys():
+                unchanged_sentences[ps.content].append(ps)
+        for sens in unchanged_sentences.values():
+            if sens[0].pos_in_text == sens[1].pos_in_text:
+                # print(f'yes: {sens[0].pos_in_text} - {sens[1].pos_in_text}')
+                sens[0].set_label('unchanged')
+                sens[0].set_tagged_tokens_and_typos(sens[1].tagged_tokens)
+                self.unchanged_sentences.append(sens[0])
+            else:
+                # print(f'no: {sens[0].pos_in_text} - {sens[1].pos_in_text}')
+                sens[0].set_label('transposed')
+                sens[0].set_tagged_tokens_and_typos(sens[1].tagged_tokens)
+                self.transposed_sentences.append(sens[0])
 

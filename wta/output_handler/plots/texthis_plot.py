@@ -3,15 +3,13 @@ import matplotlib.pyplot as plt
 import settings
 from ..plots.colors import Colors
 from .base import BasePlot
+from ...pipeline.names import SenLabels
 
 
 class TexthisPlot(BasePlot):
 
     def __init__(self, texthis):
-        self.texthis = [tpsf for tpsf in texthis if (
-                len(tpsf.new_sentences) > 0
-                or len(tpsf.modified_sentences) > 0
-                or len(tpsf.deleted_sentences) > 0)]
+        self.texthis = texthis
         self.sen_lengths = self.preprocess_data()
         self.filtered = ''
 
@@ -19,16 +17,12 @@ class TexthisPlot(BasePlot):
         sentences_lengths = {}
         for tpsf in self.texthis:
             sentences_lens = []
-            for s in tpsf.sentence_list:
-                if s.text in [sen.text for sen in tpsf.unchanged_sentences]:
-                    label = 'unchanged'
-                elif s.text in [sen.text for sen in tpsf.new_sentences]:
-                    label = 'new'
-                elif s.text in [sen.text for sen in tpsf.modified_sentences]:
-                    label = f'modified through {tpsf.transforming_sequence.label}'
-                elif s.text in [sen.text for sen in tpsf.deleted_sentences]:
-                    label = 'deleted'
-                sentences_lens.append((label, len(s.text)))
+            for tu, tu_state in zip(tpsf.textunits, tpsf.tus_states):
+                if tu_state == SenLabels.MOD:
+                    label = f'modified through {tpsf.ts.label}'
+                else:
+                    label = tu_state
+                sentences_lens.append((label, len(tu.text)))
             sentences_lengths.update({tpsf.revision_id: sentences_lens})
         return sentences_lengths
 
@@ -42,7 +36,7 @@ class TexthisPlot(BasePlot):
         fig_width = fig_height * 0.8
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(fig_width, fig_height),
                                        gridspec_kw={'width_ratios': [4, 1]})
-        plt.yticks(ticks=list(self.sen_lengths.keys()), labels=tpsf_labels)
+        plt.yticks(ticks=list(range(0, len(tpsf_labels))), labels=tpsf_labels)
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.02)
 
         ax1.set_title('Text History', pad=5)
@@ -63,13 +57,13 @@ class TexthisPlot(BasePlot):
         for id, sens in self.sen_lengths.items():
             starts = 0
             for s in sens:
-                lbl = f'{s[0]} sentences' if s[0] in ['new', 'deleted', 'unchanged'] else f'sentences {s[0]}'
+                lbl = f'{s[0]} text units' if s[0] in ['new', 'deleted', 'unchanged_pre', 'unchanged_post'] else f'text units {s[0]}'
                 ax1.barh(str(id), s[1], left=starts, height=1, color=Colors.SEN_COLORS[s[0]], edgecolor='white', label=lbl)
                 starts += s[1]
         for tpsf in self.texthis:
-            lbl = tpsf.transforming_sequence.label
-            transforming_seq_text = tpsf.transforming_sequence.text
-            ax2.barh(str(tpsf.revision_id), len(transforming_seq_text), left=0, height=1, label=lbl, color=Colors.TS_COLORS[lbl], edgecolor='white')
+            lbl = tpsf.ts.label
+            ts_text_len = len(tpsf.ts.text)  # tpsf.ts.rplcmt_textlen if tpsf.ts.label == 'replacement'
+            ax2.barh(str(tpsf.revision_id), ts_text_len, left=0, height=1, label=lbl, color=Colors.TS_COLORS[lbl], edgecolor='white')
 
     def set_legend(self, ax1, ax2):
         hand, labl = ax1.get_legend_handles_labels()
@@ -113,7 +107,7 @@ class FilteredTexthisPlot(TexthisPlot):
         fig_width = fig_height * 0.8
         fig, (ax1, ax2) = plt.subplots(1, 2, sharey=True, figsize=(fig_width, fig_height),
                                        gridspec_kw={'width_ratios': [5, 3]})
-        plt.yticks(ticks=list(self.sen_lengths.keys()), labels=tpsf_labels)
+        plt.yticks(ticks=list(range(0, len(tpsf_labels))), labels=tpsf_labels)
         plt.subplots_adjust(bottom=0.1, right=0.8, top=0.4, wspace=0.02)
 
         ax1.set_title('Filtered Text History', pad=5)
@@ -122,7 +116,7 @@ class FilteredTexthisPlot(TexthisPlot):
         ax1.label_outer()
         ax1.set_xlabel('Number of characters')
 
-        ax2.set_title('Preceding\n Edit Operations\n Sequence', pad=5)
+        ax2.set_title('Preceding\n Edit Operation Types', pad=5)
         ax2.set_ylim(len(self.sen_lengths) + 1, -1)
         ax2.tick_params(axis='y', which='major', labelsize=7)
         ax2.tick_params(
@@ -146,24 +140,31 @@ class FilteredTexthisPlot(TexthisPlot):
                 starts += s[1]
         ypos = 0
         for tpsf in self.texthis:
-            transforming_sequences = tpsf.irrelevant_ts_aggregated
+            preceding_tss = tpsf.irrelevant_tss_aggregated if tpsf.irrelevant_tss_aggregated is not None else []
+            preceding_tss = [*preceding_tss, tpsf.ts]
             starts = 0
-            for ts in transforming_sequences:
-                lbl = ts[1]
+            for ts in preceding_tss:
+                lbl = ts.label
                 if lbl == 'insertion':
                     bar_lbl = 'ins'
                 elif lbl == 'append':
                     bar_lbl = 'app'
                 elif lbl == 'deletion':
                     bar_lbl = 'del'
+                elif lbl == 'midletion':
+                    bar_lbl = 'mid'
+                elif lbl == 'replacement':
+                    bar_lbl = 'rep'
+                elif lbl == 'pasting':
+                    bar_lbl = 'pas'
                 else:
                     print(
-                        f'Attention. Label undefined for the following transforming sequence: {ts}. The transforming sequence will not be visible in the visualisation.')
-                transforming_seq_len = 2
-                ax2.barh(str(tpsf.revision_id), transforming_seq_len, left=starts, height=1,
+                        f'ATTENTION: Label undefined for the following transforming sequence: {ts.sen_text}. The transforming sequence will not be visible in the visualisation.')
+                ts_len = 2
+                ax2.barh(str(tpsf.revision_id), ts_len, left=starts, height=1,
                          color=Colors.TS_COLORS[lbl], edgecolor='white', label=lbl)  # label=lbl,
-                ax2.text(s=bar_lbl, x=1 + starts, y=ypos, color="w", verticalalignment="center",
-                         horizontalalignment="center", size=10)
-                starts += transforming_seq_len
+                ax2.sen_text(s=bar_lbl, x=1 + starts, y=ypos, color="w", verticalalignment="center",
+                             horizontalalignment="center", size=10)
+                starts += ts_len
             ypos += 1
 

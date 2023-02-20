@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from tqdm import tqdm
 
-from wta.pipeline.text_history.names import KeyNames
+from wta.pipeline.names import KeyNames
 from .events.keyboard import (NavigationKeyboardEvent, ProductionKeyboardEvent,
                               BDeletionKeyboardEvent, DDeletionKeyboardEvent)
 from .events.replacement import ReplacementEvent
@@ -145,10 +145,12 @@ class EventFactory:
         elif event['type'] == 'replacement':
             try:
                 content = event.part.newtext.get_text()  # character to replace marked sequence
-                startpos = int(event.part.start.get_text())
-                rplcmt_endpos = int(event.part.end.get_text())-1
-                endpos = startpos + len(content)
-                evnt = ReplacementEvent(content, startpos, endpos, rplcmt_endpos)
+                orig_startpos = int(event.part.start.get_text())
+                orig_endpos = int(event.part.end.get_text())
+                endpos = orig_startpos + len(content)
+                rplcmt_textlen = orig_endpos - orig_startpos
+                rplcmt_endpos = orig_endpos - 1
+                evnt = ReplacementEvent(content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen)
             except:
                 print('FAILURE: Replacement event information not available in the IDFX file.')
         # SEQUENCE INSERTION: a text sequence is inserted

@@ -21,6 +21,7 @@ class TsFactory:
         """
         tss = []
         prev_endtime = None
+        rplcmt_textlen = None
         action_groups = tqdm(action_groups.items(), 'Extracting transforming sequences')
         for acttyp, actgro in action_groups:
             text = ''.join([a.content for a in actgro])
@@ -38,10 +39,9 @@ class TsFactory:
                 startpos, endpos = endpos, startpos
             elif actlbl == 'replacement':
                 endpos = actgro[-1].rplcmt_endpos
+                rplcmt_textlen = actgro[0].textlen
             prev_endtime = endtime
-            ts = TransformingSequence(text, actlbl, startpos, endpos, starttime, endtime, duration, preceding_pause)
-            if actlbl == 'navigation':
-                print(ts.__dict__)
+            ts = TransformingSequence(text, actlbl, startpos, endpos, starttime, endtime, duration, preceding_pause, rplcmt_textlen)
             tss.append(ts)
         return tss
 

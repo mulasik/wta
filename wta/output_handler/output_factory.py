@@ -90,16 +90,22 @@ class TpsfsOutputFactory(OutputFactory):
 class TexthisOutputFactory(OutputFactory):
 
     @classmethod
-    def run(cls, texthis, texthis_pcm, texthis_fltr):
+    def run(cls, texthis):  # + texthis_pcm
         StorageSettings.set_paths()
         TexthisJson(texthis).to_file()
-        TexthisJson(texthis_pcm, mode='pcm').to_file()
-        TexthisJson(texthis_fltr, filtered=True).to_file()
+        # TODO: TexthisJson(texthis_pcm, mode='pcm').to_file()
         TexthisTxt(texthis).to_file()
-        TexthisTxt(texthis_fltr, filtered=True).to_file()
         TexthisSvg(texthis).to_file()
-        FilteredTexthisSvg(texthis_fltr).to_file()
 
+
+class TexthisFltrOutputFactory(OutputFactory):
+
+    @classmethod
+    def run(cls, texthis_fltr):  # + texthis_pcm
+        StorageSettings.set_paths()
+        TexthisJson(texthis_fltr, filtered=True).to_file()
+        TexthisTxt(texthis_fltr, filtered=True).to_file()
+        FilteredTexthisSvg(texthis_fltr).to_file()
 
 class SenhisOutputFactory(OutputFactory):
 

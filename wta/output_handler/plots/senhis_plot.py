@@ -29,10 +29,10 @@ class SenhisPlot(BasePlot):
             tpsf_sens = []
             for id, sen in enumerate(tpsf.sentence_list):
                 for sen_id, sen_list in senhis.items():
-                    if sen.text.strip() in [s.text for s in sen_list] and sen.text.strip() not in [s[2] for s in tpsf_sens]:
-                        tpsf_sens.append((len(sen.text), self.sen_colors[sen_id], sen.text))
-                if sen.text.strip() not in [s[2] for s in tpsf_sens]:
-                    tpsf_sens.append((len(sen.text), 'beige', sen.text))
+                    if sen.content.strip() in [s.content for s in sen_list] and sen.content.strip() not in [s[2] for s in tpsf_sens]:
+                        tpsf_sens.append((len(sen.content), self.sen_colors[sen_id], sen.content))
+                if sen.content.strip() not in [s[2] for s in tpsf_sens]:
+                    tpsf_sens.append((len(sen.content), 'beige', sen.content))
             tpsf_sentences.update({tpsf.revision_id: tpsf_sens})
         return tpsf_sentences
 
@@ -60,7 +60,7 @@ class SenhisPlot(BasePlot):
         a2_starts = 0.95
         for s in last_sen_versions:
             a2_starts -= 0.01
-            ax2.text(0, a2_starts, s[2].strip(), wrap=True, size=7, bbox={'facecolor': s[1], 'alpha': 0.6, 'pad': 2})
+            ax2.content(0, a2_starts, s[2].strip(), wrap=True, size=7, bbox={'facecolor': s[1], 'alpha': 0.6, 'pad': 2})
             a2_starts -= 0.01
         return plt
 

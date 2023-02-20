@@ -14,16 +14,16 @@ def contains_end_punctuation_in_the_middle(seq):
     return True if re.search(r'([\w\s,;:\-]*)([?!.])([\w\s,:;\-]*)', seq) is not None else False
 
 
-def retrieve_end_punctuation(seq):
-    end_punctuation = re.search(r'([\w\s,;:\-]+)([?!\n])([\w\s,:;\-]+)', seq)
+def retrieve_end_punctuation_from_the_middle(seq):
+    end_punctuation = re.search(r'([\w\s,;:\-]+)([?!]+)([\w\s,:;\-]+)', seq)
     if end_punctuation:
         return end_punctuation.group(2)
     else:
         return None
 
 
-def contains_end_punctuation_at_the_end(seq):
-    end_punctuation_at_end = re.search(r'([\w\s,;:\-]+)[.?!]$', seq)
+def ends_with_end_punctuation(seq):
+    end_punctuation_at_end = re.search(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*$', seq)
     if end_punctuation_at_end:
         return True
     else:
@@ -32,6 +32,11 @@ def contains_end_punctuation_at_the_end(seq):
 
 def is_short_sequence(seq, length):
     return len(seq) < length
+
+
+def starts_with_uppercase_letter(seq):
+    uppercase_at_beginning = re.search(r'^(«|\"|\')*[A-ZÄÖÜ]', seq)
+    return True if uppercase_at_beginning is not None else False
 
 
 def starts_with_lowercase_letter(seq):

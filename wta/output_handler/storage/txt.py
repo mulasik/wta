@@ -27,7 +27,7 @@ class EventsTxt(Txt):
     def preprocess_data(self, events) -> str:
         output_str = ''
         for event in events:
-            output_str += f'{type(event).__name__}: {event.__dict__["content"]} {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
+            output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
         return output_str
 
 
@@ -83,12 +83,24 @@ class TpsfsTxt(Txt):
     def preprocess_data(self, tpsfs) -> str:
         output_str = ''
         for tpsf in tpsfs:
-            output_str += f'{tpsf.content}\n\n\n'
+            tpsf_tus = [] if not tpsf.textunits else [f"({tu_state}) {type(tu).__name__.upper()}:   |{tu.text}|\n" for tu, tu_state in zip(tpsf.textunits, tpsf.tus_states)]
+            tus_str = ''
+            for ttus in tpsf_tus:
+                tus_str += f'{ttus}\n'
+            # ts_str = f'The distance between the previous and the current point of inscription: {tpsf.ts_diff}.\n\n'
+            # ts_str_no_change = 'Point of inscription unchanged.\n\n'
+            # f'{ts_str if tpsf.ts_diff != 0 else ts_str_no_change}' \
+            output_str += f'======================{tpsf.revision_id}====================\n\n' \
+                          f'----------------TRANSFORMING SEQUENCE----------------\n\n' \
+                          f'{tpsf.ts.label.upper()} ({tpsf.ts.startpos}-{tpsf.ts.endpos}):\n|{tpsf.ts.text}|\n' \
+                          f'------------------------TEXT-------------------------\n\n'\
+                          f'|{tpsf.text}|\n\n'\
+                          f'----------------------TEXTUNITS----------------------\n\n'\
+                          f'{tus_str}\n'
         return output_str
 
 
 class TexthisTxt(Txt):
-
     def __init__(self, data, mode='ecm', filtered=False):
         self.output_str = self.preprocess_data(data)
         filter_label = '' if not filtered else '_filtered'
