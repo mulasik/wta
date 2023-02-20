@@ -16,3 +16,4 @@ wta.tar
 docs/.DS_Store
 docs/charts/.DS_Store
 wta/.DS_Store
+pyvenv.cfg
