@@ -70,5 +70,10 @@ class ReplacementEvent(BaseEvent):
         self.rplcmt_textlen = rplcmt_textlen
 
     def to_action(self):
-        return Replacement(self.content, self.startpos, self.endpos, self.rplcmt_endpos, self.rplcmt_textlen)
-
+        return Replacement(
+            self.content,
+            self.startpos,
+            self.endpos,
+            self.rplcmt_endpos,
+            self.rplcmt_textlen,
+        )

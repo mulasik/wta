@@ -1,9 +1,11 @@
-from wta.utils.nlp import (ends_with_end_punctuation,
-                           contains_end_punctuation_in_the_middle,
-                           retrieve_end_punctuation_from_the_middle,
-                           is_short_sequence,
-                           starts_with_lowercase_letter,
-                           retrieve_mismatch_range_for_sentence_pair)
+from wta.utils.nlp import (
+    ends_with_end_punctuation,
+    contains_end_punctuation_in_the_middle,
+    retrieve_end_punctuation_from_the_middle,
+    is_short_sequence,
+    starts_with_lowercase_letter,
+    retrieve_mismatch_range_for_sentence_pair,
+)
 from wta.pipeline.text_history.ts import TransformingSequence
 import json
 import uuid
@@ -36,24 +38,22 @@ class TextUnit(ABC):
         self.state = state
 
     def __str__(self):
-        return f'{self.text}'
+        return f"{self.text}"
 
     def to_json(self):
         return json.dumps(self, default=lambda o: o.__dict__)
 
     def to_dict(self):
         # TODO: extend with more tu properties
-        tu_dict = {
-            'text': self.text
-        }
+        tu_dict = {"text": self.text}
         return tu_dict
 
     def to_text(self):
         # TODO: extend with more tu properties
         s = self.to_dict()
-        return f'''
+        return f"""
                 {s["text"]}
-                '''
+                """
 
 
 class Sin(TextUnit):
@@ -75,5 +75,3 @@ class Sen(TextUnit):
 
     def __init__(self, text):
         super().__init__(text)
-
-

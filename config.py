@@ -67,7 +67,9 @@ VIDEO_CONF3 = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("R")
+        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f))
+        and f.endswith("idfx")
+        and f.startswith("R")
     ],
     "output_dir": os.path.join("output_data", "video"),
     "pause_duration": DEFAULT_PAUSE_DURATION,
@@ -78,4 +80,3 @@ VIDEO_CONF3 = {
     "punctuation": False,
     "language": DEFAULT_LANGUAGE,
 }
-

@@ -10,11 +10,10 @@ from ..names import SenLabels
 
 
 class SentenceHistoryGenerator:
-
     def run(self, tpsfs):
         sentence_history = {}
         global_new_sens = []
-        progress = tqdm(tpsfs, 'Generating sentence histories')
+        progress = tqdm(tpsfs, "Generating sentence histories")
         for i, tpsf in enumerate(tpsfs):
             print([(tu.state.upper(), tu.text) for tu in tpsf.textunits])
             if i == 0:
@@ -22,20 +21,24 @@ class SentenceHistoryGenerator:
                     uid = uuid.uuid1().int
                     sentence_history[uid] = [tu]
                     tu.set_id(uid)
-            elif i > 0 and len(tpsf.textunits) == len(tpsfs[i-1].textunits):
-                print(f'Number of sentences ({len(tpsf.textunits)}) has not changed.')
-                for ctu, ptu in zip(tpsf.textunits, tpsfs[i-1].textunits):
+            elif i > 0 and len(tpsf.textunits) == len(tpsfs[i - 1].textunits):
+                print(f"Number of sentences ({len(tpsf.textunits)}) has not changed.")
+                for ctu, ptu in zip(tpsf.textunits, tpsfs[i - 1].textunits):
                     ctu.set_id(ptu.tu_id)
-            elif i > 0 and len(tpsf.textunits) < len(tpsfs[i-1].textunits):
-                print(f'Sentence deletion detected: from {len(tpsfs[i-1].textunits)} to {len(tpsf.textunits)}')
-                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i-1].textunits):
+            elif i > 0 and len(tpsf.textunits) < len(tpsfs[i - 1].textunits):
+                print(
+                    f"Sentence deletion detected: from {len(tpsfs[i-1].textunits)} to {len(tpsf.textunits)}"
+                )
+                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i - 1].textunits):
                     if ctu.state == SenLabels.UNC_PRE:
                         ctu.set_id(ptu.tu_id)
                     elif ctu.state == SenLabels.MOD:
                         ...
-            elif i > 0 and len(tpsf.textunits) > len(tpsfs[i-1].textunits):
-                print(f'Sentence creation detected: from {len(tpsfs[i - 1].textunits)} to {len(tpsf.textunits)}')
-                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i-1].textunits):
+            elif i > 0 and len(tpsf.textunits) > len(tpsfs[i - 1].textunits):
+                print(
+                    f"Sentence creation detected: from {len(tpsfs[i - 1].textunits)} to {len(tpsf.textunits)}"
+                )
+                for ctu, ptu in zip_longest(tpsf.textunits, tpsfs[i - 1].textunits):
                     if ctu.state == SenLabels.UNC_PRE:
                         try:
                             ctu.set_id(ptu.tu_id)
@@ -68,4 +71,3 @@ class SentenceHistoryGenerator:
                     continue
             sentence_history_duplicates_eliminated[id] = sens_duplicates_eliminated
         return sentence_history_duplicates_eliminated
-

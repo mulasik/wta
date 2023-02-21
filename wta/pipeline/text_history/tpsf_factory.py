@@ -6,7 +6,6 @@ from .tpsf import TpsfECM
 
 
 class TpsfFactory:
-
     def run(self):
         pass
 
@@ -39,21 +38,21 @@ class ECMFactory(TpsfFactory):
         """
         output = []
         tpsfs = []
-        tss = [ts for ts in tss if ts.label != 'navigation']
-        tss = tqdm(tss, 'Extracting tpsfs')
+        tss = [ts for ts in tss if ts.label != "navigation"]
+        tss = tqdm(tss, "Extracting tpsfs")
         prev_tpsf = None
         for i, ts in enumerate(tss):
-            if ts.label in ['append', 'insertion', 'pasting']:
+            if ts.label in ["append", "insertion", "pasting"]:
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
                     startpos += 1
-            elif ts.label in ['deletion', 'midletion']:
-                text = output[ts.startpos:ts.endpos + 1]
-                ts.set_text(''.join(text))
-                del output[ts.startpos:ts.endpos + 1]
-            elif ts.label == 'replacement':
-                del output[ts.startpos:ts.endpos + 1]
+            elif ts.label in ["deletion", "midletion"]:
+                text = output[ts.startpos : ts.endpos + 1]
+                ts.set_text("".join(text))
+                del output[ts.startpos : ts.endpos + 1]
+            elif ts.label == "replacement":
+                del output[ts.startpos : ts.endpos + 1]
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
@@ -63,4 +62,3 @@ class ECMFactory(TpsfFactory):
             tpsfs.append(tpsf)
             prev_tpsf = tpsf
         return tpsfs
-

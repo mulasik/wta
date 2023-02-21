@@ -8,22 +8,22 @@ from .base import BaseStorage
 
 
 class Json(BaseStorage):
-
     def preprocess_data(self):
         pass
 
     def to_file(self):
-        with open(self.filepath, 'w') as f:
+        with open(self.filepath, "w") as f:
             json.dump(self.data, f)
 
 
 class TexthisJson(Json):
-
-    def __init__(self, data, mode='ecm', filtered=False):
+    def __init__(self, data, mode="ecm", filtered=False):
         self.data = self.preprocess_data(data)
         self.mode = mode
-        filter_label = '' if not filtered else '_filtered'
-        json_file = f'{settings.filename}_{Names.TEXTHIS}_{self.mode}{filter_label}.json'
+        filter_label = "" if not filtered else "_filtered"
+        json_file = (
+            f"{settings.filename}_{Names.TEXTHIS}_{self.mode}{filter_label}.json"
+        )
         self.filepath = os.path.join(paths.texthis_json_dir, json_file)
 
     def preprocess_data(self, texthis):
@@ -31,12 +31,13 @@ class TexthisJson(Json):
 
 
 class SenhisJson(Json):
-
-    def __init__(self, data, view_mode='normal', filtered=False):
-        self.view_mode = '' if view_mode == 'normal' else f'_{view_mode}'
+    def __init__(self, data, view_mode="normal", filtered=False):
+        self.view_mode = "" if view_mode == "normal" else f"_{view_mode}"
         self.data = self.preprocess_data(data)
-        filter_label = '' if not filtered else '_filtered'
-        json_file = f'{settings.filename}_{Names.SENHIS}{self.view_mode}{filter_label}.json'
+        filter_label = "" if not filtered else "_filtered"
+        json_file = (
+            f"{settings.filename}_{Names.SENHIS}{self.view_mode}{filter_label}.json"
+        )
         self.filepath = os.path.join(paths.senhis_json_dir, json_file)
 
     def preprocess_data(self, senhis):
@@ -47,12 +48,15 @@ class SenhisJson(Json):
 
 
 class TranshisJson(Json):
-
     def __init__(self, data, grammar):
         self.data = self.preprocess_data(data)
         self.grammar = grammar
-        json_file = f'{settings.filename}_{Names.TRANSHIS}_{grammar}.json'
-        output_dir = paths.dependency_transhis_dir if grammar == 'dependency' else paths.constituency_transhis_dir
+        json_file = f"{settings.filename}_{Names.TRANSHIS}_{grammar}.json"
+        output_dir = (
+            paths.dependency_transhis_dir
+            if grammar == "dependency"
+            else paths.constituency_transhis_dir
+        )
         self.filepath = os.path.join(output_dir, json_file)
 
     def preprocess_data(self, transhis):
@@ -60,4 +64,3 @@ class TranshisJson(Json):
         for sen_id, th in transhis.items():
             _transhis[sen_id] = [t.__dict__ for t in th]
         return _transhis
-

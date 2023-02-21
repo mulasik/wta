@@ -11,36 +11,43 @@ from .pipeline.text_history.action_factory import ActionFactory, ActionAggregato
 from .pipeline.text_history.ts_factory import TsFactory
 from .pipeline.text_history.tpsf_factory import ECMFactory
 from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
-from .output_handler.output_factory import (EventsOutputFactory, ActionsOutputFactory, ActionGroupsOutputFactory,
-                                            TssOutputFactory, TpsfsOutputFactory, TexthisOutputFactory, TexthisFltrOutputFactory)
+from .output_handler.output_factory import (
+    EventsOutputFactory,
+    ActionsOutputFactory,
+    ActionGroupsOutputFactory,
+    TssOutputFactory,
+    TpsfsOutputFactory,
+    TexthisOutputFactory,
+    TexthisFltrOutputFactory,
+)
 
 
 def load_path(dotted_path):
-    parts = dotted_path.split('.')
-    module = import_module('.'.join(parts[:-1]))
+    parts = dotted_path.split(".")
+    module = import_module(".".join(parts[:-1]))
     attr = getattr(module, parts[-1])
     return attr
 
 
 def run() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument('config')
+    parser.add_argument("config")
     args = parser.parse_args(sys.argv[1:])
     config = load_path(args.config)
-    nlp_model = SpacyModel(config['language'])
+    nlp_model = SpacyModel(config["language"])
 
     settings.config = config
     settings.nlp_model = nlp_model
 
-    for idfx in config['xml']:
+    for idfx in config["xml"]:
         try:
-            filename = os.path.split(idfx)[-1].replace('.idfx', '')
+            filename = os.path.split(idfx)[-1].replace(".idfx", "")
             settings.filename = filename
 
-            print(f'\nProcessing the input file {idfx}...')
+            print(f"\nProcessing the input file {idfx}...")
 
             # GENERATE TEXTHIS
-            print('\n== KEYSTROKE LOGS PROCESSING & TEXT HISTORY GENERATION ==')
+            print("\n== KEYSTROKE LOGS PROCESSING & TEXT HISTORY GENERATION ==")
             events = EventFactory().run(idfx)
             EventsOutputFactory.run(events)
             actions = ActionFactory().run(events)

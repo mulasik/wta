@@ -2,14 +2,15 @@ import settings
 
 
 class RelevanceEvaluator:
-
     def __init__(self, tpsf):
         self.tpsf = tpsf
-        self.min_edit_distance = settings.config['min_edit_distance']
-        self.spellchecking = settings.config['enable_spellchecking']
-        self.ts_min_tokens_number = settings.config['ts_min_tokens_number']
-        self.edit_dist_combined_with_tok_number = settings.config['combine_edit_distance_with_tok_number']
-        self.punctuation_rel = settings.config['include_punctuation_edits']
+        self.min_edit_distance = settings.config["min_edit_distance"]
+        self.spellchecking = settings.config["enable_spellchecking"]
+        self.ts_min_tokens_number = settings.config["ts_min_tokens_number"]
+        self.edit_dist_combined_with_tok_number = settings.config[
+            "combine_edit_distance_with_tok_number"
+        ]
+        self.punctuation_rel = settings.config["include_punctuation_edits"]
         self.nlp_model = settings.nlp_model
         self.sens_to_evaluate = self.tpsf.modified_sentences + self.tpsf.new_sentences
         self.relevance = None
@@ -28,7 +29,11 @@ class RelevanceEvaluator:
                 # overwrite relevance value if any typos discovered
                 if self.relevance is True and self.tpsf.contains_typos is True:
                     self.relevance = False
-            self.capture_relevance_eval_results(len(self.tpsf.ts.text), len(self.tpsf.ts.tagged_tokens), self.tpsf.contains_typos)
+            self.capture_relevance_eval_results(
+                len(self.tpsf.ts.text),
+                len(self.tpsf.ts.tagged_tokens),
+                self.tpsf.contains_typos,
+            )
 
     def determine_ts_relevance(self, ts):
         ts_length = len(ts.text)
@@ -48,11 +53,13 @@ class RelevanceEvaluator:
             else:
                 ts.set_ts_relevance(False)
 
-    def capture_relevance_eval_results(self, edit_distance, ts_tokens_number, tpsf_contains_typos):
+    def capture_relevance_eval_results(
+        self, edit_distance, ts_tokens_number, tpsf_contains_typos
+    ):
         self.relevance_eval_results = {
-                'edit_distance': edit_distance,
-                'number_tokens_in_transformin_seq': ts_tokens_number,
-                'tpsf_contains_typos': tpsf_contains_typos,
+            "edit_distance": edit_distance,
+            "number_tokens_in_transformin_seq": ts_tokens_number,
+            "tpsf_contains_typos": tpsf_contains_typos,
         }
 
     def determine_sentence_relevance(self, sen):
@@ -60,4 +67,3 @@ class RelevanceEvaluator:
         sen.set_tu_transforming_sequence(sen_transforming_sequence)
         self.determine_ts_relevance(sen.tu_transforming_sequence)
         sen.set_tu_relevance(sen.tu_transforming_sequence.ts_relevance)
-

@@ -1,8 +1,9 @@
 class BaseEvent:
-
     def __init__(self, content, startpos, endpos):
         self.content = content
-        self.startpos = startpos  # text[startpos] returns the first character of the _content_
+        self.startpos = (
+            startpos  # text[startpos] returns the first character of the _content_
+        )
         self.endpos = endpos  # text[endpos] returns the last character of the _content_
         self.prev_evnt = None
         self.next_evnt = None
@@ -21,4 +22,3 @@ class BaseEvent:
 
     def to_action(self):
         pass
-

@@ -53,9 +53,10 @@ class KeyboardEvent(BaseEvent):
 
 
 class ProductionKeyboardEvent(KeyboardEvent):
-
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
+        super().__init__(
+            content, startpos, endpos, keyname, starttime, endtime, textlen
+        )
         self.char_number_diff = CHAR_NUMBER_DIFF_PRODUCTION
 
     def to_action(self):
@@ -68,48 +69,96 @@ class ProductionKeyboardEvent(KeyboardEvent):
             return Pasting(self.content, self.startpos, self.endpos)
         # if position is smaller then text length
         elif len(self.content) == 1 and self.startpos < cur_textlen:
-            return Insertion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
+            return Insertion(
+                self.content,
+                self.startpos,
+                self.endpos,
+                self.keyname,
+                self.starttime,
+                self.endtime,
+                self.pause,
+                cur_textlen,
+            )
         else:
-            return Append(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
+            return Append(
+                self.content,
+                self.startpos,
+                self.endpos,
+                self.keyname,
+                self.starttime,
+                self.endtime,
+                self.pause,
+                cur_textlen,
+            )
 
 
 class DeletionKeyboardEvent(KeyboardEvent):
-
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
+        super().__init__(
+            content, startpos, endpos, keyname, starttime, endtime, textlen
+        )
 
     def to_action(self):
         cur_textlen = self.textlen - self.char_number_diff
         if type(self.next_evnt).__name__ == EventTypes.RE:
             pass
         elif self.startpos < cur_textlen:
-            return Midletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
+            return Midletion(
+                self.content,
+                self.startpos,
+                self.endpos,
+                self.keyname,
+                self.starttime,
+                self.endtime,
+                self.pause,
+                cur_textlen,
+            )
         else:
-            return Deletion(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, cur_textlen)
+            return Deletion(
+                self.content,
+                self.startpos,
+                self.endpos,
+                self.keyname,
+                self.starttime,
+                self.endtime,
+                self.pause,
+                cur_textlen,
+            )
 
 
 class BDeletionKeyboardEvent(DeletionKeyboardEvent):
-
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
+        super().__init__(
+            content, startpos, endpos, keyname, starttime, endtime, textlen
+        )
         self.char_number_diff = CHAR_NUMBER_DIFF_BDELETION
 
 
 class DDeletionKeyboardEvent(DeletionKeyboardEvent):
-
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
+        super().__init__(
+            content, startpos, endpos, keyname, starttime, endtime, textlen
+        )
         self.char_number_diff = CHAR_NUMBER_DIFF_DDELETION
 
 
 class NavigationKeyboardEvent(KeyboardEvent):
-
     def __init__(self, content, startpos, endpos, keyname, starttime, endtime, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, textlen)
+        super().__init__(
+            content, startpos, endpos, keyname, starttime, endtime, textlen
+        )
 
     def set_endpos(self):
         self.endpos = self.next_evnt.startpos
 
     def to_action(self):
-        return Navigation(self.content, self.startpos, self.endpos, self.keyname, self.starttime, self.endtime, self.pause, self.textlen)
-
+        return Navigation(
+            self.content,
+            self.startpos,
+            self.endpos,
+            self.keyname,
+            self.starttime,
+            self.endtime,
+            self.pause,
+            self.textlen,
+        )

@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 
 
 class BasePlot(ABC):
-
     @abstractmethod
     def preprocess_data(self):
         pass
@@ -22,4 +21,3 @@ class BasePlot(ABC):
     @abstractmethod
     def run(self):
         pass
-

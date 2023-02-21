@@ -2,17 +2,18 @@ from ..sentence_histories.text_unit_factory import TextUnitFactory
 
 
 class TpsfECM:
-
     def __init__(self, revision_id, content, ts, prev_tpsf, final=False):
         self.revision_id = revision_id
         self.text = content
         self.ts = ts
         self.prev_tpsf = prev_tpsf
         self.final = final
-        self.textunits, self.tus_states = TextUnitFactory().run(self.text, self.revision_id, self.ts, self.prev_tpsf)
+        self.textunits, self.tus_states = TextUnitFactory().run(
+            self.text, self.revision_id, self.ts, self.prev_tpsf
+        )
 
     def __str__(self):
-        return f'''
+        return f"""
 
 === TPSF ===
 
@@ -25,7 +26,7 @@ RESULT TEXT:
 TRANSFORMING SEQUENCE: 
 {self.ts.label.upper()} *{self.ts.text}*
 
-            '''
+            """
 
     def to_dict(self):
         tpsf_dict = {
@@ -36,7 +37,9 @@ TRANSFORMING SEQUENCE:
                 "transforming_sequence": self.ts.__dict__,
             },
             "textunits": {
-                "previous_textunits": [] if not self.prev_tpsf else [tu.to_dict() for tu in self.prev_tpsf.textunits],
+                "previous_textunits": []
+                if not self.prev_tpsf
+                else [tu.to_dict() for tu in self.prev_tpsf.textunits],
                 "current_textunits": [tu.to_dict() for tu in self.textunits],
             },
         }

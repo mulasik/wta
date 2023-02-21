@@ -1,14 +1,19 @@
-
 class TransformationClass:
-    REDUCTION = 'dependency tree reduction'
-    EXTENSION = 'dependency tree extension'
-    MODIFICATION = 'dependency tree modification'
-    WORD_MODIFICATION = 'word-level modification'
+    REDUCTION = "dependency tree reduction"
+    EXTENSION = "dependency tree extension"
+    MODIFICATION = "dependency tree modification"
+    WORD_MODIFICATION = "word-level modification"
 
 
 class Transformation:
-
-    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, syntactic_impact):
+    def __init__(
+        self,
+        cur_senver_id,
+        cur_parsed_sen,
+        prev_senver_id,
+        prev_parsed_sen,
+        syntactic_impact,
+    ):
         self.cur_senver_id = cur_senver_id
         self.cur_parsed_sen = cur_parsed_sen
         self.prev_senver_id = prev_senver_id
@@ -17,9 +22,18 @@ class Transformation:
 
 
 class DependencyTransformation(Transformation):
-
-    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, dep_impacted, word_modified):
-        super().__init__(cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, dep_impacted)
+    def __init__(
+        self,
+        cur_senver_id,
+        cur_parsed_sen,
+        prev_senver_id,
+        prev_parsed_sen,
+        dep_impacted,
+        word_modified,
+    ):
+        super().__init__(
+            cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, dep_impacted
+        )
         self.word_modified = word_modified
         self.transformation_class = self.classify()
 
@@ -66,27 +80,35 @@ class DependencyTransformation(Transformation):
         :param w2: second word to compare
         :return: a list of attributes names which the words have in common
         """
-        same_id = w1['id'] == w2['id']
-        same_word = w1['word'] == w2['word']
-        same_pos = w1['pos'] == w2['pos']
-        same_head = w1['head'] == w2['head']
-        same_dep_rel = w1['dep_rel'] == w2['dep_rel']
+        same_id = w1["id"] == w2["id"]
+        same_word = w1["word"] == w2["word"]
+        same_pos = w1["pos"] == w2["pos"]
+        same_head = w1["head"] == w2["head"]
+        same_dep_rel = w1["dep_rel"] == w2["dep_rel"]
         res = {
-            'same_id': same_id,
-            'same_word': same_word,
-            'same_pos': same_pos,
-            'same_head': same_head,
-            'same_dep_rel': same_dep_rel
+            "same_id": same_id,
+            "same_word": same_word,
+            "same_pos": same_pos,
+            "same_head": same_head,
+            "same_dep_rel": same_dep_rel,
         }
         equal_attrs = [key for key, val in res.items() if val is True]
         return equal_attrs
 
 
 class ConstituencyTransformation(Transformation):
-
-    def __init__(self, cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, const_impacted):
-        super().__init__(cur_senver_id, cur_parsed_sen, prev_senver_id, prev_parsed_sen, const_impacted)
-
-
-
-
+    def __init__(
+        self,
+        cur_senver_id,
+        cur_parsed_sen,
+        prev_senver_id,
+        prev_parsed_sen,
+        const_impacted,
+    ):
+        super().__init__(
+            cur_senver_id,
+            cur_parsed_sen,
+            prev_senver_id,
+            prev_parsed_sen,
+            const_impacted,
+        )

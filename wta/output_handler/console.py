@@ -2,7 +2,6 @@ import json
 
 
 class Console:
-
     def __init__(self, texthis: dict, senhis: dict, mode: str, filtered: bool):
         self.texthis = texthis
         self.senhis = senhis
@@ -22,6 +21,5 @@ class Console:
         print(json.dumps(_senhis, indent=5))
 
     def revnum_to_console(self):
-        _filtered = 'filtered' if self.filtered is True else 'all'
-        print(f'{self.mode}: {len(self.texthis)} text revisions ({_filtered}).')
-
+        _filtered = "filtered" if self.filtered is True else "all"
+        print(f"{self.mode}: {len(self.texthis)} text revisions ({_filtered}).")

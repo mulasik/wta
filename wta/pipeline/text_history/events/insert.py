@@ -39,4 +39,3 @@ class InsertEvent(BaseEvent):
 
     def to_action(self):
         return Pasting(self.content, self.startpos, self.endpos)
-
