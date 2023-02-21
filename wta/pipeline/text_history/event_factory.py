@@ -35,8 +35,9 @@ class EventFactory:
         Returns:
             list of Event objects
         """
-        soup = BeautifulSoup(open(idfx), features="lxml")
-        idfx_events = soup.find_all("event")
+        with open(idfx) as fp:
+            soup = BeautifulSoup(fp, features="lxml")
+            idfx_events = soup.find_all("event")
         idfx_events = tqdm(idfx_events, "Processing keylogs")
         events = [self.create_event(event) for event in idfx_events]
         for i, event in enumerate(events):

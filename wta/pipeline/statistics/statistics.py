@@ -56,8 +56,9 @@ class EventStatistics(Statistics):
         self.data = self.retrieve_stats()
 
     def retrieve_stats(self):
-        soup = BeautifulSoup(open(self.idfx), features="lxml")
-        events = soup.find_all("event")
+        with open(self.idfx) as fp:
+            soup = BeautifulSoup(fp, features="lxml")
+            events = soup.find_all("event")
         num_events = len(events)
         num_keystrokes, num_replacements, num_insertions = 0, 0, 0
         for e in events:
