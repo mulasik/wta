@@ -107,10 +107,8 @@ ignore = [
     "RET503", # missing explicit return for not None return value
     "RET504", # return directly
     "RET505", # unecessary else after return
-    "SIM102", # merge ifs
     "SIM103", # return directly
     "SIM108", # use ternary
-    "SIM114", # merge ifs
     "SIM115", # use context handler for files
     "SIM118", # simplify key lookup
     "SIM210", # bool() simplification

@@ -25,10 +25,13 @@ class RelevanceEvaluator:
             # check if ts meets the criteria defined in the tool config
             self.determine_ts_relevance(self.tpsf.ts)
             self.relevance = self.tpsf.ts.ts_relevance
-            if self.spellchecking is True:
+            if (
+                self.spellchecking is True
+                and self.relevance is True
+                and self.tpsf.contains_typos is True
+            ):
                 # overwrite relevance value if any typos discovered
-                if self.relevance is True and self.tpsf.contains_typos is True:
-                    self.relevance = False
+                self.relevance = False
             self.capture_relevance_eval_results(
                 len(self.tpsf.ts.text),
                 len(self.tpsf.ts.tagged_tokens),

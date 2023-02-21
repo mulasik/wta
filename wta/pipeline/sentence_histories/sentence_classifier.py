@@ -110,55 +110,40 @@ class SentenceClassifier:
                         )
                     cp_wo_transforming_seq = cp.content.replace(self.ts.text, "")
                     for pc in self.delta_previous_current:
-                        if cp_wo_transforming_seq.strip() == pc.content.strip():
+                        if cp_wo_transforming_seq.strip() == pc.content.strip() or (
+                            calculate_sequence_similarity(cp.content, pc.content) > 0.75
+                        ):
                             cp.set_previous_text_version(pc)
                             cp.set_label("modified")
                             self.modified_sentences.append(cp)
                         else:
-                            if (
-                                calculate_sequence_similarity(cp.content, pc.content)
-                                > 0.75
-                            ):
+                            pc_extended = pc.content + self.ts.text
+                            if pc_extended.strip() == cp.content.strip():
                                 cp.set_previous_text_version(pc)
                                 cp.set_label("modified")
                                 self.modified_sentences.append(cp)
                             else:
-                                pc_extended = pc.content + self.ts.text
+                                pc_extended = pc.content + " " + self.ts.text
                                 if pc_extended.strip() == cp.content.strip():
                                     cp.set_previous_text_version(pc)
                                     cp.set_label("modified")
                                     self.modified_sentences.append(cp)
                                 else:
-                                    pc_extended = pc.content + " " + self.ts.text
-                                    if pc_extended.strip() == cp.content.strip():
-                                        cp.set_previous_text_version(pc)
-                                        cp.set_label("modified")
-                                        self.modified_sentences.append(cp)
-                                    else:
-                                        if cp.content not in [
-                                            s.content for s in self.unchanged_sentences
-                                        ]:
-                                            cp.set_label("unchanged")
-                                            self.unchanged_sentences.append(cp)
+                                    if cp.content not in [
+                                        s.content for s in self.unchanged_sentences
+                                    ]:
+                                        cp.set_label("unchanged")
+                                        self.unchanged_sentences.append(cp)
             else:
                 for pc in self.delta_previous_current:
                     for cp in self.delta_current_previous:
                         if (
                             pc.content.replace(self.ts.text.strip(), "").strip()
                             == cp.content.strip()
-                        ):
-                            cp.set_previous_text_version(pc)
-                            cp.set_label("modified")
-                            self.modified_sentences.append(cp)
-                        elif (
-                            pc.content.replace(self.ts.text, "").strip()
+                            or pc.content.replace(self.ts.text, "").strip()
                             == cp.content.strip()
-                        ):
-                            cp.set_previous_text_version(pc)
-                            cp.set_label("modified")
-                            self.modified_sentences.append(cp)
-                        elif (
-                            calculate_sequence_similarity(pc.content, cp.content) > 0.75
+                            or calculate_sequence_similarity(pc.content, cp.content)
+                            > 0.75
                         ):
                             cp.set_previous_text_version(pc)
                             cp.set_label("modified")
