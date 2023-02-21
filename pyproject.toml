@@ -76,6 +76,7 @@ select = ["ALL"]
 ignore = [
     # handled by black:
     "COM812",
+    "E501",
     # don't require self and cls to have types
     "ANN101",
     "ANN102",
@@ -88,30 +89,25 @@ ignore = [
     # disabled for now:
     "A001", # shadowing builtin
     "ANN", # missing annotations
-    "ARG001", # unused argument
     "B007", # loop variable not used
+    "B024", # abstract class without abstract methods
     "B905", # zip without strict
     "C416", # unnecessary list comprehension
     "C901", # too complex
-    "E501", # line too long
     "E722", # bare except
     "E741", # ambiguous variable name
     "ERA001", # commented out code
     "F541", # f-strings without placeholders
-    "F811", # redefinition
-    "F821", # undefined name
     "F841", # unused variable
     "FBT00", # boolean positional argument
-    "N806", # invalid name
-    "PIE794", # redefinition
     "PLR0912", # too many branches
     "PLR0913", # too many arguments
     "PLR0915", # too many statements
     "PLR2004", # magic value used
     "PTH", # use pathlib
+    "RET503", # missing explicit return for not None return value
     "RET504", # return directly
     "RET505", # unecessary else after return
-    "RUF005", # splat instead of concatenation
     "SIM102", # merge ifs
     "SIM103", # return directly
     "SIM108", # use ternary
@@ -120,7 +116,4 @@ ignore = [
     "SIM118", # simplify key lookup
     "SIM210", # bool() simplification
     "T201", # print used
-    "UP015", # unnecessary open parameter
-    "RET503", # missing explicit return for not None return value
-    "B024", # abstract class without abstract methods
 ]
