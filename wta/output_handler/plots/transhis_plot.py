@@ -160,9 +160,9 @@ class SynBarTranshisPlot(BasePlot):
             starts = 0
             for iv in impact_values:
                 lbl = (
-                    f"Edit with syntactic impact"
+                    "Edit with syntactic impact"
                     if iv is True
-                    else f"Edit without syntactic impact"
+                    else "Edit without syntactic impact"
                 )
                 ax1.barh(
                     id,
@@ -178,9 +178,9 @@ class SynBarTranshisPlot(BasePlot):
             starts = 0
             for iv in impact_values:
                 lbl = (
-                    f"Edit with syntactic impact"
+                    "Edit with syntactic impact"
                     if iv is True
-                    else f"Edit without syntactic impact"
+                    else "Edit without syntactic impact"
                 )
                 ax2.barh(
                     id,
@@ -220,7 +220,7 @@ class SynBarTranshisPlot(BasePlot):
 
 class SynPieTranshisPlot(SynBarTranshisPlot):
     def create_figure(self):
-        lbls = [f"syntactic impact", f"no syntactic impact"]  # TODO add labels
+        lbls = ["syntactic impact", "no syntactic impact"]  # TODO add labels
         plt.rcParams.update({"font.size": 35})
         fig, (ax1, ax2) = plt.subplots(
             1, 2, sharey=True, figsize=(40, 20), gridspec_kw={"width_ratios": [1, 1]}

@@ -97,7 +97,6 @@ ignore = [
     "E722", # bare except
     "E741", # ambiguous variable name
     "ERA001", # commented out code
-    "F541", # f-strings without placeholders
     "F841", # unused variable
     "FBT00", # boolean positional argument
     "PLR0912", # too many branches
