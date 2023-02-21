@@ -17,12 +17,113 @@ nltk = "^3.8"
 matplotlib = "^3.6.2"
 numpy = "^1.24.0"
 supar = "^1.1.4"
-spacy = "~3.0.6"
-de-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.0.0/de_core_news_md-3.0.0.tar.gz#egg=de_core_news_md"}
-en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.0.0/en_core_web_md-3.0.0.tar.gz#egg=en_core_web_md"}
-el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.0.0/el_core_news_md-3.0.0.tar.gz#egg=el_core_news_md"}
+spacy = "~3.5.0"
+de-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.5.0/de_core_news_md-3.5.0.tar.gz#egg=de_core_news_md"}
+en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.5.0/en_core_web_md-3.5.0.tar.gz#egg=en_core_web_md"}
+el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.5.0/el_core_news_md-3.5.0.tar.gz#egg=el_core_news_md"}
 language-tool-python = "2.5.4"
+
+[tool.poetry.group.type-checking.dependencies]
+mypy = "^1.0.0"
+types-tqdm = "^4.64.7.12"
+types-beautifulsoup4 = "^4.11.6.5"
+
+[tool.poetry.group.linter.dependencies]
+ruff = "^0.0.249"
+black = "^23.1.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy]
+mypy_path = "stubs"
+sqlite_cache = true
+show_error_codes = true
+show_absolute_path = true
+show_column_numbers = true
+
+strict_optional = true
+warn_no_return = true
+disallow_any_unimported = true
+
+# Across versions of mypy, the flags toggled by --strict vary.  To ensure
+# we have reproducible type check, we instead manually specify the flags
+warn_unused_configs = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_return_any = true
+warn_unreachable = true
+implicit_reexport = false
+strict_equality = true
+
+# Disallow any
+disallow_any_explicit = true
+disallow_any_decorated = true
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+select = ["ALL"]
+ignore = [
+    # handled by black:
+    "COM812",
+    # don't require self and cls to have types
+    "ANN101",
+    "ANN102",
+    # allow relative imports from parents
+    "TID252",
+    # don't separate typing imports
+    "TCH",
+    # ignore documentations
+    "D",
+    # disabled for now:
+    "A001", # shadowing builtin
+    "ANN", # missing annotations
+    "ARG001", # unused argument
+    "B007", # loop variable not used
+    "B905", # zip without strict
+    "C416", # unnecessary list comprehension
+    "C901", # too complex
+    "E401", # multiple imports on one line
+    "E501", # line too long
+    "E722", # bare except
+    "E741", # ambiguous variable name
+    "ERA001", # commented out code
+    "F401", # unused import
+    "F541", # f-strings without placeholders
+    "F811", # redefinition
+    "F821", # undefined name
+    "F841", # unused variable
+    "FBT00", # boolean positional argument
+    "I001", # sort imports
+    "N806", # invalid name
+    "PIE794", # redefinition
+    "PLR0912", # too many branches
+    "PLR0913", # too many arguments
+    "PLR0915", # too many statements
+    "PLR2004", # magic value used
+    "PTH", # use pathlib
+    "RET504", # return directly
+    "RET505", # unecessary else after return
+    "RUF005", # splat instead of concatenation
+    "SIM102", # merge ifs
+    "SIM103", # return directly
+    "SIM108", # use ternary
+    "SIM114", # merge ifs
+    "SIM115", # use context handler for files
+    "SIM118", # simplify key lookup
+    "SIM210", # bool() simplification
+    "T201", # print used
+    "UP015", # unnecessary open parameter
+    "RET503", # missing explicit return for not None return value
+    "B024", # abstract class without abstract methods
+]
