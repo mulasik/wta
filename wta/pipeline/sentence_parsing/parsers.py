@@ -81,3 +81,4 @@ class Supar(BaseParserAdapter):
             return tok_lst
         if self.grammar == Grammars.CONST:
             return list(parsed_sen)[0]
+        return None

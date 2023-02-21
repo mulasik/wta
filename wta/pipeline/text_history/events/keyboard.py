@@ -64,12 +64,12 @@ class ProductionKeyboardEvent(KeyboardEvent):
         cur_textlen = self.textlen - self.char_number_diff
         # if the next event is a replacement, the keyboard event is part of the replacement
         if type(self.next_evnt).__name__ == EventTypes.RE:
-            pass
+            return None
         # if more than 1 character has been produced at one go, the action is pasting
-        elif len(self.content) > 1:
+        if len(self.content) > 1:
             return Pasting(self.content, self.startpos, self.endpos)
         # if position is smaller then text length
-        elif len(self.content) == 1 and self.startpos < cur_textlen:
+        if len(self.content) == 1 and self.startpos < cur_textlen:
             return Insertion(
                 self.content,
                 self.startpos,
@@ -80,17 +80,16 @@ class ProductionKeyboardEvent(KeyboardEvent):
                 self.pause,
                 cur_textlen,
             )
-        else:
-            return Append(
-                self.content,
-                self.startpos,
-                self.endpos,
-                self.keyname,
-                self.starttime,
-                self.endtime,
-                self.pause,
-                cur_textlen,
-            )
+        return Append(
+            self.content,
+            self.startpos,
+            self.endpos,
+            self.keyname,
+            self.starttime,
+            self.endtime,
+            self.pause,
+            cur_textlen,
+        )
 
 
 class DeletionKeyboardEvent(KeyboardEvent):
@@ -102,8 +101,8 @@ class DeletionKeyboardEvent(KeyboardEvent):
     def to_action(self):
         cur_textlen = self.textlen - self.char_number_diff
         if type(self.next_evnt).__name__ == EventTypes.RE:
-            pass
-        elif self.startpos < cur_textlen:
+            return None
+        if self.startpos < cur_textlen:
             return Midletion(
                 self.content,
                 self.startpos,
@@ -114,17 +113,16 @@ class DeletionKeyboardEvent(KeyboardEvent):
                 self.pause,
                 cur_textlen,
             )
-        else:
-            return Deletion(
-                self.content,
-                self.startpos,
-                self.endpos,
-                self.keyname,
-                self.starttime,
-                self.endtime,
-                self.pause,
-                cur_textlen,
-            )
+        return Deletion(
+            self.content,
+            self.startpos,
+            self.endpos,
+            self.keyname,
+            self.starttime,
+            self.endtime,
+            self.pause,
+            cur_textlen,
+        )
 
 
 class BDeletionKeyboardEvent(DeletionKeyboardEvent):

@@ -80,7 +80,7 @@ class SpacyModel:
             sentences.append(sent.text_with_ws)
         return sentences
 
-    def collect_additional_tokens_tags(self, text: str) -> tuple:
+    def collect_additional_tokens_tags(self, text: str) -> tuple | None:
         doc = self.nlp(text)
         for token in doc:
             return (
@@ -91,16 +91,18 @@ class SpacyModel:
                 token.has_vector,
                 token.vector_norm,
             )
+        return None
 
-    def check_if_same_words(self, editted_word: str, result_word: str) -> bool:
-        if editted_word and result_word:
-            editted_word = self.nlp(editted_word)
-            result_word = self.nlp(result_word)
-            return (
-                editted_word.pos_ == result_word.pos_
-                and editted_word.lemma_ == result_word.lemma_
-                and editted_word.dep_ == result_word.dep_
-            )
+    def check_if_same_words(self, editted_word: str, result_word: str) -> bool | None:
+        if not editted_word or not result_word:
+            return None
+        editted_word = self.nlp(editted_word)
+        result_word = self.nlp(result_word)
+        return (
+            editted_word.pos_ == result_word.pos_
+            and editted_word.lemma_ == result_word.lemma_
+            and editted_word.dep_ == result_word.dep_
+        )
 
     def check_if_any_oov(self, tokens: list) -> bool:
         for t in tokens:

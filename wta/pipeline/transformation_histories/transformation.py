@@ -54,6 +54,7 @@ class DependencyTransformation(Transformation):
                 return TransformationClass.MODIFICATION
         if not self.syntactic_impact and self.word_modified:
             return TransformationClass.WORD_MODIFICATION
+        return None
 
     def find_best_match(self, word, word_list):
         """

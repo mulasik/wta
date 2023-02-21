@@ -103,7 +103,6 @@ ignore = [
     "PLR0915", # too many statements
     "PLR2004", # magic value used
     "PTH", # use pathlib
-    "RET503", # missing explicit return for not None return value
     "SIM115", # use context handler for files
     "SIM118", # simplify key lookup
     "T201", # print used
