@@ -44,10 +44,7 @@ class DependencyTransformationFactory(TransformationFactory):
                                 dep_impacted = True
                             else:
                                 dep_impacted = False
-                                if word["word"] != prev_word["word"]:
-                                    word_modified = True
-                                else:
-                                    word_modified = False
+                                word_modified = word["word"] != prev_word["word"]
                         # the tree has been extended
                         except IndexError:
                             dep_impacted = True
@@ -88,10 +85,7 @@ class ConsituencyTransformationFactory(TransformationFactory):
                     )
                     try:
                         # the constituents have changed
-                        if parse_wo_tokens != prev_parse_wo_tokens:
-                            const_impacted = True
-                        else:
-                            const_impacted = False
+                        const_impacted = parse_wo_tokens != prev_parse_wo_tokens
                     # the tree has been extended
                     except IndexError:
                         const_impacted = True

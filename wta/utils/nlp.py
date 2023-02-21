@@ -208,8 +208,9 @@ def retrieve_mismatch_range_for_sentence_pair(prev_sen: str, cur_sen: str) -> tu
         elif m[0] == "replace":
             edit = m[0]
             mismatch_range.append(range(max(m[1], m[3]), max(m[2] + 1, m[4] + 1)))
-            if mismatch_range[0] == m[1] and mismatch_range[-1] == m[2]:
-                relevant = "prev"
-            else:
-                relevant = "cur"
+            relevant = (
+                "prev"
+                if mismatch_range[0] == m[1] and mismatch_range[-1] == m[2]
+                else "cur"
+            )
     return edit, mismatch_range, relevant

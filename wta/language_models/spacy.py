@@ -178,11 +178,8 @@ class SpacyModel:
                 # if the edit was performed within one token, check the edit distance
                 affected_token = affected_tokens[0]
                 edit_distance = check_edit_distance(affected_token)
-                if edit_distance <= predef_edit_distance:
-                    # if the edit distance is less than the pre-defined edit distance, the TPSF is not relevant
-                    morphosyntactic_relevance = False
-                else:
-                    morphosyntactic_relevance = True
+                # if the edit distance is less than the pre-defined edit distance, the TPSF is not relevant
+                morphosyntactic_relevance = edit_distance > predef_edit_distance
             else:
                 contains_one_char_token = (
                     True

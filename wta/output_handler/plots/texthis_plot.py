@@ -16,10 +16,11 @@ class TexthisPlot(BasePlot):
         for tpsf in self.texthis:
             sentences_lens = []
             for tu, tu_state in zip(tpsf.textunits, tpsf.tus_states):
-                if tu_state == SenLabels.MOD:
-                    label = f"modified through {tpsf.ts.label}"
-                else:
-                    label = tu_state
+                label = (
+                    f"modified through {tpsf.ts.label}"
+                    if tu_state == SenLabels.MOD
+                    else tu_state
+                )
                 sentences_lens.append((label, len(tu.text)))
             sentences_lengths.update({tpsf.revision_id: sentences_lens})
         return sentences_lengths
