@@ -96,14 +96,11 @@ class SpacyModel:
         if editted_word and result_word:
             editted_word = self.nlp(editted_word)
             result_word = self.nlp(result_word)
-            if (
-                editted_word.pos_ != result_word.pos_
-                or editted_word.lemma_ != result_word.lemma_
-                or editted_word.dep_ != result_word.dep_
-            ):
-                return False
-            else:
-                return True
+            return (
+                editted_word.pos_ == result_word.pos_
+                and editted_word.lemma_ == result_word.lemma_
+                and editted_word.dep_ == result_word.dep_
+            )
 
     def check_if_any_oov(self, tokens: list) -> bool:
         for t in tokens:

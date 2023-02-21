@@ -33,8 +33,7 @@ class TextUnit(ABC):
 
     def to_dict(self):
         # TODO: extend with more tu properties
-        tu_dict = {"text": self.text}
-        return tu_dict
+        return {"text": self.text}
 
     def to_text(self):
         # TODO: extend with more tu properties

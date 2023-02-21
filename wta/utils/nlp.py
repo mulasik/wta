@@ -7,8 +7,7 @@ import nltk
 
 def segment_sentences_with_nltk(text):
     sent_detector = nltk.data.load("tokenizers/punkt/german.pickle")
-    sentences = list(sent_detector.tokenize(text.strip()))
-    return sentences
+    return list(sent_detector.tokenize(text.strip()))
 
 
 def contains_end_punctuation_in_the_middle(seq):
@@ -25,10 +24,7 @@ def retrieve_end_punctuation_from_the_middle(seq):
 
 def ends_with_end_punctuation(seq):
     end_punctuation_at_end = re.search(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*$', seq)
-    if end_punctuation_at_end:
-        return True
-    else:
-        return False
+    return bool(end_punctuation_at_end)
 
 
 def is_short_sequence(seq, length):
@@ -42,10 +38,7 @@ def starts_with_uppercase_letter(seq):
 
 def starts_with_lowercase_letter(seq):
     lowercase_at_beginning = re.search(r"^[a-zäöü]", seq)
-    if lowercase_at_beginning is not None:
-        return True
-    else:
-        return False
+    return lowercase_at_beginning is not None
 
 
 def calculate_sequence_similarity(a, b):
@@ -54,14 +47,12 @@ def calculate_sequence_similarity(a, b):
 
 def retrieve_match_range(seq1: str, seq2: str) -> tuple:
     seq_match = difflib.SequenceMatcher(None, seq1.strip(), seq2.strip())
-    match_ranges = seq_match.get_matching_blocks()
-    return match_ranges
+    return seq_match.get_matching_blocks()
 
 
 def retrieve_mismatch_ranges(seq1: str, seq2: str) -> tuple:
     seq_match = difflib.SequenceMatcher(None, seq1, seq2)
-    mismatch_ranges = seq_match.get_opcodes()
-    return mismatch_ranges
+    return seq_match.get_opcodes()
 
 
 def check_overlap_with_seq_beginning(s1, s2):
@@ -179,8 +170,7 @@ def retrieve_affected_tokens(prev_sen, cur_sen) -> list:
 def check_edit_distance(tokens: list) -> int:
     prev_tok = "" if tokens["prev"] is None else tokens["prev"]["text"]
     cur_tok = "" if tokens["cur"] is None else tokens["cur"]["text"]
-    ed = nltk.edit_distance(prev_tok, cur_tok)
-    return ed
+    return nltk.edit_distance(prev_tok, cur_tok)
 
 
 def retrieve_mismatch_range_for_sentence_pair(prev_sen: str, cur_sen: str) -> tuple:

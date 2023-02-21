@@ -88,7 +88,7 @@ class TextUnitFactory:
         ]
         if len(doubles) == 0:
             # print(f'No more doubles.')
-            pass
+            return textunit_list
         else:
             # print(f'Detected doubles. Need to merge.')
             prev_merged_text = ""
@@ -115,8 +115,7 @@ class TextUnitFactory:
                 elif i.text != prev_merged_text:
                     merged_textunits.append(i)
                     prev_merged_text = ""
-            textunit_list = self.merge_double_textunits(merged_textunits)
-        return textunit_list
+            return self.merge_double_textunits(merged_textunits)
 
     def detect_tus_diffs(self, textunits, ts, prev_tpsf):
         if ts.label in [TSLabels.MID, TSLabels.DEL, TSLabels.REPL]:

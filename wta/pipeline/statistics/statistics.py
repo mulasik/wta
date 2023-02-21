@@ -43,12 +43,11 @@ class BasicStatistics(Statistics):
         self.data = self.retrieve_stats()
 
     def retrieve_stats(self):
-        data = {
+        return {
             "num_tpsfs": len(self.texthis),
             "num_tpsfs_filtered": len(self.texthis_filtered),
             "num_tpsfs_pcm": len(self.texthis_pcm),
         }
-        return data
 
 
 class EventStatistics(Statistics):
@@ -68,13 +67,12 @@ class EventStatistics(Statistics):
                 num_replacements += 1
             if e["type"] == "insert":
                 num_insertions += 1
-        data = {
+        return {
             "num_events": num_events,
             "num_keystrokes": num_keystrokes,
             "num_replacements": num_replacements,
             "num_insertions": num_insertions,
         }
-        return data
 
 
 class PauseStatistics(Statistics):
@@ -90,12 +88,11 @@ class PauseStatistics(Statistics):
                 pauses.append(tpsf.preceeding_pause)
                 total_pauses_duration += tpsf.preceeding_pause
         avg_pause_duration = round(total_pauses_duration / len(pauses))
-        data = {
+        return {
             "avg_duration": avg_pause_duration,
             "max_duration": max(pauses),
             "min_duration": min(pauses),
         }
-        return data
 
 
 class TSStatistics(Statistics):
@@ -125,7 +122,7 @@ class TSStatistics(Statistics):
         for tst in transforming_sequences_texts:
             total_ts_length += len(tst)
         avg_ts_len = round(total_ts_length / len(transforming_sequences_texts))
-        data = {
+        return {
             "num_nonempty_ts": num_nonempty_ts,
             "avg_ts_len": avg_ts_len,
             "num_ins": num_ins,
@@ -135,7 +132,6 @@ class TSStatistics(Statistics):
             "num_del_chars": num_del_chars,
             "num_app_chars": num_app_chars,
         }
-        return data
 
 
 class SentenceStatistics(Statistics):
@@ -162,7 +158,7 @@ class SentenceStatistics(Statistics):
             num_sen_versions.append(len(sh))
         mean_num_sentence_versions = round(np.mean(num_sen_versions), 2)
         final_num_sentences = len(self.texthis[-1].sentence_list)
-        data = {
+        return {
             "detected_sens": detected_sens,
             "final_num_sentences": final_num_sentences,
             "num_potentially_erroneous_sens": num_potentially_erroneous_sens,
@@ -171,4 +167,3 @@ class SentenceStatistics(Statistics):
             "mean_num_sentence_versions": mean_num_sentence_versions,
             "num_unchanged_sens": num_unchanged_sens,
         }
-        return data

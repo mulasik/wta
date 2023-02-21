@@ -92,8 +92,7 @@ class DependencyTransformation(Transformation):
             "same_head": same_head,
             "same_dep_rel": same_dep_rel,
         }
-        equal_attrs = [key for key, val in res.items() if val is True]
-        return equal_attrs
+        return [key for key, val in res.items() if val is True]
 
 
 class ConstituencyTransformation(Transformation):

@@ -24,8 +24,7 @@ from .pipeline.text_history.ts_factory import TsFactory
 def load_path(dotted_path):
     parts = dotted_path.split(".")
     module = import_module(".".join(parts[:-1]))
-    attr = getattr(module, parts[-1])
-    return attr
+    return getattr(module, parts[-1])
 
 
 def run() -> None:

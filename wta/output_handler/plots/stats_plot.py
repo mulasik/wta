@@ -140,10 +140,7 @@ class DeletionsPlot(StatsPlot):
                         and t["pos"] in ts_content.keys()
                     ):
                         ts_content[t["pos"]] += 1
-        sorted_ts_content = sorted(
-            ts_content.items(), key=operator.itemgetter(0), reverse=True
-        )
-        return sorted_ts_content
+        return sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)
 
     def create_figure(self):
         plt.rcParams.update({"font.size": 35})
@@ -176,10 +173,7 @@ class InsertionsPlot(StatsPlot):
                         and t["pos"] in ts_content.keys()
                     ):
                         ts_content[t["pos"]] += 1
-        sorted_ts_content = sorted(
-            ts_content.items(), key=operator.itemgetter(0), reverse=True
-        )
-        return sorted_ts_content
+        return sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)
 
     def create_figure(self):
         plt.rcParams.update({"font.size": 35})

@@ -29,7 +29,7 @@ TRANSFORMING SEQUENCE:
             """
 
     def to_dict(self):
-        tpsf_dict = {
+        return {
             "revision_id": self.revision_id,
             "prev_text_version": None if not self.prev_tpsf else self.prev_tpsf.text,
             "result_text": self.text,
@@ -43,7 +43,6 @@ TRANSFORMING SEQUENCE:
                 "current_textunits": [tu.to_dict() for tu in self.textunits],
             },
         }
-        return tpsf_dict
 
     def to_text(self):
         return f"""

@@ -105,9 +105,7 @@ ignore = [
     "PLR2004", # magic value used
     "PTH", # use pathlib
     "RET503", # missing explicit return for not None return value
-    "RET504", # return directly
     "RET505", # unecessary else after return
-    "SIM103", # return directly
     "SIM115", # use context handler for files
     "SIM118", # simplify key lookup
     "T201", # print used
