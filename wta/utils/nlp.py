@@ -18,8 +18,7 @@ def retrieve_end_punctuation_from_the_middle(seq):
     end_punctuation = re.search(r"([\w\s,;:\-]+)([?!]+)([\w\s,:;\-]+)", seq)
     if end_punctuation:
         return end_punctuation.group(2)
-    else:
-        return None
+    return None
 
 
 def ends_with_end_punctuation(seq):
@@ -59,26 +58,26 @@ def check_overlap_with_seq_beginning(s1, s2):
     # s1 is modifying seq and s2 is sen
     index = 1
     s1_beginning = s1[:index]
-    if s1_beginning in s2:
-        while s1_beginning in s2 and len(s1_beginning) < len(s1):
-            index += 1
-            s1_beginning = s1[:index]
-        return True, s1_beginning, index
-    else:
+    if s1_beginning not in s2:
         return False, "", None
+
+    while s1_beginning in s2 and len(s1_beginning) < len(s1):
+        index += 1
+        s1_beginning = s1[:index]
+    return True, s1_beginning, index
 
 
 def check_overlap_with_seq_end(s1: str, s2: str) -> tuple:
     # s1 is modifying seq and s2 is sen
     index = len(s1)
     s1_end = s1[index:]
-    if s1_end in s2:
-        while s1_end in s2 and len(s1_end) < len(s1):
-            index -= 1
-            s1_end = s1[index:]
-        return True, s1_end, index
-    else:
+    if s1_end not in s2:
         return False, "", None
+
+    while s1_end in s2 and len(s1_end) < len(s1):
+        index -= 1
+        s1_end = s1[index:]
+    return True, s1_end, index
 
 
 def retrieve_token_indices(prev_sen: str, cur_sen: str) -> tuple:

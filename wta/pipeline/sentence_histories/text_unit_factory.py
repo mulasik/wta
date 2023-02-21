@@ -89,33 +89,33 @@ class TextUnitFactory:
         if len(doubles) == 0:
             # print(f'No more doubles.')
             return textunit_list
-        else:
-            # print(f'Detected doubles. Need to merge.')
-            prev_merged_text = ""
-            merged_textunits = []
-            for i, j in zip_longest(textunit_list, textunit_list[1:]):
-                if type(i).__name__ == type(j).__name__ != "Sen":
-                    merged_tu_text = i.text + j.text
-                    text_wo_trailing_ws = re.sub(
-                        RegularExpressions.TRAILING_WS_RE, "", merged_tu_text
-                    )
-                    uppercase_letter = starts_with_uppercase_letter(text_wo_trailing_ws)
-                    end_punctuation = ends_with_end_punctuation(text_wo_trailing_ws)
-                    if not uppercase_letter or not end_punctuation:
-                        merged_tu = i.__class__(merged_tu_text)
-                        merged_textunits.append(merged_tu)
-                    else:
-                        sen = Sen(text_wo_trailing_ws)
-                        merged_textunits.append(sen)
-                        sin_content = merged_tu_text.replace(text_wo_trailing_ws, "")
-                        if len(sin_content) > 0:
-                            sin = Sin(sin_content)
-                            merged_textunits.append(sin)
-                    prev_merged_text = j.text
-                elif i.text != prev_merged_text:
-                    merged_textunits.append(i)
-                    prev_merged_text = ""
-            return self.merge_double_textunits(merged_textunits)
+
+        # print(f'Detected doubles. Need to merge.')
+        prev_merged_text = ""
+        merged_textunits = []
+        for i, j in zip_longest(textunit_list, textunit_list[1:]):
+            if type(i).__name__ == type(j).__name__ != "Sen":
+                merged_tu_text = i.text + j.text
+                text_wo_trailing_ws = re.sub(
+                    RegularExpressions.TRAILING_WS_RE, "", merged_tu_text
+                )
+                uppercase_letter = starts_with_uppercase_letter(text_wo_trailing_ws)
+                end_punctuation = ends_with_end_punctuation(text_wo_trailing_ws)
+                if not uppercase_letter or not end_punctuation:
+                    merged_tu = i.__class__(merged_tu_text)
+                    merged_textunits.append(merged_tu)
+                else:
+                    sen = Sen(text_wo_trailing_ws)
+                    merged_textunits.append(sen)
+                    sin_content = merged_tu_text.replace(text_wo_trailing_ws, "")
+                    if len(sin_content) > 0:
+                        sin = Sin(sin_content)
+                        merged_textunits.append(sin)
+                prev_merged_text = j.text
+            elif i.text != prev_merged_text:
+                merged_textunits.append(i)
+                prev_merged_text = ""
+        return self.merge_double_textunits(merged_textunits)
 
     def detect_tus_diffs(self, textunits, ts, prev_tpsf):
         if ts.label in [TSLabels.MID, TSLabels.DEL, TSLabels.REPL]:

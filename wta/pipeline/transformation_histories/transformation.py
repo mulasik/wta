@@ -48,9 +48,9 @@ class DependencyTransformation(Transformation):
             delta_cur_prev = [r for r in self.cur_parsed_sen if r not in unchanged]
             if len(delta_prev_cur) > 0 and len(delta_cur_prev) == 0:
                 return TransformationClass.REDUCTION
-            elif len(delta_prev_cur) == 0 and len(delta_cur_prev) > 0:
+            if len(delta_prev_cur) == 0 and len(delta_cur_prev) > 0:
                 return TransformationClass.EXTENSION
-            elif len(delta_prev_cur) > 0 and len(delta_cur_prev) > 0:
+            if len(delta_prev_cur) > 0 and len(delta_cur_prev) > 0:
                 return TransformationClass.MODIFICATION
         if not self.syntactic_impact and self.word_modified:
             return TransformationClass.WORD_MODIFICATION
