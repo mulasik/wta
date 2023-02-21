@@ -12,11 +12,7 @@ def segment_sentences_with_nltk(text):
 
 
 def contains_end_punctuation_in_the_middle(seq):
-    return (
-        True
-        if re.search(r"([\w\s,;:\-]*)([?!.])([\w\s,:;\-]*)", seq) is not None
-        else False
-    )
+    return re.search("([\\w\\s,;:\\-]*)([?!.])([\\w\\s,:;\\-]*)", seq) is not None
 
 
 def retrieve_end_punctuation_from_the_middle(seq):
@@ -41,7 +37,7 @@ def is_short_sequence(seq, length):
 
 def starts_with_uppercase_letter(seq):
     uppercase_at_beginning = re.search(r"^(«|\"|\')*[A-ZÄÖÜ]", seq)
-    return True if uppercase_at_beginning is not None else False
+    return uppercase_at_beginning is not None
 
 
 def starts_with_lowercase_letter(seq):

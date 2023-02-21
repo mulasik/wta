@@ -49,9 +49,9 @@ class TransformingSequence:
         self.tagged_tokens = (
             []
         )  # if text is None or text == '' else settings.nlp_model.tag_words(self.text)
-        self.contains_punctuation = (
-            True if "PUNCT" in [tok["pos"] for tok in self.tagged_tokens] else False
-        )
+        self.contains_punctuation = "PUNCT" in [
+            tok["pos"] for tok in self.tagged_tokens
+        ]
         self.contains_end_punctuation_in_the_middle = (
             contains_end_punctuation_in_the_middle(self.text)
         )

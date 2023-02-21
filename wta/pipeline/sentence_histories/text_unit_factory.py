@@ -38,11 +38,7 @@ class TextUnitFactory:
     def split_in_textunits(self, sentence_list):
         textunit_list = []
         for s in sentence_list:
-            contains_only_ws = (
-                True
-                if re.search(RegularExpressions.ONLY_WS_RE, s) is not None
-                else False
-            )
+            contains_only_ws = re.search(RegularExpressions.ONLY_WS_RE, s) is not None
             if contains_only_ws is True:
                 sin = Sin(s)
                 textunit_list.append(sin)

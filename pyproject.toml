@@ -110,6 +110,5 @@ ignore = [
     "SIM103", # return directly
     "SIM115", # use context handler for files
     "SIM118", # simplify key lookup
-    "SIM210", # bool() simplification
     "T201", # print used
 ]
