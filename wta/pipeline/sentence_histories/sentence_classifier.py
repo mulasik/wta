@@ -26,7 +26,7 @@ class SentenceClassifier:
     def classify_sentence_level_changes(self):
         # if there is no previous TPSF version, all sentences are new sentences
         if not self.prev_sens:
-            self.new_sentences = [s for s in self.sens]
+            self.new_sentences = list(self.sens)
             for s in self.new_sentences:
                 sen_tagged_tokens = self.nlp_model.tag_words(s.content)
                 s.set_tagged_tokens_and_typos(sen_tagged_tokens)

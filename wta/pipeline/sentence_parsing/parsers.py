@@ -80,4 +80,4 @@ class Supar(BaseParserAdapter):
                     tok_lst.append(tok_props)
             return tok_lst
         if self.grammar == Grammars.CONST:
-            return [s for s in parsed_sen][0]
+            return list(parsed_sen)[0]

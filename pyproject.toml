@@ -92,7 +92,6 @@ ignore = [
     "B007", # loop variable not used
     "B024", # abstract class without abstract methods
     "B905", # zip without strict
-    "C416", # unnecessary list comprehension
     "C901", # too complex
     "E722", # bare except
     "E741", # ambiguous variable name
