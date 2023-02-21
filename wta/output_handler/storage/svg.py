@@ -3,22 +3,23 @@ import os
 import paths
 import settings
 from wta.output_handler.names import Names
-from .base import BaseStorage
-from ..plots.texthis_plot import TexthisPlot, FilteredTexthisPlot
+
 from ..plots.senhis_plot import SenhisPlot
-from ..plots.transhis_plot import (
-    DepTranshisPlot,
-    ConstTranshisPlot,
-    SynBarTranshisPlot,
-    SynPieTranshisPlot,
-)
 from ..plots.stats_plot import (
+    DeletionsPlot,
+    InsertionsPlot,
     SenEditPlot,
     TsLabelsPlot,
     TsTokensPlot,
-    DeletionsPlot,
-    InsertionsPlot,
 )
+from ..plots.texthis_plot import FilteredTexthisPlot, TexthisPlot
+from ..plots.transhis_plot import (
+    ConstTranshisPlot,
+    DepTranshisPlot,
+    SynBarTranshisPlot,
+    SynPieTranshisPlot,
+)
+from .base import BaseStorage
 
 
 class Svg(BaseStorage):

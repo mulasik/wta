@@ -4,32 +4,33 @@ import paths
 import settings
 from wta.output_handler.names import Names
 from wta.utils.other import ensure_path
-from .storage.json import TexthisJson, SenhisJson, TranshisJson
-from .storage.txt import (
-    EventsTxt,
-    ActionsTxt,
-    ActionGroupsTxt,
-    TssTxt,
-    TpsfsTxt,
-    TexthisTxt,
-    SenhisTxt,
-    StatsTxt,
-    DepParsesTxt,
-    ConstParsesTxt,
-)
+
+from .storage.json import SenhisJson, TexthisJson, TranshisJson
 from .storage.svg import (
-    TexthisSvg,
-    FilteredTexthisSvg,
-    SenhisSvg,
-    DepTranshisSvg,
     ConstTranshisSvg,
+    DeletionsSvg,
+    DepTranshisSvg,
+    FilteredTexthisSvg,
+    InsertionsSvg,
+    SenEditSvg,
+    SenhisSvg,
     SynBarTranshisSvg,
     SynPieTranshisSvg,
-    SenEditSvg,
+    TexthisSvg,
     TsLabelsSvg,
     TsTokensSvg,
-    DeletionsSvg,
-    InsertionsSvg,
+)
+from .storage.txt import (
+    ActionGroupsTxt,
+    ActionsTxt,
+    ConstParsesTxt,
+    DepParsesTxt,
+    EventsTxt,
+    SenhisTxt,
+    StatsTxt,
+    TexthisTxt,
+    TpsfsTxt,
+    TssTxt,
 )
 
 

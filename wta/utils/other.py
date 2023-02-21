@@ -1,6 +1,6 @@
 import difflib
-import os
 import errno
+import os
 
 
 def ensure_path(path):

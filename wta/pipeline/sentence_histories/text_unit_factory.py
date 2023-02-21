@@ -1,10 +1,12 @@
-import settings
 import re
 from itertools import zip_longest
-from .text_unit import Sen, Sec, Sin
+
+import settings
+from wta.pipeline.names import SenLabels, TSLabels
+
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
-from wta.pipeline.names import TSLabels, SenLabels
 from ..regularexpressions import RegularExpressions
+from .text_unit import Sec, Sen, Sin
 
 
 class TextUnitFactory:

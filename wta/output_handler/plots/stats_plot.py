@@ -1,10 +1,9 @@
-import matplotlib.pyplot as plt
-import os
 import operator
 
-import settings
-import paths
+import matplotlib.pyplot as plt
+
 from wta.output_handler.plots.colors import Colors
+
 from .base import BasePlot
 
 

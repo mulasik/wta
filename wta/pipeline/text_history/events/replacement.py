@@ -1,5 +1,5 @@
-from .base import BaseEvent
 from ..action import Replacement
+from .base import BaseEvent
 
 
 class ReplacementEvent(BaseEvent):

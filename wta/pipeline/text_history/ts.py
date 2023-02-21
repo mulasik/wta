@@ -1,5 +1,3 @@
-import settings
-
 from wta.utils.nlp import contains_end_punctuation_in_the_middle
 
 

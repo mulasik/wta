@@ -1,11 +1,8 @@
 import uuid
+from itertools import zip_longest
 
 from tqdm import tqdm
 
-import settings
-from itertools import zip_longest
-
-from .text_unit import TextUnit
 from ..names import SenLabels
 
 

@@ -1,6 +1,7 @@
-from bs4 import BeautifulSoup
-import numpy as np
 from abc import ABC, abstractmethod
+
+import numpy as np
+from bs4 import BeautifulSoup
 
 
 class Statistics(ABC):

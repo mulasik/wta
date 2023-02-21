@@ -1,10 +1,10 @@
-from wta.utils.nlp import (
-    check_overlap_with_seq_beginning,
-    calculate_sequence_similarity,
-)
 import unicodedata
 
 import settings
+from wta.utils.nlp import (
+    calculate_sequence_similarity,
+    check_overlap_with_seq_beginning,
+)
 
 
 class SentenceClassifier:

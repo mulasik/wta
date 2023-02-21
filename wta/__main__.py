@@ -6,20 +6,19 @@ from importlib import import_module
 
 import settings
 from wta.language_models.spacy import SpacyModel
-from .pipeline.text_history.event_factory import EventFactory
-from .pipeline.text_history.action_factory import ActionFactory, ActionAggregator
-from .pipeline.text_history.ts_factory import TsFactory
-from .pipeline.text_history.tpsf_factory import ECMFactory
-from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
+
 from .output_handler.output_factory import (
-    EventsOutputFactory,
-    ActionsOutputFactory,
     ActionGroupsOutputFactory,
-    TssOutputFactory,
-    TpsfsOutputFactory,
+    ActionsOutputFactory,
+    EventsOutputFactory,
     TexthisOutputFactory,
-    TexthisFltrOutputFactory,
+    TpsfsOutputFactory,
+    TssOutputFactory,
 )
+from .pipeline.text_history.action_factory import ActionAggregator, ActionFactory
+from .pipeline.text_history.event_factory import EventFactory
+from .pipeline.text_history.tpsf_factory import ECMFactory
+from .pipeline.text_history.ts_factory import TsFactory
 
 
 def load_path(dotted_path):

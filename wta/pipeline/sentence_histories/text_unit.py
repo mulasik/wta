@@ -1,17 +1,5 @@
-from wta.utils.nlp import (
-    ends_with_end_punctuation,
-    contains_end_punctuation_in_the_middle,
-    retrieve_end_punctuation_from_the_middle,
-    is_short_sequence,
-    starts_with_lowercase_letter,
-    retrieve_mismatch_range_for_sentence_pair,
-)
-from wta.pipeline.text_history.ts import TransformingSequence
 import json
-import uuid
 from abc import ABC
-
-import settings
 
 
 class TextUnit(ABC):

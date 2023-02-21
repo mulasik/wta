@@ -2,8 +2,8 @@ from .statistics import (
     BasicStatistics,
     EventStatistics,
     PauseStatistics,
-    TSStatistics,
     SentenceStatistics,
+    TSStatistics,
 )
 
 

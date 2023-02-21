@@ -1,5 +1,3 @@
-import copy
-
 from tqdm import tqdm
 
 from .tpsf import TpsfECM

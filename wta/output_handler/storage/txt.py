@@ -3,8 +3,9 @@ import os
 import paths
 import settings
 from wta.output_handler.names import Names
-from .base import BaseStorage
 from wta.utils.other import ensure_path
+
+from .base import BaseStorage
 
 
 class Txt(BaseStorage):
@@ -162,7 +163,7 @@ SOURCE FILE: {source_file}
 
 - EVENTS IN THE LOG FILE -
             Number events of type keyboard, replacement, insert: {e_stats.data['num_events']}
-            Number keystrokes: {e_stats.data['num_keystrokes']} 
+            Number keystrokes: {e_stats.data['num_keystrokes']}
             Number replacements: {e_stats.data['num_replacements']}
             Number insert events: {e_stats.data['num_insertions']}
 
@@ -177,7 +178,7 @@ SOURCE FILE: {source_file}
             Minimum pauses duration: {p_stats.data['min_duration']}
 
 - TRANSFORMING SEQUENCES -
-            Number transforming sequences: {ts_stats.data['num_nonempty_ts']} 
+            Number transforming sequences: {ts_stats.data['num_nonempty_ts']}
             Average transforming sequence length: {ts_stats.data['avg_ts_len']}
             Number insertions: {ts_stats.data['num_ins']}
             Number inserted characters: {ts_stats.data['num_ins_chars']}
@@ -190,7 +191,7 @@ SOURCE FILE: {source_file}
             Number detected sentences in total: {sen_stats.data['detected_sens']}
             Number sentences in the final text: {sen_stats.data['final_num_sentences']}
             Potentially erroneous sentences due to segmentation problems: {sen_stats.data['num_potentially_erroneous_sens']}
-            Maximum number sentence versions: {sen_stats.data['max_num_sen_versions']} 
+            Maximum number sentence versions: {sen_stats.data['max_num_sen_versions']}
             The sentence with most versions: "{sen_stats.data['sen_with_most_versions']}
             Mean number sentence versions: {sen_stats.data['mean_num_sentence_versions']}
             Number unchanged sentences: {sen_stats.data['num_unchanged_sens']}

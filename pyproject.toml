@@ -93,18 +93,15 @@ ignore = [
     "B905", # zip without strict
     "C416", # unnecessary list comprehension
     "C901", # too complex
-    "E401", # multiple imports on one line
     "E501", # line too long
     "E722", # bare except
     "E741", # ambiguous variable name
     "ERA001", # commented out code
-    "F401", # unused import
     "F541", # f-strings without placeholders
     "F811", # redefinition
     "F821", # undefined name
     "F841", # unused variable
     "FBT00", # boolean positional argument
-    "I001", # sort imports
     "N806", # invalid name
     "PIE794", # redefinition
     "PLR0912", # too many branches

@@ -1,7 +1,8 @@
 import re
+
 import tqdm
 
-from .transformation import DependencyTransformation, ConstituencyTransformation
+from .transformation import ConstituencyTransformation, DependencyTransformation
 
 
 class TransformationFactory:

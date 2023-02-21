@@ -1,6 +1,7 @@
-from .base import BaseEvent
-from ..action import Append, Insertion, Pasting, Navigation, Deletion, Midletion
 from wta.pipeline.names import EventTypes
+
+from ..action import Append, Deletion, Insertion, Midletion, Navigation, Pasting
+from .base import BaseEvent
 
 CHAR_NUMBER_DIFF_PRODUCTION = 1
 CHAR_NUMBER_DIFF_DDELETION = 1

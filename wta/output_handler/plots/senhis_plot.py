@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 
 from wta.output_handler.plots.colors import Colors
+
 from .base import BasePlot
 
 

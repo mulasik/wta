@@ -1,7 +1,7 @@
-from wta.utils.nlp import check_edit_distance
 import language_tool_python
 
 from wta.pipeline.sentence_parsing.models import Languages
+from wta.utils.nlp import check_edit_distance
 
 
 class SpacyModel:
@@ -23,7 +23,7 @@ class SpacyModel:
             self.nlp = spacy.load("en_core_web_md")
             self.tool = language_tool_python.LanguageTool("en-US")
         elif lang == Languages.GR:
-            from spacy.lang.el import Greekte
+            from spacy.lang.el import Greek
 
             self.nlp = Greek()
             print("Loading Spacy model for Greek...")

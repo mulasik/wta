@@ -1,5 +1,5 @@
-from .base import BaseEvent
 from ..action import Pasting
+from .base import BaseEvent
 
 
 class InsertEvent(BaseEvent):

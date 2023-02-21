@@ -2,14 +2,15 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 from wta.pipeline.names import KeyNames
+
+from .events.insert import InsertEvent
 from .events.keyboard import (
-    NavigationKeyboardEvent,
-    ProductionKeyboardEvent,
     BDeletionKeyboardEvent,
     DDeletionKeyboardEvent,
+    NavigationKeyboardEvent,
+    ProductionKeyboardEvent,
 )
 from .events.replacement import ReplacementEvent
-from .events.insert import InsertEvent
 
 
 class EventFactory:

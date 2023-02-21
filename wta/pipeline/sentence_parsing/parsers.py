@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from .models import Parsers, Grammars, ModelMapping
+from .models import Grammars, ModelMapping, Parsers
 
 
 class BaseParserAdapter(ABC):

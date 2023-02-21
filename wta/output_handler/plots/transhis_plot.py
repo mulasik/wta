@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
-import os
 import numpy as np
 
 import settings
-import paths
-from ..names import Names
+
 from .base import BasePlot
 from .colors import Colors
 

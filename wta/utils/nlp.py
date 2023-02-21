@@ -1,7 +1,8 @@
-import nltk
-import re
 import difflib
 import itertools
+import re
+
+import nltk
 
 
 def segment_sentences_with_nltk(text):

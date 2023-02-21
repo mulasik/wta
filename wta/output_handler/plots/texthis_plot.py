@@ -1,9 +1,8 @@
 import matplotlib.pyplot as plt
 
-import settings
+from ...pipeline.names import SenLabels
 from ..plots.colors import Colors
 from .base import BasePlot
-from ...pipeline.names import SenLabels
 
 
 class TexthisPlot(BasePlot):
