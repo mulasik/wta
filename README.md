@@ -1,11 +1,11 @@
 # Text History Extraction Tool (THEtool). A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions produced during this session, and eventually generating text and sentence histories based on the collected information. 
+An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions produced during this session, and eventually generating text and sentence histories based on the collected information.
 
 The input file processed by the tool is an idfx file in XML format.
 
-The tool uses two main modes to capture text versions from idfx files: 
-* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the text production to yield versions, 
+The tool uses two main modes to capture text versions from idfx files:
+* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the text production to yield versions,
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 
 ## Tool Outputs
@@ -20,7 +20,7 @@ The main outputs of the tool are:
 
 In case filtering has been activated in the configuration:
 * filtered text history in JSON format
-* filtered text versions exported to TXT format 
+* filtered text versions exported to TXT format
 * filtered sentence history in JSON format
 * visualisation of filtered text history in ECM in SVG format
 * filtered sentence history visualisation in SVG format
@@ -29,14 +29,14 @@ In case filtering has been activated in the configuration:
 
 The central building block of the tool is TPSF. It is a data type for storing the text version together with further details retrieved from the processed keystroke logging data.
 
-Generating a TPSF comprises the following steps: 
-* First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version. 
-* This data is next stored in a TPSF data structure and subsequently used to retrieve information on the sentences constituting this version. 
-* Finally, the version is evaluated for its morphosyntactic relevance. 
+Generating a TPSF comprises the following steps:
+* First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version.
+* This data is next stored in a TPSF data structure and subsequently used to retrieve information on the sentences constituting this version.
+* Finally, the version is evaluated for its morphosyntactic relevance.
 
 In each step, the TPSF is enriched with the newly collected details.
 
-An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered. 
+An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered.
 
 The following figure provides an overview of the processing steps.
 
@@ -46,79 +46,79 @@ An example of a TPD exported to JSON format:
 
 ```
 {
-	"revision_id": 4, 
-	"previous_text_version": "An edit operation is an act of either removing or inserting a sequence. ", 
-	"preceding_pause": 0.54, 
-	"result_text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
+	"revision_id": 4,
+	"previous_text_version": "An edit operation is an act of either removing or inserting a sequence. ",
+	"preceding_pause": 0.54,
+	"result_text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
 	"edit": {
-		"edit_start_position": 70, 
+		"edit_start_position": 70,
 		"transforming_sequence": {
 			"label": "insertion",
-			"text": " without interruption", 
+			"text": " without interruption",
 			"tags": [
 				{"text": " ", "pos": "SPACE", "pos_details": "_SP", "dep": "", "lemma": " ", "oov": false, "is_punct": false, "is_space": true},
 				"text": "without", "pos": "ADP", "pos_details": "IN", "dep": "ROOT", "lemma": "without", "oov": false, "is_punct": false, "is_space": false},
 				"text": "interruption", "pos": "NOUN", "pos_details": "NN", "dep": "pobj", "lemma": "interruption", "oov": false, "is_punct": false, "is_space": false},
 				]
-	}, 
+	},
 	"sentences": {
 		"previous_sentence_list": [
 			{
-				"text": "An edit operation is an act of either removing or inserting a sequence. ", 
-				"start_index": 0, 
-				"end_index": 70, 
-				"revision_id": 3, 
+				"text": "An edit operation is an act of either removing or inserting a sequence. ",
+				"start_index": 0,
+				"end_index": 70,
+				"revision_id": 3,
 				"pos_in_text": 0
 			}
-		], 
+		],
 		"current_sentence_list": [
 			{
-				"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
-				"start_index": 0, 
-				"end_index": 91, 
-				"revision_id": 3, 
-				"pos_in_text": 0, 
+				"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
+				"start_index": 0,
+				"end_index": 91,
+				"revision_id": 3,
+				"pos_in_text": 0,
 				"label": "modified"
-			}, 
-		"new_sentences": [], 
+			},
+		"new_sentences": [],
 		"edited_sentences": [
 			{
 				"previous_sentence": {
-					"text": "An edit operation is an act of either removing or inserting a sequence. ", 
-					"start_index": 0, 
-					"end_index": 70, 
-					"revision_id": 3, 
+					"text": "An edit operation is an act of either removing or inserting a sequence. ",
+					"start_index": 0,
+					"end_index": 70,
+					"revision_id": 3,
 					"pos_in_text": 0
-				}, 
+				},
 				"current_sentence": {
-					"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ", 
-					"start_index": 0, 
-					"end_index": 91, 
-					"revision_id": 3, 
-					"pos_in_text": 0, 
+					"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
+					"start_index": 0,
+					"end_index": 91,
+					"revision_id": 3,
+					"pos_in_text": 0,
 					"label": "modified"
 				}
 			}
-		], 
-		"deleted_sentences": [], 
+		],
+		"deleted_sentences": [],
 		"unchanged_sentences": []
-	}, 
+	},
 	"morphosyntactic_relevance_evaluation": [
 		"number_affected_tokens": 3,
 		"affected_tokens": [
-			{"prev_tok": ("sequence.", 62, 70), "cur_tok": ("sequence", 62, 69)}, 
+			{"prev_tok": ("sequence.", 62, 70), "cur_tok": ("sequence", 62, 69)},
 			{"prev_tok": ("", null, null), "cur_tok": ("without", 71, 77)},
 			{"prev_tok": ("", null, null), "cur_tok": ("interruption.", 79, 91)},
 		]
 		"is_any_tok_oov": false,
 		"edit_distance": 21
-	], 
+	],
 	"morphosyntactic_relevance": true
 }
 
 ```
 
-For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data. 
+For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data.
 
 ## Tool Configuration
 
@@ -147,7 +147,7 @@ The configuration structure:
 
 ## Running the Tool
 
-* To install all dependencies, run: 
+* To install all dependencies, run:
 
 ```
 pip install -r requirements.txt

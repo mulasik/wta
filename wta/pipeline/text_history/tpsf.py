@@ -17,13 +17,13 @@ class TpsfECM:
 
 === TPSF ===
 
-PREVIOUS TEXT:  
+PREVIOUS TEXT:
 {self.prev_text_version}
 
-RESULT TEXT:            
+RESULT TEXT:
 {self.result_text}
 
-TRANSFORMING SEQUENCE: 
+TRANSFORMING SEQUENCE:
 {self.ts.label.upper()} *{self.ts.text}*
 
             """
@@ -49,6 +49,6 @@ TRANSFORMING SEQUENCE:
         return f"""
 TPSF version {self.revision_id}:
 {self.text}
-TS: 
+TS:
 {(self.ts.text, self.ts.label.upper())}
             """
