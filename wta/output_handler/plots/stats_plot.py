@@ -137,7 +137,7 @@ class DeletionsPlot(StatsPlot):
                         ts_content.update({t["pos"]: 1})
                     elif (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
-                        and t["pos"] in ts_content.keys()
+                        and t["pos"] in ts_content
                     ):
                         ts_content[t["pos"]] += 1
         return sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)
@@ -170,7 +170,7 @@ class InsertionsPlot(StatsPlot):
                         ts_content.update({t["pos"]: 1})
                     elif (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
-                        and t["pos"] in ts_content.keys()
+                        and t["pos"] in ts_content
                     ):
                         ts_content[t["pos"]] += 1
         return sorted(ts_content.items(), key=operator.itemgetter(0), reverse=True)

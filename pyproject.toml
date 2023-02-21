@@ -103,6 +103,5 @@ ignore = [
     "PLR0915", # too many statements
     "PLR2004", # magic value used
     "PTH", # use pathlib
-    "SIM118", # simplify key lookup
     "T201", # print used
 ]

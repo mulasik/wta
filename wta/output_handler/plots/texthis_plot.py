@@ -28,7 +28,7 @@ class TexthisPlot(BasePlot):
     def create_figure(self):
         min_fig_heigth = 15
         tpsf_labels = []
-        for key in self.sen_lengths.keys():
+        for key in self.sen_lengths:
             text = f"TPSF {key}"
             tpsf_labels.append(text)
         fig_height = (
@@ -127,7 +127,7 @@ class FilteredTexthisPlot(TexthisPlot):
     def create_figure(self):
         min_fig_heigth = 15
         tpsf_labels = []
-        for key in self.sen_lengths.keys():
+        for key in self.sen_lengths:
             text = f"TPSF {key}"
             tpsf_labels.append(text)
         fig_height = (

@@ -287,7 +287,7 @@ class SentenceClassifier:
             if s.content in [ps.content for ps in self.prev_sens]
         }
         for ps in self.prev_sens:
-            if ps.content in unchanged_sentences.keys():
+            if ps.content in unchanged_sentences:
                 unchanged_sentences[ps.content].append(ps)
         for sens in unchanged_sentences.values():
             if sens[0].pos_in_text == sens[1].pos_in_text:
