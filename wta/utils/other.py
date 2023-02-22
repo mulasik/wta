@@ -3,7 +3,7 @@ import errno
 import os
 
 
-def ensure_path(path):
+def ensure_path(path: str) -> None:
     try:
         os.makedirs(path)
     except OSError as err:
@@ -13,7 +13,9 @@ def ensure_path(path):
             raise
 
 
-def retrieve_mismatch_range_for_sentence_pair(prev_sen: str, cur_sen: str) -> tuple:
+def retrieve_mismatch_range_for_sentence_pair(
+    prev_sen: str, cur_sen: str
+) -> tuple[str | None, list[range], str]:
     seq_match = difflib.SequenceMatcher(None, prev_sen, cur_sen)
     prev_cur_match = seq_match.get_opcodes()
     mismatch_range = []
@@ -36,7 +38,7 @@ def retrieve_mismatch_range_for_sentence_pair(prev_sen: str, cur_sen: str) -> tu
             mismatch_range.append(range(max(m[1], m[3]), max(m[2] + 1, m[4] + 1)))
             relevant = (
                 "prev"
-                if mismatch_range[0] == m[1] and mismatch_range[-1] == m[2]
+                if m[1] in mismatch_range[0] and m[2] in mismatch_range[-1]
                 else "cur"
             )
     return edit, mismatch_range, relevant

@@ -1,5 +1,7 @@
 from matplotlib import colors as pltc
 
+from ...pipeline.sentence_histories.text_unit import TextUnit
+
 
 class Colors:
     SEN_COLORS = {
@@ -68,7 +70,7 @@ class Colors:
     BOOL_COLORS = {True: "indianred", False: "teal"}
 
     @classmethod
-    def assign_colors_to_sens(cls, senhis):
+    def assign_colors_to_sens(cls, senhis: dict[int, list[TextUnit]]) -> dict[int, str]:
         """
         Assigns colors to sentences in sentence history.
         Each sentence has a unique color.
@@ -81,7 +83,7 @@ class Colors:
         return sen_colors
 
     @classmethod
-    def assign_color_to_pos(cls, pos_list):
+    def assign_color_to_pos(cls, pos_list: list[str]) -> list[str]:
         colors = []
         for pos in pos_list:
             if pos in Colors.POS_COLORS:
@@ -91,7 +93,7 @@ class Colors:
         return colors
 
     @classmethod
-    def assign_color_to_number_versions(cls, number_versions):
+    def assign_color_to_number_versions(cls, number_versions: list[int]) -> list[str]:
         colors = []
         for nv in number_versions:
             if nv == 1:

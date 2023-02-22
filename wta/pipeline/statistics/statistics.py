@@ -1,7 +1,11 @@
 from abc import ABC, abstractmethod
+from typing import cast
 
 import numpy as np
 from bs4 import BeautifulSoup
+
+from ..sentence_histories.text_unit import TextUnit
+from ..text_history.tpsf import TpsfECM
 
 
 class Statistics(ABC):
@@ -31,18 +35,23 @@ class Statistics(ABC):
     """
 
     @abstractmethod
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         pass
 
 
 class BasicStatistics(Statistics):
-    def __init__(self, texthis, texthis_filtered, texthis_pcm):
+    def __init__(
+        self,
+        texthis: list[TpsfECM],
+        texthis_filtered: list[TpsfECM],
+        texthis_pcm: list[TpsfECM],
+    ) -> None:
         self.texthis = texthis
         self.texthis_filtered = texthis_filtered
         self.texthis_pcm = texthis_pcm
         self.data = self.retrieve_stats()
 
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         return {
             "num_tpsfs": len(self.texthis),
             "num_tpsfs_filtered": len(self.texthis_filtered),
@@ -51,11 +60,11 @@ class BasicStatistics(Statistics):
 
 
 class EventStatistics(Statistics):
-    def __init__(self, idfx: str):
+    def __init__(self, idfx: str) -> None:
         self.idfx = idfx
         self.data = self.retrieve_stats()
 
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         with open(self.idfx) as fp:
             soup = BeautifulSoup(fp, features="lxml")
             events = soup.find_all("event")
@@ -77,11 +86,11 @@ class EventStatistics(Statistics):
 
 
 class PauseStatistics(Statistics):
-    def __init__(self, texthis: dict):
+    def __init__(self, texthis: list[TpsfECM]) -> None:
         self.texthis = texthis
         self.data = self.retrieve_stats()
 
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         pauses = []
         total_pauses_duration = 0
         for tpsf in self.texthis:
@@ -97,11 +106,11 @@ class PauseStatistics(Statistics):
 
 
 class TSStatistics(Statistics):
-    def __init__(self, texthis: dict):
+    def __init__(self, texthis: list[TpsfECM]) -> None:
         self.texthis = texthis
         self.data = self.retrieve_stats()
 
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         transforming_sequences_texts = []
         num_nonempty_ts = 0
         num_ins, number_dels, num_apps = 0, 0, 0
@@ -136,12 +145,14 @@ class TSStatistics(Statistics):
 
 
 class SentenceStatistics(Statistics):
-    def __init__(self, texthis: dict, senhis: dict):
+    def __init__(
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+    ) -> None:
         self.texthis = texthis
         self.senhis = senhis
         self.data = self.retrieve_stats()
 
-    def retrieve_stats(self):
+    def retrieve_stats(self) -> dict[str, int | float | str]:
         detected_sens = len(self.senhis)
         num_unchanged_sens = 0
         num_sen_versions = []
@@ -157,7 +168,7 @@ class SentenceStatistics(Statistics):
                 max_num_sen_versions = len(sh)
                 sen_with_most_versions = sh[-1].content
             num_sen_versions.append(len(sh))
-        mean_num_sentence_versions = round(np.mean(num_sen_versions), 2)
+        mean_num_sentence_versions = cast(float, round(np.mean(num_sen_versions), 2))
         final_num_sentences = len(self.texthis[-1].sentence_list)
         return {
             "detected_sens": detected_sens,

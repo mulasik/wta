@@ -64,12 +64,19 @@ class ReplacementEvent(BaseEvent):
     </event>
     """
 
-    def __init__(self, content, startpos, endpos, rplcmt_endpos, rplcmt_textlen):
+    def __init__(
+        self,
+        content: str,
+        startpos: int,
+        endpos: int | None,
+        rplcmt_endpos: int,
+        rplcmt_textlen: int,
+    ) -> None:
         super().__init__(content, startpos, endpos)
         self.rplcmt_endpos = rplcmt_endpos
         self.rplcmt_textlen = rplcmt_textlen
 
-    def to_action(self):
+    def to_action(self) -> Replacement:
         return Replacement(
             self.content,
             self.startpos,

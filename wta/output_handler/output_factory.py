@@ -2,9 +2,23 @@ import os
 
 import paths
 import settings
-from wta.output_handler.names import Names
-from wta.utils.other import ensure_path
+from wta.pipeline.sentence_histories.text_unit import TextUnit
+from wta.pipeline.sentence_parsing.parsers import TokenProp
+from wta.pipeline.statistics.statistics import (
+    BasicStatistics,
+    EventStatistics,
+    PauseStatistics,
+    SentenceStatistics,
+    TSStatistics,
+)
+from wta.pipeline.transformation_histories.transformation import Transformation
 
+from ..pipeline.text_history.action import Action
+from ..pipeline.text_history.events.keyboard import KeyboardEvent
+from ..pipeline.text_history.tpsf import TpsfECM
+from ..pipeline.text_history.ts import TransformingSequence
+from ..utils.other import ensure_path
+from .names import Names
 from .storage.json import SenhisJson, TexthisJson, TranshisJson
 from .storage.svg import (
     ConstTranshisSvg,
@@ -36,7 +50,7 @@ from .storage.txt import (
 
 class StorageSettings:
     @classmethod
-    def set_paths(cls):
+    def set_paths(cls) -> None:
         paths.events_dir = os.path.join(
             settings.config["output_dir"], Names.PREPROCESSING, Names.EVENTS
         )
@@ -73,50 +87,44 @@ class StorageSettings:
             ensure_path(getattr(paths, p))
 
 
-class OutputFactory:
+class EventsOutputFactory:
     @classmethod
-    def run(cls):
-        raise NotImplementedError
-
-
-class EventsOutputFactory(OutputFactory):
-    @classmethod
-    def run(cls, events):
+    def run(cls, events: list[KeyboardEvent]) -> None:
         StorageSettings.set_paths()
         EventsTxt(events).to_file()
 
 
-class ActionsOutputFactory(OutputFactory):
+class ActionsOutputFactory:
     @classmethod
-    def run(cls, actions):
+    def run(cls, actions: list[Action]) -> None:
         StorageSettings.set_paths()
         ActionsTxt(actions).to_file()
 
 
-class ActionGroupsOutputFactory(OutputFactory):
+class ActionGroupsOutputFactory:
     @classmethod
-    def run(cls, action_groups):
+    def run(cls, action_groups: dict[int, list[Action]]) -> None:
         StorageSettings.set_paths()
         ActionGroupsTxt(action_groups).to_file()
 
 
-class TssOutputFactory(OutputFactory):
+class TssOutputFactory:
     @classmethod
-    def run(cls, tss):
+    def run(cls, tss: list[TransformingSequence]) -> None:
         StorageSettings.set_paths()
         TssTxt(tss).to_file()
 
 
-class TpsfsOutputFactory(OutputFactory):
+class TpsfsOutputFactory:
     @classmethod
-    def run(cls, tpsfs):
+    def run(cls, tpsfs: list[TpsfECM]) -> None:
         StorageSettings.set_paths()
         TpsfsTxt(tpsfs).to_file()
 
 
-class TexthisOutputFactory(OutputFactory):
+class TexthisOutputFactory:
     @classmethod
-    def run(cls, texthis):  # + texthis_pcm
+    def run(cls, texthis: list[TpsfECM]) -> None:  # + texthis_pcm
         StorageSettings.set_paths()
         TexthisJson(texthis).to_file()
         # TODO: TexthisJson(texthis_pcm, mode='pcm').to_file()
@@ -124,18 +132,24 @@ class TexthisOutputFactory(OutputFactory):
         TexthisSvg(texthis).to_file()
 
 
-class TexthisFltrOutputFactory(OutputFactory):
+class TexthisFltrOutputFactory:
     @classmethod
-    def run(cls, texthis_fltr):  # + texthis_pcm
+    def run(cls, texthis_fltr: list[TpsfECM]) -> None:  # + texthis_pcm
         StorageSettings.set_paths()
         TexthisJson(texthis_fltr, filtered=True).to_file()
         TexthisTxt(texthis_fltr, filtered=True).to_file()
         FilteredTexthisSvg(texthis_fltr).to_file()
 
 
-class SenhisOutputFactory(OutputFactory):
+class SenhisOutputFactory:
     @classmethod
-    def run(cls, texthis, texthis_fltr, senhis, senhis_fltr):
+    def run(
+        cls,
+        texthis: list[TpsfECM],
+        texthis_fltr: list[TpsfECM],
+        senhis: dict[int, list[TextUnit]],
+        senhis_fltr: dict[int, list[TextUnit]],
+    ) -> None:
         StorageSettings.set_paths()
         SenhisJson(senhis).to_file()
         SenhisJson(senhis, "simplified").to_file()
@@ -149,16 +163,24 @@ class SenhisOutputFactory(OutputFactory):
         SenhisSvg(texthis_fltr, senhis_fltr, filtered=True).to_file()
 
 
-class ParseOutputFactory(OutputFactory):
+class ParseOutputFactory:
     @classmethod
-    def run(cls, dep_senhis_parses, const_senhis_parses):
+    def run(
+        cls,
+        dep_senhis_parses: dict[int, list[list[TokenProp]]],
+        const_senhis_parses: dict[int, list[list[TokenProp]]],
+    ) -> None:
         DepParsesTxt(dep_senhis_parses).to_file()
         ConstParsesTxt(const_senhis_parses).to_file()
 
 
-class TranshisOutputFactory(OutputFactory):
+class TranshisOutputFactory:
     @classmethod
-    def run(cls, dep_transhis, const_transhis):
+    def run(
+        cls,
+        dep_transhis: dict[int, list[Transformation]],
+        const_transhis: dict[int, list[Transformation]],
+    ) -> None:
         TranshisJson(dep_transhis, "dependency").to_file()
         TranshisJson(const_transhis, "constituency").to_file()
         DepTranshisSvg(dep_transhis).to_file()
@@ -167,9 +189,19 @@ class TranshisOutputFactory(OutputFactory):
         SynPieTranshisSvg(dep_transhis, const_transhis).to_file()
 
 
-class StatsOutputFactory(OutputFactory):
+class StatsOutputFactory:
     @classmethod
-    def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis):
+    def run(
+        cls,
+        b_stats: BasicStatistics,
+        e_stats: EventStatistics,
+        p_stats: PauseStatistics,
+        ts_stats: TSStatistics,
+        sen_stats: SentenceStatistics,
+        idfx: str,
+        texthis: list[TpsfECM],
+        senhis: dict[int, list[TextUnit]],
+    ) -> None:
         StorageSettings.set_paths()
         StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_file()
         SenEditSvg(texthis, senhis).to_file()

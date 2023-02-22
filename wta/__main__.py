@@ -3,10 +3,12 @@ import os
 import sys
 import traceback
 from importlib import import_module
+from typing import cast
 
 import settings
-from wta.language_models.spacy import SpacyModel
 
+from .config_data import ConfigData
+from .language_models.spacy import SpacyModel
 from .output_handler.output_factory import (
     ActionGroupsOutputFactory,
     ActionsOutputFactory,
@@ -21,10 +23,10 @@ from .pipeline.text_history.tpsf_factory import ECMFactory
 from .pipeline.text_history.ts_factory import TsFactory
 
 
-def load_path(dotted_path):
+def load_path(dotted_path: str) -> ConfigData:
     parts = dotted_path.split(".")
     module = import_module(".".join(parts[:-1]))
-    return getattr(module, parts[-1])
+    return cast(ConfigData, getattr(module, parts[-1]))
 
 
 def run() -> None:

@@ -1,8 +1,12 @@
 import settings
 
+from .sentence_histories.sentence_classifier import SentenceClassifier
+from .text_history.tpsf import TpsfECM
+from .text_history.ts import TransformingSequence
+
 
 class RelevanceEvaluator:
-    def __init__(self, tpsf):
+    def __init__(self, tpsf: TpsfECM) -> None:
         self.tpsf = tpsf
         self.min_edit_distance = settings.config["min_edit_distance"]
         self.spellchecking = settings.config["enable_spellchecking"]
@@ -19,7 +23,7 @@ class RelevanceEvaluator:
         for s in self.sens_to_evaluate:
             self.determine_sentence_relevance(s)
 
-    def determine_tpsf_relevance(self):
+    def determine_tpsf_relevance(self) -> None:
         if self.tpsf.ts is not None:
             self.tpsf.check_tpsf_spelling()
             # check if ts meets the criteria defined in the tool config
@@ -38,7 +42,7 @@ class RelevanceEvaluator:
                 self.tpsf.contains_typos,
             )
 
-    def determine_ts_relevance(self, ts):
+    def determine_ts_relevance(self, ts: TransformingSequence) -> None:
         ts_length = len(ts.text)
         ts_tokens_number = len(ts.tagged_tokens)
         ts_longer_than_min = ts_length >= self.min_edit_distance
@@ -57,15 +61,15 @@ class RelevanceEvaluator:
                 ts.set_ts_relevance(False)
 
     def capture_relevance_eval_results(
-        self, edit_distance, ts_tokens_number, tpsf_contains_typos
-    ):
+        self, edit_distance: int, ts_tokens_number: int, tpsf_contains_typos: bool
+    ) -> None:
         self.relevance_eval_results = {
             "edit_distance": edit_distance,
             "number_tokens_in_transformin_seq": ts_tokens_number,
             "tpsf_contains_typos": tpsf_contains_typos,
         }
 
-    def determine_sentence_relevance(self, sen):
+    def determine_sentence_relevance(self, sen: SentenceClassifier) -> None:
         sen_transforming_sequence = sen.retrieve_tu_transforming_sequence()
         sen.set_tu_transforming_sequence(sen_transforming_sequence)
         self.determine_ts_relevance(sen.tu_transforming_sequence)

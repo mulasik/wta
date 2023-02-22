@@ -1,5 +1,6 @@
 import os
 
+from wta.config_data import ConfigData
 from wta.pipeline.sentence_parsing.models import Languages
 
 DATA_DIR = "input_data"
@@ -15,7 +16,7 @@ PUNCTUATION_INCLUDED_DEFAULT = False
 DEFAULT_LANGUAGE = Languages.DE
 
 
-VIDEO = {
+VIDEO: ConfigData = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)
@@ -31,7 +32,7 @@ VIDEO = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF1 = {
+VIDEO_CONF1: ConfigData = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)
@@ -47,7 +48,7 @@ VIDEO_CONF1 = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF2 = {
+VIDEO_CONF2: ConfigData = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)
@@ -63,7 +64,7 @@ VIDEO_CONF2 = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF3 = {
+VIDEO_CONF3: ConfigData = {
     "xml": [
         os.path.join(VIDEO_DATA_DIR, f)
         for f in os.listdir(VIDEO_DATA_DIR)

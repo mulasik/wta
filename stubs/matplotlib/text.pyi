@@ -1,0 +1,3 @@
+from matplotlib.artist import Artist
+
+class Text(Artist): ...

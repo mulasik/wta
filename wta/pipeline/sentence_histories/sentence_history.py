@@ -3,11 +3,14 @@ from itertools import zip_longest
 
 from tqdm import tqdm
 
+from wta.pipeline.sentence_histories.text_unit import TextUnit
+
 from ..names import SenLabels
+from ..text_history.tpsf import TpsfECM
 
 
 class SentenceHistoryGenerator:
-    def run(self, tpsfs):
+    def run(self, tpsfs: list[TpsfECM]) -> dict[int, list[TextUnit]]:
         sentence_history = {}
         global_new_sens = []
         progress = tqdm(tpsfs, "Generating sentence histories")
@@ -57,10 +60,12 @@ class SentenceHistoryGenerator:
                 ...  # TODO
         # return self.eliminate_duplicates(sentence_history)
 
-    def eliminate_duplicates(self, sentence_history):
+    def eliminate_duplicates(
+        self, sentence_history: dict[int, list[TextUnit]]
+    ) -> dict[int, list[TextUnit]]:
         sentence_history_duplicates_eliminated = {}
         for id, sens in sentence_history.items():
-            sens_duplicates_eliminated = []
+            sens_duplicates_eliminated: list[TextUnit] = []
             for s in sens:
                 if s.text not in [sde.text for sde in sens_duplicates_eliminated]:
                     sens_duplicates_eliminated.append(s)

@@ -2,28 +2,43 @@ import os
 
 import paths
 import settings
-from wta.output_handler.names import Names
-from wta.utils.other import ensure_path
+from wta.pipeline.sentence_histories.text_unit import TextUnit
+from wta.pipeline.sentence_parsing.parsers import TokenProp
+from wta.pipeline.statistics.statistics import (
+    BasicStatistics,
+    EventStatistics,
+    PauseStatistics,
+    SentenceStatistics,
+    TSStatistics,
+)
 
+from ...pipeline.text_history.action import Action
+from ...pipeline.text_history.events.keyboard import KeyboardEvent
+from ...pipeline.text_history.tpsf import TpsfECM
+from ...pipeline.text_history.ts import TransformingSequence
+from ...utils.other import ensure_path
+from ..names import Names
 from .base import BaseStorage
 
 
 class Txt(BaseStorage):
-    def preprocess_data(self):
-        pass
+    def __init__(self, filepath: str, output_str: str) -> None:
+        self.filepath = filepath
+        self.output_str = output_str
 
-    def to_file(self):
+    def to_file(self) -> None:
         with open(self.filepath, "w") as f:
             f.write(self.output_str)
 
 
 class EventsTxt(Txt):
-    def __init__(self, data):
-        self.output_str = self.preprocess_data(data)
+    def __init__(self, data: list[KeyboardEvent]) -> None:
         txt_file = f"{settings.filename}_{Names.EVENTS}.txt"
-        self.filepath = os.path.join(paths.events_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.events_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, events) -> str:
+    def preprocess_data(self, events: list[KeyboardEvent]) -> str:
         output_str = ""
         for event in events:
             output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
@@ -31,12 +46,13 @@ class EventsTxt(Txt):
 
 
 class ActionsTxt(Txt):
-    def __init__(self, data):
-        self.output_str = self.preprocess_data(data)
+    def __init__(self, data: list[Action]) -> None:
         txt_file = f"{settings.filename}_{Names.ACTIONS}.txt"
-        self.filepath = os.path.join(paths.actions_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.actions_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, actions) -> str:
+    def preprocess_data(self, actions: list[Action]) -> str:
         output_str = ""
         for a in actions:
             output_str += (
@@ -46,12 +62,13 @@ class ActionsTxt(Txt):
 
 
 class ActionGroupsTxt(Txt):
-    def __init__(self, data):
-        self.output_str = self.preprocess_data(data)
+    def __init__(self, data: dict[int, list[Action]]) -> None:
         txt_file = f"{settings.filename}_{Names.ACTION_GROUPS}.txt"
-        self.filepath = os.path.join(paths.actions_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.actions_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, action_groups) -> str:
+    def preprocess_data(self, action_groups: dict[int, list[Action]]) -> str:
         output_str = ""
         for at, aa in action_groups.items():
             output_str += f'{at} * len {len(aa)} * ({aa[0].startpos}:{aa[-1].endpos}) \n*{"".join([a.__dict__["content"] for a in aa])}*\n\n'
@@ -59,12 +76,13 @@ class ActionGroupsTxt(Txt):
 
 
 class TssTxt(Txt):
-    def __init__(self, data):
-        self.output_str = self.preprocess_data(data)
+    def __init__(self, data: list[TransformingSequence]) -> None:
         txt_file = f"{settings.filename}_{Names.TSS}.txt"
-        self.filepath = os.path.join(paths.tss_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.tss_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, tss) -> str:
+    def preprocess_data(self, tss: list[TransformingSequence]) -> str:
         output_str = ""
         for ts in tss:
             output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}, dur: {ts.duration}, pause: {ts.preceding_pause}): "{ts.text}"\n\n'
@@ -72,12 +90,13 @@ class TssTxt(Txt):
 
 
 class TpsfsTxt(Txt):
-    def __init__(self, data):
-        self.output_str = self.preprocess_data(data)
+    def __init__(self, data: list[TpsfECM]) -> None:
         txt_file = f"{settings.filename}_{Names.TPSFS}.txt"
-        self.filepath = os.path.join(paths.tpsfs_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.tpsfs_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, tpsfs) -> str:
+    def preprocess_data(self, tpsfs: list[TpsfECM]) -> str:
         output_str = ""
         for tpsf in tpsfs:
             tpsf_tus = (
@@ -107,13 +126,16 @@ class TpsfsTxt(Txt):
 
 
 class TexthisTxt(Txt):
-    def __init__(self, data, mode="ecm", filtered=False):
-        self.output_str = self.preprocess_data(data)
+    def __init__(
+        self, data: list[TpsfECM], mode: str = "ecm", filtered: bool = False
+    ) -> None:
         filter_label = "" if not filtered else "_filtered"
         txt_file = f"{settings.filename}_{Names.TEXTHIS}_{mode}{filter_label}.txt"
-        self.filepath = os.path.join(paths.texthis_txt_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.texthis_txt_dir, txt_file), self.preprocess_data(data)
+        )
 
-    def preprocess_data(self, texthis) -> str:
+    def preprocess_data(self, texthis: list[TpsfECM]) -> str:
         output_str = ""
         for tpsf in texthis:
             output_str += f"{tpsf.to_text()}\n"
@@ -121,16 +143,23 @@ class TexthisTxt(Txt):
 
 
 class SenhisTxt(Txt):
-    def __init__(self, data, view_mode="normal", filtered=False):
-        self.output_str = self.preprocess_data(data, view_mode)
+    def __init__(
+        self,
+        data: dict[int, list[TextUnit]],
+        view_mode: str = "normal",
+        filtered: bool = False,
+    ) -> None:
         view_mode_name = "" if view_mode == "normal" else f"_{view_mode}"
         filter_label = "" if not filtered else "_filtered"
         txt_file = (
             f"{settings.filename}_{Names.SENHIS}{view_mode_name}{filter_label}.txt"
         )
-        self.filepath = os.path.join(paths.senhis_txt_dir, txt_file)
+        super().__init__(
+            os.path.join(paths.senhis_txt_dir, txt_file),
+            self.preprocess_data(data, view_mode),
+        )
 
-    def preprocess_data(self, senhis: dict, view_mode: str) -> str:
+    def preprocess_data(self, senhis: dict[int, list[TextUnit]], view_mode: str) -> str:
         output_str = ""
         for id, sens in senhis.items():
             output_str += f"\n******* {id} *******\n"
@@ -141,19 +170,31 @@ class SenhisTxt(Txt):
 
 class StatsTxt(Txt):
     def __init__(
-        self, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx: str
-    ) -> str:
-        self.output_str = self.preprocess_data(
-            b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx
-        )
+        self,
+        b_stats: BasicStatistics,
+        e_stats: EventStatistics,
+        p_stats: PauseStatistics,
+        ts_stats: TSStatistics,
+        sen_stats: SentenceStatistics,
+        idfx: str,
+    ) -> None:
         txt_file_path = os.path.join(
             paths.stats_dir, settings.filename + "_basic_statistics.txt"
         )
-        self.filepath = os.path.join(paths.senhis_txt_dir, txt_file_path)
+        super().__init__(
+            os.path.join(paths.senhis_txt_dir, txt_file_path),
+            self.preprocess_data(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx),
+        )
 
     def preprocess_data(
-        self, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx: str
-    ):
+        self,
+        b_stats: BasicStatistics,
+        e_stats: EventStatistics,
+        p_stats: PauseStatistics,
+        ts_stats: TSStatistics,
+        sen_stats: SentenceStatistics,
+        idfx: str,
+    ) -> str:
         source_file = settings.filename + ".idfx"
         task_name = os.path.split(os.path.split(idfx)[0])[-1]
         user_name = settings.filename.split("_", 1)[0]
@@ -199,11 +240,13 @@ SOURCE FILE: {source_file}
 
 
 class ParsesTxt(Txt):
-    def __init__(self, data, output_dir):
+    def __init__(self, data: dict[int, list[list[TokenProp]]], output_dir: str) -> None:
         self.output_dir = output_dir
         self.output = self.preprocess_data(data)
 
-    def preprocess_data(self, senhis_parses: dict):
+    def preprocess_data(
+        self, senhis_parses: dict[int, list[list[TokenProp]]]
+    ) -> list[tuple[str, str]]:
         output = []
         for sen_id, sgl_senhis_parses in senhis_parses.items():
             output_path = os.path.join(self.output_dir, f"{sen_id}")
@@ -214,20 +257,20 @@ class ParsesTxt(Txt):
                 output.append((output_filepath, output_str))
         return output
 
-    def generate_str(self, parsed_sen):
+    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
         raise NotImplementedError
 
-    def to_file(self):
+    def to_file(self) -> None:
         for o in self.output:
             with open(o[0], "w") as f:
                 f.write(o[1])
 
 
 class DepParsesTxt(ParsesTxt):
-    def __init__(self, data):
+    def __init__(self, data: dict[int, list[list[TokenProp]]]) -> None:
         super().__init__(data, paths.dependency_senhis_parses_dir)
 
-    def generate_str(self, parsed_sen):
+    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
         output_str = ""
         for tok in parsed_sen:
             output_str += f'{tok["id"]}\t{tok["word"]}\t{tok["pos"]}\t{tok["head"]}\t{tok["dep_rel"]}\n'
@@ -235,8 +278,8 @@ class DepParsesTxt(ParsesTxt):
 
 
 class ConstParsesTxt(ParsesTxt):
-    def __init__(self, data):
+    def __init__(self, data: dict[int, list[list[TokenProp]]]) -> None:
         super().__init__(data, paths.constituency_senhis_parses_dir)
 
-    def generate_str(self, parsed_sen):
+    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
         return f"{str(parsed_sen)}\n"

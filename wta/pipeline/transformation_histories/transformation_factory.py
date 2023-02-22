@@ -2,26 +2,33 @@ import re
 
 import tqdm
 
-from .transformation import ConstituencyTransformation, DependencyTransformation
+from ..sentence_parsing.parsers import TokenProp
+from .transformation import (
+    ConstituencyTransformation,
+    DependencyTransformation,
+    Transformation,
+)
 
 
 class TransformationFactory:
-    def __init__(self, senhis_parses, grammar):
+    def __init__(
+        self, senhis_parses: dict[int, list[list[TokenProp]]], grammar: str
+    ) -> None:
         self.senhis_parses = senhis_parses
         self.grammar = grammar
-        self.transhis = {}
+        self.transhis: dict[int, list[Transformation]] = {}
         self.identify_transformations()
 
-    def identify_transformations(self):
+    def identify_transformations(self) -> None:
         pass
 
 
 class DependencyTransformationFactory(TransformationFactory):
-    def __init__(self, parsed_senhis):
+    def __init__(self, parsed_senhis: dict[int, list[list[TokenProp]]]) -> None:
         super().__init__(parsed_senhis, "dependency")
 
-    def identify_transformations(self):
-        sen_dependency_transformations = []
+    def identify_transformations(self) -> None:
+        sen_dependency_transformations: list[Transformation] = []
         progress = tqdm.tqdm(
             self.senhis_parses.items(), "Generating dependency transformation histories"
         )
@@ -63,15 +70,15 @@ class DependencyTransformationFactory(TransformationFactory):
 
 
 class ConsituencyTransformationFactory(TransformationFactory):
-    def __init__(self, parsed_senhis):
+    def __init__(self, parsed_senhis: dict[int, list[list[TokenProp]]]) -> None:
         super().__init__(parsed_senhis, "constituency")
 
-    def identify_transformations(self):
+    def identify_transformations(self) -> None:
         progress = tqdm.tqdm(
             self.senhis_parses.items(),
             "Generating constituency transformation histories",
         )
-        constituency_transformations = []
+        constituency_transformations: list[Transformation] = []
         for sen_id, sgl_senhis_parses in progress:
             for senver_id, parsed_sen in enumerate(sgl_senhis_parses):
                 parse_wo_tokens = re.sub(

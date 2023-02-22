@@ -1,29 +1,33 @@
 import unicodedata
 
 import settings
-from wta.utils.nlp import (
+from wta.pipeline.text_history.tpsf import TpsfECM
+
+from ...utils.nlp import (
     calculate_sequence_similarity,
     check_overlap_with_seq_beginning,
 )
+from ..text_history.ts import TransformingSequence
 
 
 class SentenceClassifier:
-    def __init__(self, prev_sens, sens, ts):
+    def __init__(
+        self, prev_sens: list[TpsfECM], sens: list[TpsfECM], ts: TransformingSequence
+    ) -> None:
         self.prev_sens = prev_sens
         self.sens = sens
         self.ts = ts
         self.nlp_model = settings.nlp_model
-        self.delta_current_previous, self.delta_previous_current = [], []
-        (
-            self.new_sentences,
-            self.modified_sentences,
-            self.deleted_sentences,
-            self.unchanged_sentences,
-            self.transposed_sentences,
-        ) = ([], [], [], [], [])
+        self.delta_current_previous = []
+        self.delta_previous_current = []
+        self.new_sentences = []
+        self.modified_sentences = []
+        self.deleted_sentences = []
+        self.unchanged_sentences = []
+        self.transposed_sentences = []
         self.classify_sentence_level_changes()
 
-    def classify_sentence_level_changes(self):
+    def classify_sentence_level_changes(self) -> None:
         # if there is no previous TPSF version, all sentences are new sentences
         if not self.prev_sens:
             self.new_sentences = list(self.sens)
@@ -56,7 +60,7 @@ class SentenceClassifier:
             ):
                 self.compare_deltas()
 
-    def compare_deltas(self):
+    def compare_deltas(self) -> None:
         if (
             len(self.delta_previous_current) == 0
             and len(self.delta_current_previous) > 0
@@ -175,7 +179,7 @@ class SentenceClassifier:
         else:
             self.process_complex_operations()
 
-    def process_complex_operations(self):
+    def process_complex_operations(self) -> None:
         if (
             len(self.delta_previous_current) != 0
             and len(self.delta_current_previous) != 0
@@ -245,7 +249,9 @@ class SentenceClassifier:
                             s.set_label("deleted_due_to_merge")
                             self.deleted_sentences.append(s)
 
-    def verify_segmentation(self, shorter_list, longer_list):
+    def verify_segmentation(
+        self, shorter_list: list[TpsfECM], longer_list: list[TpsfECM]
+    ) -> None:
         print(
             "\nAttention. A potential sentence segmentation error detected. Verifying segmentation..."
         )
@@ -280,7 +286,7 @@ class SentenceClassifier:
                 new_sen.set_label("new")
                 self.new_sentences.append(new_sen)
 
-    def set_unchanged_sentences(self):
+    def set_unchanged_sentences(self) -> None:
         unchanged_sentences = {
             s.content: [s]
             for s in self.sens

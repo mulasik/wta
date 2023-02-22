@@ -1,17 +1,19 @@
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
 from ...pipeline.names import SenLabels
+from ...pipeline.text_history.tpsf import TpsfECM
 from ..plots.colors import Colors
 from .base import BasePlot
 
 
 class TexthisPlot(BasePlot):
-    def __init__(self, texthis):
+    def __init__(self, texthis: list[TpsfECM]) -> None:
         self.texthis = texthis
         self.sen_lengths = self.preprocess_data()
         self.filtered = ""
 
-    def preprocess_data(self):
+    def preprocess_data(self) -> dict[int, list[tuple[str, int]]]:
         sentences_lengths = {}
         for tpsf in self.texthis:
             sentences_lens = []
@@ -25,7 +27,7 @@ class TexthisPlot(BasePlot):
             sentences_lengths.update({tpsf.revision_id: sentences_lens})
         return sentences_lengths
 
-    def create_figure(self):
+    def create_figure(self) -> tuple[Axes, Axes]:
         min_fig_heigth = 15
         tpsf_labels = []
         for key in self.sen_lengths:
@@ -59,7 +61,7 @@ class TexthisPlot(BasePlot):
 
         return ax1, ax2
 
-    def plot_data(self, ax1, ax2):
+    def plot_data(self, ax1: Axes, ax2: Axes) -> None:
         for id, sens in self.sen_lengths.items():
             starts = 0
             for s in sens:
@@ -93,7 +95,7 @@ class TexthisPlot(BasePlot):
                 edgecolor="white",
             )
 
-    def set_legend(self, ax1, ax2):
+    def set_legend(self, ax1: Axes, ax2: Axes) -> None:
         hand, labl = ax1.get_legend_handles_labels()
         handout = []
         lablout = []
@@ -112,19 +114,18 @@ class TexthisPlot(BasePlot):
                 handout2.append(h2)
         ax2.legend(handout2, lablout2, loc="upper right")
 
-    def run(self):
+    def run(self) -> None:
         ax1, ax2 = self.create_figure()
         self.plot_data(ax1, ax2)
         self.set_legend(ax1, ax2)
-        return plt
 
 
 class FilteredTexthisPlot(TexthisPlot):
-    def __init__(self, texthis):
+    def __init__(self, texthis: list[TpsfECM]) -> None:
         super().__init__(texthis)
         self.filtered = "_filtered"
 
-    def create_figure(self):
+    def create_figure(self) -> tuple[Axes, Axes]:
         min_fig_heigth = 15
         tpsf_labels = []
         for key in self.sen_lengths:
@@ -165,7 +166,7 @@ class FilteredTexthisPlot(TexthisPlot):
 
         return ax1, ax2
 
-    def plot_data(self, ax1, ax2):
+    def plot_data(self, ax1: Axes, ax2: Axes) -> None:
         for id, sens in self.sen_lengths.items():
             starts = 0
             for s in sens:

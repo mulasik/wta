@@ -1,8 +1,36 @@
+from typing import Any, Optional, TypedDict
+
+from ..sentence_histories.text_unit import TextUnitDict
 from ..sentence_histories.text_unit_factory import TextUnitFactory
+from .ts import TransformingSequence
+
+
+class EditDict(TypedDict):
+    transforming_sequence: dict[str, Any]
+
+
+class TextUnitsDict(TypedDict):
+    previous_textunits: list[TextUnitDict]
+    current_textunits: list[TextUnitDict]
+
+
+class TpsfECMDict(TypedDict):
+    revision_id: int
+    prev_text_version: str | None
+    result_text: str
+    edit: EditDict
+    textunits: TextUnitsDict
 
 
 class TpsfECM:
-    def __init__(self, revision_id, content, ts, prev_tpsf, final=False):
+    def __init__(
+        self,
+        revision_id: int,
+        content: str,
+        ts: TransformingSequence,
+        prev_tpsf: Optional["TpsfECM"],
+        final: bool = False,
+    ) -> None:
         self.revision_id = revision_id
         self.text = content
         self.ts = ts
@@ -12,23 +40,23 @@ class TpsfECM:
             self.text, self.revision_id, self.ts, self.prev_tpsf
         )
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"""
 
 === TPSF ===
 
 PREVIOUS TEXT:
-{self.prev_text_version}
+{None if not self.prev_tpsf else self.prev_tpsf.text}
 
 RESULT TEXT:
-{self.result_text}
+{self.text}
 
 TRANSFORMING SEQUENCE:
 {self.ts.label.upper()} *{self.ts.text}*
 
             """
 
-    def to_dict(self):
+    def to_dict(self) -> TpsfECMDict:
         return {
             "revision_id": self.revision_id,
             "prev_text_version": None if not self.prev_tpsf else self.prev_tpsf.text,
@@ -44,7 +72,7 @@ TRANSFORMING SEQUENCE:
             },
         }
 
-    def to_text(self):
+    def to_text(self) -> str:
         return f"""
 TPSF version {self.revision_id}:
 {self.text}

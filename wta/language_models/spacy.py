@@ -1,11 +1,29 @@
-import language_tool_python
+from typing import TypedDict
 
-from wta.pipeline.sentence_parsing.models import Languages
-from wta.utils.nlp import check_edit_distance
+import language_tool_python
+from spacy.language import Language
+
+from ..pipeline.sentence_parsing.models import Languages
+from ..utils.nlp import TokensDict, check_edit_distance
+
+
+class TaggedWord(TypedDict):
+    text: str
+    pos: str
+    pos_details: str
+    dep: str
+    lemma: str
+    oov: bool
+    is_typo: bool
+    is_single_char: bool
+    is_punct: bool
+    is_space: bool
 
 
 class SpacyModel:
-    def __init__(self, lang):
+    nlp: Language
+
+    def __init__(self, lang: str) -> None:
         import spacy
 
         if lang == Languages.DE:
@@ -32,14 +50,12 @@ class SpacyModel:
         else:
             print("FAILURE: Could not recognize the language.")
 
-    def tag_words(self, text: str) -> list:
+    def tag_words(self, text: str) -> list[TaggedWord]:
         doc = self.nlp(text)
-        tags = []
+        tags: list[TaggedWord] = []
         for token in doc:
-            is_typo = bool(
-                self.tool.check(token.text)
-                and self.tool.check(token.text)[0].ruleId == "GERMAN_SPELLER_RULE"
-            )
+            matches = self.tool.check(token.text)
+            is_typo = bool(matches and matches[0].ruleId == "GERMAN_SPELLER_RULE")
             is_single_char = len(token) == 1
             tags.append(
                 {
@@ -57,7 +73,7 @@ class SpacyModel:
             )
         return tags
 
-    def segment_text(self, text: str) -> list:
+    def segment_text(self, text: str) -> list[str]:
         doc = self.nlp(text)
         sentences = []
         # Attention:
@@ -80,46 +96,48 @@ class SpacyModel:
             sentences.append(sent.text_with_ws)
         return sentences
 
-    def collect_additional_tokens_tags(self, text: str) -> tuple | None:
-        doc = self.nlp(text)
-        for token in doc:
-            return (
-                token.content,
-                token.shape_,
-                token.is_alpha,
-                token.is_stop,
-                token.has_vector,
-                token.vector_norm,
-            )
-        return None
+    # def collect_additional_tokens_tags(
+    #     self, text: str
+    # ) -> tuple[str, str, bool, bool, bool, float] | None:
+    #     doc = self.nlp(text)
+    #     for token in doc:
+    #         return (
+    #             token.content,
+    #             token.shape_,
+    #             token.is_alpha,
+    #             token.is_stop,
+    #             token.has_vector,
+    #             token.vector_norm,
+    #         )
+    #     return None
 
-    def check_if_same_words(self, editted_word: str, result_word: str) -> bool | None:
-        if not editted_word or not result_word:
-            return None
-        editted_word = self.nlp(editted_word)
-        result_word = self.nlp(result_word)
-        return (
-            editted_word.pos_ == result_word.pos_
-            and editted_word.lemma_ == result_word.lemma_
-            and editted_word.dep_ == result_word.dep_
-        )
+    # def check_if_same_words(self, editted_word: str, result_word: str) -> bool | None:
+    #     if not editted_word or not result_word:
+    #         return None
+    #     editted_word_tokens = self.nlp(editted_word)
+    #     result_word_tokens = self.nlp(result_word)
+    #     return (
+    #         editted_word_tokens.pos_ == result_word_tokens.pos_
+    #         and editted_word_tokens.lemma_ == result_word_tokens.lemma_
+    #         and editted_word_tokens.dep_ == result_word_tokens.dep_
+    #     )
 
-    def check_if_any_oov(self, tokens: list) -> bool:
+    def check_if_any_oov(self, tokens: list[TokensDict]) -> bool:
         for t in tokens:
             pt = t["prev"]
             ct = t["cur"]
             if pt is not None and pt["text"] != "":
-                pt = pt["text"]
-                pt = self.nlp(pt)
-                pt = pt[0]
-                pt_oov = pt.is_oov
+                pt_text = pt["text"]
+                pt_tokens = self.nlp(pt_text)
+                pt_token = pt_tokens[0]
+                pt_oov = pt_token.is_oov
             else:
                 pt_oov = None
             if ct is not None and ct["text"] != "":
-                ct = ct["text"]
-                ct = self.nlp(ct)
-                ct = ct[0]
-                ct_oov = ct.is_oov
+                ct_text = ct["text"]
+                ct_tokens = self.nlp(ct_text)
+                ct_token = ct_tokens[0]
+                ct_oov = ct_token.is_oov
             else:
                 ct_oov = None
             if pt_oov is True or ct_oov is True:
@@ -127,37 +145,37 @@ class SpacyModel:
         return False
 
     def check_if_token_a_typo(self, token: str) -> bool:
-        return bool(
-            self.tool.check(token)
-            and self.tool.check(token)[0].ruleId == "GERMAN_SPELLER_RULE"
-        )
+        matches = self.tool.check(token)
+        return bool(matches and matches[0].ruleId == "GERMAN_SPELLER_RULE")
 
-    def check_if_any_typos(self, tokens: list) -> bool:
+    def check_if_any_typos(self, tokens: list[TokensDict]) -> bool:
         typos = []
         for t in tokens:
             pt = t["prev"]
             ct = t["cur"]
             if pt is not None and pt["text"] != "":
-                pt = pt["text"].strip(",.:")
+                pt_text = pt["text"].strip(",.:")
+                matches = self.tool.check(pt_text)
                 pt_is_typo = bool(
-                    self.tool.check(pt)
-                    and self.tool.check(pt)[0].ruleId == "GERMAN_SPELLER_RULE"
+                    matches and matches[0].ruleId == "GERMAN_SPELLER_RULE"
                 )
             else:
                 pt_is_typo = None
             typos.append(pt_is_typo)
             if ct is not None and ct["text"] != "":
-                ct = ct["text"].strip(",.:")
+                ct_text = ct["text"].strip(",.:")
+                matches = self.tool.check(ct_text)
                 ct_is_typo = bool(
-                    self.tool.check(ct)
-                    and self.tool.check(ct)[0].ruleId == "GERMAN_SPELLER_RULE"
+                    matches and matches[0].ruleId == "GERMAN_SPELLER_RULE"
                 )
             else:
                 ct_is_typo = None
             typos.append(ct_is_typo)
         return True in typos
 
-    def analyse_affected_tokens(self, affected_tokens: list, predef_edit_distance: int):
+    def analyse_affected_tokens(
+        self, affected_tokens: list[TokensDict], predef_edit_distance: int
+    ) -> tuple[int | None, bool, bool, bool]:
         is_any_tok_oov = self.check_if_any_oov(affected_tokens)
         is_any_tok_typo = self.check_if_any_typos(affected_tokens)
         if is_any_tok_typo is True:

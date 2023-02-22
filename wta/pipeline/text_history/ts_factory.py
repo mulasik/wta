@@ -1,5 +1,6 @@
 from tqdm import tqdm
 
+from .action import Action
 from .ts import TransformingSequence
 
 
@@ -11,7 +12,7 @@ class TsFactory:
     """
 
     @staticmethod
-    def run(action_groups):
+    def run(action_groups: dict[str, list[Action]]) -> list[TransformingSequence]:
         """
         Generates objects of type TransformingSequence from action groups.
         Args:
@@ -22,8 +23,9 @@ class TsFactory:
         tss = []
         prev_endtime = None
         rplcmt_textlen = None
-        action_groups = tqdm(action_groups.items(), "Extracting transforming sequences")
-        for acttyp, actgro in action_groups:
+        for acttyp, actgro in tqdm(
+            action_groups.items(), "Extracting transforming sequences"
+        ):
             text = "".join([a.content for a in actgro])
             actlbl = acttyp.split("_")[0].lower()
             startpos = actgro[0].startpos

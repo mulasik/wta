@@ -1,16 +1,30 @@
 from abc import ABC, abstractmethod
+from typing import TypedDict, cast
+
+from supar import Parser
+from supar.utils import Dataset
 
 from .models import Grammars, ModelMapping, Parsers
 
 
+class TokenProp(TypedDict):
+    id: str  # noqa: A003
+    word: str
+    pos: str
+    head: str
+    dep_rel: str
+
+
 class BaseParserAdapter(ABC):
     @abstractmethod
-    def load_pipeline(self):
+    def load_pipeline(self) -> Parser:
         pass
 
     @abstractmethod
-    def predict(self, senhis_sentexts: dict):
-        pass
+    def predict(
+        self, senhis_sentexts: dict[int, list[str]]
+    ) -> dict[int, list[list[TokenProp] | None]]:
+        raise NotImplementedError
 
 
 class Supar(BaseParserAdapter):
@@ -33,19 +47,19 @@ class Supar(BaseParserAdapter):
     2	tortoise	_	_	_	_	3	nsubj	_	_
     """
 
-    def __init__(self, lang: str, grammar: str):
+    def __init__(self, lang: str, grammar: str) -> None:
         self.lang = lang
         self.grammar = grammar
 
-    def load_pipeline(self):
-        from supar import Parser
-
+    def load_pipeline(self) -> Parser:
         model = ModelMapping.mapping[self.grammar][Parsers.SUPAR][self.lang]
         return Parser.load(model)
 
-    def predict(self, senhis_sentexts: dict):
+    def predict(
+        self, senhis_sentexts: dict[int, list[str]]
+    ) -> dict[int, list[list[TokenProp] | None]]:
         pipeline = self.load_pipeline()
-        senhis_parses = {}
+        senhis_parses: dict[int, list[list[TokenProp] | None]] = {}
         for sen_id, sgl_senhis_sentexts in senhis_sentexts.items():
             print(f"Processing the sentence {sen_id}...")
             senhis_parses[sen_id] = []
@@ -53,8 +67,7 @@ class Supar(BaseParserAdapter):
                 result = pipeline.predict(
                     sentext, lang=self.lang, prob=True, verbose=False
                 )
-                result = self.postprocess(result)
-                senhis_parses[sen_id].append(result)
+                senhis_parses[sen_id].append(self.postprocess(result))
                 # TODO: visualise constituency trees:
                 # t = Tree.fromstring(str(s_tree))
                 # t.pretty_print()
@@ -63,22 +76,23 @@ class Supar(BaseParserAdapter):
                 # TreeView(t)._cframe.print_to_file(output_file)
         return senhis_parses
 
-    def postprocess(self, parsed_sen):
+    def postprocess(self, parsed_sen: Dataset) -> list[TokenProp] | None:
         if self.grammar == Grammars.DEP:
-            tok_lst = []
+            tok_lst: list[TokenProp] = []
             _tok_lst = [str(tok).split("\n") for tok in parsed_sen][0]
             for _tok in _tok_lst:
                 _tok_props = _tok.split("\t")
                 if len(_tok_props) > 1:
-                    tok_props = {
-                        "id": _tok_props[0],
-                        "word": _tok_props[1],
-                        "pos": _tok_props[3],
-                        "head": _tok_props[6],
-                        "dep_rel": _tok_props[7],
-                    }
-                    tok_lst.append(tok_props)
+                    tok_lst.append(
+                        {
+                            "id": _tok_props[0],
+                            "word": _tok_props[1],
+                            "pos": _tok_props[3],
+                            "head": _tok_props[6],
+                            "dep_rel": _tok_props[7],
+                        }
+                    )
             return tok_lst
         if self.grammar == Grammars.CONST:
-            return list(parsed_sen)[0]
+            return cast(list[TokenProp], list(parsed_sen)[0])
         return None

@@ -89,7 +89,6 @@ ignore = [
     "D",
     # disabled for now:
     "A001", # shadowing builtin
-    "ANN", # missing annotations
     "B007", # loop variable not used
     "B024", # abstract class without abstract methods
     "B905", # zip without strict
@@ -99,10 +98,25 @@ ignore = [
     "ERA001", # commented out code
     "F841", # unused variable
     "FBT00", # boolean positional argument
+    "PLR0911", # too many returns
     "PLR0912", # too many branches
     "PLR0913", # too many arguments
     "PLR0915", # too many statements
     "PLR2004", # magic value used
     "PTH", # use pathlib
     "T201", # print used
+]
+
+[tool.ruff.per-file-ignores]
+"stubs/**/*.pyi" = [
+    # ignore unused arguments
+    "ARG001",
+    # ignore missing __init__.py
+    "INP001",
+    # ignore bool params, because the library chose it this way
+    "FBT001",
+    # ignore invalid names
+    "A002",
+    "N815",
+    "N816",
 ]

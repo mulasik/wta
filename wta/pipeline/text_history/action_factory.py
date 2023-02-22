@@ -1,4 +1,9 @@
+from collections.abc import Collection
+
 from tqdm import tqdm
+
+from .action import Action
+from .events.keyboard import KeyboardEvent
 
 
 class ActionFactory:
@@ -8,7 +13,7 @@ class ActionFactory:
     """
 
     @staticmethod
-    def run(evnts) -> list:
+    def run(evnts: Collection[KeyboardEvent]) -> list[Action]:
         """
         Generates a list of Action objects for all events.
         Args:
@@ -23,9 +28,9 @@ class ActionFactory:
         actions = []
         evnts = tqdm(evnts, "Generating actions")
         for evnt in evnts:
-            if evnt.to_action() is not None:
-                a = evnt.to_action()
-                actions.append(a)
+            action = evnt.to_action()
+            if action is not None:
+                actions.append(action)
             else:
                 print(
                     f"INFO: No action found for event {type(evnt).__name__} *{evnt.content}* at pos {evnt.startpos}-{evnt.endpos}"
@@ -52,7 +57,7 @@ class ActionAggregator:
     """
 
     @staticmethod
-    def run(acts) -> dict:
+    def run(acts: list[Action]) -> dict[str, list[Action]]:
         """
         Aggregates Action objects based on specific criteria.
         Args:

@@ -1,16 +1,27 @@
 import re
 from itertools import zip_longest
+from typing import TYPE_CHECKING
 
 import settings
 from wta.pipeline.names import SenLabels, TSLabels
+from wta.pipeline.text_history.ts import TransformingSequence
 
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
 from ..regularexpressions import RegularExpressions
-from .text_unit import Sec, Sen, Sin
+from .text_unit import Sec, Sen, Sin, TextUnit
+
+if TYPE_CHECKING:
+    from wta.pipeline.text_history.tpsf import TpsfECM
 
 
 class TextUnitFactory:
-    def run(self, text, revision_id, ts, prev_tpsf):
+    def run(
+        self,
+        text: str,
+        revision_id: int,
+        ts: TransformingSequence,
+        prev_tpsf: "TpsfECM | None",
+    ) -> tuple[list[TextUnit], list[str]]:
         print(
             f"\n\n=============================={revision_id}==============================\n"
         )
@@ -35,8 +46,8 @@ class TextUnitFactory:
         )
         return corrected_textunits, tus_states
 
-    def split_in_textunits(self, sentence_list):
-        textunit_list = []
+    def split_in_textunits(self, sentence_list: list[str]) -> list[TextUnit]:
+        textunit_list: list[TextUnit] = []
         for s in sentence_list:
             contains_only_ws = re.search(RegularExpressions.ONLY_WS_RE, s) is not None
             if contains_only_ws is True:
@@ -52,16 +63,14 @@ class TextUnitFactory:
                     merged_tu_text
                 )
                 textunit_list[len(textunit_list) - 1] = merged_tu
-                sin_text = (
-                    None
-                    if re.search(RegularExpressions.TRAILING_WS_RE, s) is None
-                    else re.search(RegularExpressions.TRAILING_WS_RE, s).group(0)
-                )
+                sin_match = re.search(RegularExpressions.TRAILING_WS_RE, s)
+                sin_text = None if sin_match is None else sin_match.group(0)
                 if sin_text is not None:
                     textunit_list.append(Sin(sin_text))
                 continue
-            if re.search(RegularExpressions.INITIAL_WS_RE, s) is not None:
-                sin = Sin(re.search(RegularExpressions.INITIAL_WS_RE, s).group(0))
+            sin_match = re.search(RegularExpressions.INITIAL_WS_RE, s)
+            if sin_match is not None:
+                sin = Sin(sin_match.group(0))
                 textunit_list.append(sin)
             sen_with_ws_trimmed = re.sub(
                 RegularExpressions.INITIAL_WS_RE, "", sen_wo_trailing_ws
@@ -75,12 +84,13 @@ class TextUnitFactory:
             else:
                 sen = Sen(sen_with_ws_trimmed)
                 textunit_list.append(sen)
-                if re.search(RegularExpressions.TRAILING_WS_RE, s) is not None:
-                    sin = Sin(re.search(RegularExpressions.TRAILING_WS_RE, s).group(0))
+                sin_match = re.search(RegularExpressions.TRAILING_WS_RE, s)
+                if sin_match is not None:
+                    sin = Sin(sin_match.group(0))
                     textunit_list.append(sin)
         return textunit_list
 
-    def merge_double_textunits(self, textunit_list):
+    def merge_double_textunits(self, textunit_list: list[TextUnit]) -> list[TextUnit]:
         doubles = [
             (i, j)
             for i, j in zip_longest(textunit_list, textunit_list[1:])
@@ -117,11 +127,17 @@ class TextUnitFactory:
                 prev_merged_text = ""
         return self.merge_double_textunits(merged_textunits)
 
-    def detect_tus_diffs(self, textunits, ts, prev_tpsf):
+    def detect_tus_diffs(
+        self,
+        textunits: list[TextUnit],
+        ts: TransformingSequence,
+        prev_tpsf: "TpsfECM | None",
+    ) -> tuple[list[TextUnit], list[TextUnit], list[TextUnit]]:
         if ts.label in [TSLabels.MID, TSLabels.DEL, TSLabels.REPL]:
-            pre_tus, changed_tus, post_tus = self.check_what_changed(
-                prev_tpsf.textunits, ts
+            prev_textunits: list[TextUnit] = (
+                [] if prev_tpsf is None else prev_tpsf.textunits
             )
+            pre_tus, changed_tus, post_tus = self.check_what_changed(prev_textunits, ts)
             # if the edit consists in deleting or reducing sentence interspace
             if (
                 len(changed_tus) == 1
@@ -131,14 +147,13 @@ class TextUnitFactory:
                 reduced_sin_content = re.sub(ts.text, "", changed_tus[0].text, count=1)
                 if reduced_sin_content == "":
                     changed_tus = []
-                elif (
-                    re.search(RegularExpressions.ONLY_WS_RE, reduced_sin_content)
-                    is not None
-                ):
-                    sin_content = re.search(
+                else:
+                    match = re.search(
                         RegularExpressions.ONLY_WS_RE, reduced_sin_content
-                    ).group(0)
-                    changed_tus = [Sin(sin_content)]
+                    )
+                    if match is not None:
+                        sin_content = match.group(0)
+                        changed_tus = [Sin(sin_content)]
             else:
                 changed_tus = [
                     tu
@@ -153,7 +168,9 @@ class TextUnitFactory:
             pre_tus, changed_tus, post_tus = self.check_what_changed(textunits, ts)
         return pre_tus, changed_tus, post_tus
 
-    def check_what_changed(self, tus, ts):
+    def check_what_changed(
+        self, tus: list[TextUnit], ts: TransformingSequence
+    ) -> tuple[list[TextUnit], list[TextUnit], list[TextUnit]]:
         pre_tus = []
         post_tus = []
         changed_tus = []
@@ -169,9 +186,11 @@ class TextUnitFactory:
             currentpos = currentpos + len(tu.text)
         return pre_tus, changed_tus, post_tus
 
-    def improve_segmentation_with_post_tus(self, changed_tus, post_tus):
+    def improve_segmentation_with_post_tus(
+        self, changed_tus: list[TextUnit], post_tus: list[TextUnit]
+    ) -> list[TextUnit]:
         post_sens = [ptu for ptu in post_tus if type(ptu).__name__ == "Sen"]
-        corrected_changed_tus = []
+        corrected_changed_tus: list[TextUnit] = []
         for ctu in changed_tus:
             matching_sens = [
                 psen for psen in post_sens if re.search(psen.text, ctu.text) is not None
@@ -189,14 +208,8 @@ class TextUnitFactory:
                         re.sub(RegularExpressions.TRAILING_WS_RE, "", new_ctu_text)
                     )
                     corrected_changed_tus.append(sen)
-                    sin_content = (
-                        None
-                        if re.search(RegularExpressions.TRAILING_WS_RE, new_ctu_text)
-                        is None
-                        else re.search(
-                            RegularExpressions.TRAILING_WS_RE, new_ctu_text
-                        ).group(0)
-                    )
+                    match = re.search(RegularExpressions.TRAILING_WS_RE, new_ctu_text)
+                    sin_content = None if match is None else match.group(0)
                     if sin_content is not None:
                         sin = Sin(sin_content)
                         corrected_changed_tus.append(sin)
@@ -208,7 +221,13 @@ class TextUnitFactory:
                 )
         return corrected_changed_tus
 
-    def collect_tus_states(self, pre_tus, changed_tus, post_tus, ts):
+    def collect_tus_states(
+        self,
+        pre_tus: list[TextUnit],
+        changed_tus: list[TextUnit],
+        post_tus: list[TextUnit],
+        ts: TransformingSequence,
+    ) -> list[str]:
         tus_states = []
         currentpos = 0
         for tu in [*pre_tus, *changed_tus, *post_tus]:

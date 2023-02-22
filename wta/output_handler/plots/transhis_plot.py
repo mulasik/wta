@@ -1,14 +1,23 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.axes import Axes
 
 import settings
+from wta.pipeline.transformation_histories.transformation import Transformation
 
 from .base import BasePlot
 from .colors import Colors
 
 
 class TranshisPlot(BasePlot):
-    def preprocess_data(self, data):
+    def __init__(self, dep_transhis: dict[int, list[Transformation]]) -> None:
+        self.dep_transhis = dep_transhis
+        self.data = self.preprocess_data(dep_transhis)
+        self.labels = self.dep_transhis.keys()
+
+    def preprocess_data(
+        self, data: dict[int, list[Transformation]]
+    ) -> tuple[list[int], list[int]]:
         non_impact_edits_lst = []
         impact_edits_lst = []
         for sen_versions in data.values():
@@ -22,7 +31,7 @@ class TranshisPlot(BasePlot):
             impact_edits_lst.append(no_impact_edits)
         return non_impact_edits_lst, impact_edits_lst
 
-    def create_figure(self):
+    def create_figure(self) -> Axes:
         plt.rcParams.update({"font.size": 6})
         plt.figure(figsize=(50, 25))
         fig, ax = plt.subplots()
@@ -34,7 +43,7 @@ class TranshisPlot(BasePlot):
         fig.tight_layout()
         return ax
 
-    def plot_data(self, ax):
+    def plot_data(self, ax: Axes) -> None:
         x = np.arange(len(self.labels))  # the label locations
         width = 0.3  # the width of the bars
         ax.bar(
@@ -52,39 +61,38 @@ class TranshisPlot(BasePlot):
             color="lightcoral",
         )
 
-    def set_legend(self, ax):
+    def set_legend(self, ax: Axes) -> None:
         ax.legend()
 
-    def run(self):
+    def run(self) -> None:
         ax = self.create_figure()
         self.plot_data(ax)
         self.set_legend(ax)
-        return plt
 
 
 class DepTranshisPlot(TranshisPlot):
-    def __init__(self, dep_transhis):
-        self.dep_transhis = dep_transhis
-        self.data = self.preprocess_data(dep_transhis)
-        self.labels = self.dep_transhis.keys()
+    pass
 
 
 class ConstTranshisPlot(TranshisPlot):
-    def __init__(self, const_transhis):
-        self.dep_transhis = const_transhis
-        self.data = self.preprocess_data(const_transhis)
-        self.labels = const_transhis.keys()
+    pass
 
 
 class SynBarTranshisPlot(BasePlot):
-    def __init__(self, dep_transhis, const_transhis):
+    def __init__(
+        self,
+        dep_transhis: dict[int, list[Transformation]],
+        const_transhis: dict[int, list[Transformation]],
+    ) -> None:
         self.output_directory = settings.config["output_dir"]
         self.filename = settings.filename
         self.dep_transhis = dep_transhis
         self.const_transhis = const_transhis
         self.data = self.preprocess_data()
 
-    def preprocess_data(self):
+    def preprocess_data(
+        self,
+    ) -> tuple[dict[int, list[bool]], int, int, dict[int, list[bool]], int, int]:
         # dependency
         d_sens_impact_values = {}
         i_d = 0
@@ -126,7 +134,7 @@ class SynBarTranshisPlot(BasePlot):
             c_no_edits_wo_impact,
         )
 
-    def create_figure(self):
+    def create_figure(self) -> tuple[Axes, Axes]:
         labels = self.data[3].keys()
 
         plt.rcParams.update({"font.size": 30})
@@ -155,7 +163,7 @@ class SynBarTranshisPlot(BasePlot):
         fig.tight_layout()
         return ax1, ax2
 
-    def plot_data(self, ax1, ax2):
+    def plot_data(self, ax1: Axes, ax2: Axes) -> None:
         for id, impact_values in self.data[3].items():
             starts = 0
             for iv in impact_values:
@@ -193,7 +201,7 @@ class SynBarTranshisPlot(BasePlot):
                 )
                 starts += 1
 
-    def set_legend(self, ax1, ax2):
+    def set_legend(self, ax1: Axes, ax2: Axes) -> None:
         hand, labl = ax1.get_legend_handles_labels()
         handout = []
         lablout = []
@@ -211,15 +219,14 @@ class SynBarTranshisPlot(BasePlot):
                 handout.append(h)
         ax2.legend(handout, lablout, loc="upper right")
 
-    def run(self):
+    def run(self) -> None:
         ax1, ax2 = self.create_figure()
         self.plot_data(ax1, ax2)
         self.set_legend(ax1, ax2)
-        return plt
 
 
 class SynPieTranshisPlot(SynBarTranshisPlot):
-    def create_figure(self):
+    def create_figure(self) -> tuple[Axes, Axes]:
         lbls = ["syntactic impact", "no syntactic impact"]  # TODO add labels
         plt.rcParams.update({"font.size": 35})
         fig, (ax1, ax2) = plt.subplots(
@@ -229,7 +236,7 @@ class SynPieTranshisPlot(SynBarTranshisPlot):
         ax2.set_title("DEPENDENCY")
         return ax1, ax2
 
-    def plot_data(self, ax1, ax2):
+    def plot_data(self, ax1: Axes, ax2: Axes) -> None:
         d_vals = [self.data[1], self.data[2]]
         c_vals = [self.data[4], self.data[5]]
         ax1.pie(c_vals, colors=["indianred", "teal"], autopct="%1.1f%%")

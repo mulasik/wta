@@ -1,12 +1,16 @@
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
-from wta.output_handler.plots.colors import Colors
-
+from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
+from .colors import Colors
 
 
 class SenhisPlot(BasePlot):
-    def __init__(self, texthis, senhis):
+    def __init__(
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+    ) -> None:
         texthis = [
             tpsf
             for tpsf in texthis
@@ -21,7 +25,9 @@ class SenhisPlot(BasePlot):
         self.sen_colors = Colors.assign_colors_to_sens(senhis)
         self.data = self.preprocess_data(texthis, senhis)
 
-    def preprocess_data(self, texthis, senhis):
+    def preprocess_data(
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+    ) -> dict[int, list[tuple[int, str, str]]]:
         """
         Collects sentence versions for each tpsf (its text and length)
         and retrieves sentence id from sentence history for each sentence version
@@ -31,7 +37,7 @@ class SenhisPlot(BasePlot):
         """
         tpsf_sentences = {}
         for tpsf in texthis:
-            tpsf_sens = []
+            tpsf_sens: list[tuple[int, str, str]] = []
             for id, sen in enumerate(tpsf.sentence_list):
                 for sen_id, sen_list in senhis.items():
                     if sen.content.strip() in [
@@ -45,7 +51,7 @@ class SenhisPlot(BasePlot):
             tpsf_sentences.update({tpsf.revision_id: tpsf_sens})
         return tpsf_sentences
 
-    def create_figure(self):
+    def create_figure(self) -> tuple[Axes, Axes]:
         fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(20, 20))
         ax1.set_ylim(len(self.data) + 1, -1)
         ax1.tick_params(axis="both", which="major", labelsize=7)
@@ -62,7 +68,7 @@ class SenhisPlot(BasePlot):
         plt.tight_layout()
         return ax1, ax2
 
-    def plot_data(self, ax1, ax2):
+    def plot_data(self, ax1: Axes, ax2: Axes) -> None:
         for id, sens in self.data.items():
             a1_starts = 0
             for s in sens:
@@ -90,12 +96,10 @@ class SenhisPlot(BasePlot):
                 bbox={"facecolor": s[1], "alpha": 0.6, "pad": 2},
             )
             a2_starts -= 0.01
-        return plt
 
-    def set_legend(self):
+    def set_legend(self) -> None:
         pass
 
-    def run(self):
+    def run(self) -> None:
         ax1, ax2 = self.create_figure()
         self.plot_data(ax1, ax2)
-        return plt

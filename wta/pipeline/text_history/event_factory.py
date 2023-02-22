@@ -1,8 +1,10 @@
-from bs4 import BeautifulSoup
+from collections.abc import Iterable
+
+from bs4 import BeautifulSoup, Tag
 from tqdm import tqdm
 
-from wta.pipeline.names import KeyNames
-
+from ..names import KeyNames
+from .events.base import BaseEvent
 from .events.insert import InsertEvent
 from .events.keyboard import (
     BDeletionKeyboardEvent,
@@ -27,7 +29,7 @@ class EventFactory:
         * InsertEvent
     """
 
-    def run(self, idfx) -> list:
+    def run(self, idfx: str) -> list[BaseEvent]:
         """
         Creates a list of Event objects.
         Args:
@@ -37,9 +39,13 @@ class EventFactory:
         """
         with open(idfx) as fp:
             soup = BeautifulSoup(fp, features="lxml")
-            idfx_events = soup.find_all("event")
+            idfx_events: Iterable[Tag] = soup.find_all("event")
         idfx_events = tqdm(idfx_events, "Processing keylogs")
-        events = [self.create_event(event) for event in idfx_events]
+        events = [
+            event_obj
+            for event_obj in (self.create_event(event) for event in idfx_events)
+            if event_obj is not None
+        ]
         for i, event in enumerate(events):
             event.set_next_evnt(events[i + 1] if i < len(events) - 1 else None)
             event.set_prev_evnt(events[i - 1] if i >= 1 else None)
@@ -50,7 +56,7 @@ class EventFactory:
         return events
 
     @staticmethod
-    def create_event(event):
+    def create_event(event: Tag) -> BaseEvent | None:
         """
         Collects event attributes and creates an object of type Event.
         Args:
@@ -132,14 +138,14 @@ class EventFactory:
                 textlen = int(wordlog.documentlength.get_text())
                 if keyname in KeyNames.NAVIGATION_KEYS:
                     endpos = None
-                    evnt = NavigationKeyboardEvent(
+                    return NavigationKeyboardEvent(
                         content, startpos, endpos, keyname, starttime, endtime, textlen
                     )
-                elif keyname in KeyNames.DELETION_KEYS:
+                if keyname in KeyNames.DELETION_KEYS:
                     if keyname == KeyNames.BACKSPACE:
                         startpos = startpos - 1
                         endpos = startpos
-                        evnt = BDeletionKeyboardEvent(
+                        return BDeletionKeyboardEvent(
                             content,
                             startpos,
                             endpos,
@@ -148,9 +154,9 @@ class EventFactory:
                             endtime,
                             textlen,
                         )
-                    elif keyname == KeyNames.DELETE:
+                    if keyname == KeyNames.DELETE:
                         endpos = startpos
-                        evnt = DDeletionKeyboardEvent(
+                        return DDeletionKeyboardEvent(
                             content,
                             startpos,
                             endpos,
@@ -162,7 +168,7 @@ class EventFactory:
                 else:
                     # first char is placed at startpos, so the char must be deduced from length:
                     endpos = startpos + (len(content) - 1)
-                    evnt = ProductionKeyboardEvent(
+                    return ProductionKeyboardEvent(
                         content, startpos, endpos, keyname, starttime, endtime, textlen
                     )
             except IndexError:
@@ -180,7 +186,7 @@ class EventFactory:
                 endpos = orig_startpos + len(content)
                 rplcmt_textlen = orig_endpos - orig_startpos
                 rplcmt_endpos = orig_endpos - 1
-                evnt = ReplacementEvent(
+                return ReplacementEvent(  # noqa: TRY300
                     content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
                 )
             except:
@@ -193,11 +199,11 @@ class EventFactory:
                 content = event.part.before.get_text()  # inserted text
                 startpos = int(event.part.position.get_text()) - len(content)
                 endpos = int(event.part.position.get_text()) - 1
-                evnt = InsertEvent(content, startpos, endpos)
+                return InsertEvent(content, startpos, endpos)  # noqa: TRY300
             except:
                 print(
                     "FAILURE: Insert event information not available in the IDFX file."
                 )
         else:
             print(f'ATTENTION: Encountered a new event type: {event["type"]}')
-        return evnt
+        return None
