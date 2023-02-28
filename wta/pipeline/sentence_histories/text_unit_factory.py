@@ -1,4 +1,3 @@
-import re
 from itertools import zip_longest
 from typing import TYPE_CHECKING
 
@@ -145,7 +144,7 @@ class TextUnitFactory:
                 and type(changed_tus[0]).__name__ == "Sin"
                 and ts.label in (TSLabels.MID, TSLabels.DEL)
             ):
-                reduced_sin_content = re.sub(ts.text, "", changed_tus[0].text, count=1)
+                reduced_sin_content = changed_tus[0].text.replace(ts.text, "", 1)
                 if reduced_sin_content == "":
                     changed_tus = []
                 else:
@@ -192,11 +191,11 @@ class TextUnitFactory:
         corrected_changed_tus: list[TextUnit] = []
         for ctu in changed_tus:
             matching_sens = [
-                psen for psen in post_sens if re.search(psen.text, ctu.text) is not None
+                psen for psen in post_sens if psen.text in ctu.text is not None
             ]
             if len(matching_sens) == 1:
                 matching_sen = matching_sens[0]
-                new_ctu_text = re.sub(matching_sen.text, "", ctu.text)
+                new_ctu_text = ctu.text.replace(matching_sen.text, "")
                 uppercase_letter = starts_with_uppercase_letter(new_ctu_text)
                 end_punctuation = ends_with_end_punctuation(new_ctu_text)
                 if not uppercase_letter or not end_punctuation:
