@@ -1,1 +1,0 @@
-cnames: dict[str, str]
