@@ -7,7 +7,7 @@ from wta.pipeline.names import SenLabels, TSLabels
 from wta.pipeline.text_history.ts import TransformingSequence
 
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
-from ..regularexpressions import RegularExpressions
+from .. import regular_expressions
 from .text_unit import Sec, Sen, Sin, TextUnit
 
 if TYPE_CHECKING:
@@ -55,37 +55,37 @@ class TextUnitFactory:
     def _split_in_textunits(self, sentence_list: list[str]) -> list[TextUnit]:
         textunit_list: list[TextUnit] = []
         for s in sentence_list:
-            contains_only_ws = re.search(RegularExpressions.ONLY_WS_RE, s) is not None
+            contains_only_ws = re.search(regular_expressions.ONLY_WS_RE, s) is not None
             if contains_only_ws is True:
                 sin = Sin(s)
                 textunit_list.append(sin)
                 continue
-            sen_wo_trailing_ws = re.sub(RegularExpressions.TRAILING_WS_RE, "", s)
+            sen_wo_trailing_ws = re.sub(regular_expressions.TRAILING_WS_RE, "", s)
             if sen_wo_trailing_ws == "»":
                 textunit_list[-1] = textunit_list[-1].copy_with_appended_text(
                     sen_wo_trailing_ws
                 )
-                sin_match = re.search(RegularExpressions.TRAILING_WS_RE, s)
+                sin_match = re.search(regular_expressions.TRAILING_WS_RE, s)
                 if sin_match is not None:
                     textunit_list.append(Sin(sin_match.group(0)))
                 continue
-            sin_match = re.search(RegularExpressions.INITIAL_WS_RE, s)
+            sin_match = re.search(regular_expressions.INITIAL_WS_RE, s)
             if sin_match is not None:
                 sin = Sin(sin_match.group(0))
                 textunit_list.append(sin)
             sen_with_ws_trimmed = re.sub(
-                RegularExpressions.INITIAL_WS_RE, "", sen_wo_trailing_ws
+                regular_expressions.INITIAL_WS_RE, "", sen_wo_trailing_ws
             )
             uppercase_letter = starts_with_uppercase_letter(sen_with_ws_trimmed)
             end_punctuation = ends_with_end_punctuation(sen_with_ws_trimmed)
             if not uppercase_letter or not end_punctuation:
-                s_wo_init_ws = re.sub(RegularExpressions.INITIAL_WS_RE, "", s)
+                s_wo_init_ws = re.sub(regular_expressions.INITIAL_WS_RE, "", s)
                 sec = Sec(s_wo_init_ws)
                 textunit_list.append(sec)
             else:
                 sen = Sen(sen_with_ws_trimmed)
                 textunit_list.append(sen)
-                sin_match = re.search(RegularExpressions.TRAILING_WS_RE, s)
+                sin_match = re.search(regular_expressions.TRAILING_WS_RE, s)
                 if sin_match is not None:
                     sin = Sin(sin_match.group(0))
                     textunit_list.append(sin)
@@ -106,7 +106,7 @@ class TextUnitFactory:
             if type(i).__name__ == type(j).__name__ != "Sen":
                 merged_tu_text = i.text + j.text
                 text_wo_trailing_ws = re.sub(
-                    RegularExpressions.TRAILING_WS_RE, "", merged_tu_text
+                    regular_expressions.TRAILING_WS_RE, "", merged_tu_text
                 )
                 uppercase_letter = starts_with_uppercase_letter(text_wo_trailing_ws)
                 end_punctuation = ends_with_end_punctuation(text_wo_trailing_ws)
@@ -150,7 +150,7 @@ class TextUnitFactory:
                     changed_tus = []
                 else:
                     match = re.search(
-                        RegularExpressions.ONLY_WS_RE, reduced_sin_content
+                        regular_expressions.ONLY_WS_RE, reduced_sin_content
                     )
                     if match is not None:
                         sin_content = match.group(0)
@@ -206,10 +206,10 @@ class TextUnitFactory:
                     corrected_changed_tus.append(sec)
                 else:
                     sen = Sen(
-                        re.sub(RegularExpressions.TRAILING_WS_RE, "", new_ctu_text)
+                        re.sub(regular_expressions.TRAILING_WS_RE, "", new_ctu_text)
                     )
                     corrected_changed_tus.append(sen)
-                    match = re.search(RegularExpressions.TRAILING_WS_RE, new_ctu_text)
+                    match = re.search(regular_expressions.TRAILING_WS_RE, new_ctu_text)
                     sin_content = None if match is None else match.group(0)
                     if sin_content is not None:
                         sin = Sin(sin_content)
