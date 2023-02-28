@@ -40,7 +40,7 @@ An accomplished collection of TPSFs results in a text history which constitutes 
 
 The following figure provides an overview of the processing steps.
 
-![Processing Pipeline](https://github.com/mulasik/wta/blob/main/docs/charts/Concept_Overview.png)
+![Processing Pipeline](docs/charts/Concept_Overview.png)
 
 An example of a TPD exported to JSON format:
 
@@ -147,22 +147,22 @@ The configuration structure:
 
 ## Running the Tool
 
-* To install all dependencies, run:
+* To install all dependencies install [poetry](https://python-poetry.org/), run:
 
 ```
-pip install -r requirements.txt
+poetry install
 ```
 
 * To run the tool, execute:
 
 ```
-python -m wta config.<YOUR CONFIGURATION NAME>
+poetry run wta config.<YOUR CONFIGURATION NAME>
 ```
 
 To run the tool for the provided **example data** (seven idfx files with short descriptive comments created by seven subjects after watching a two-minute video), execute the following command:
 
 ```
-python -m wta config.VIDEO
+poetry run wta config.VIDEO
 ```
 
 By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
