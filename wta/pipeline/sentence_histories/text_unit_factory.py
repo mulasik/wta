@@ -26,27 +26,33 @@ class TextUnitFactory:
             f"\n\n=============================={revision_id}==============================\n"
         )
         sentence_list = settings.nlp_model.segment_text(text)
-        textunit_list = self.split_in_textunits(sentence_list)
-        merged_textunit_list = self.merge_double_textunits(textunit_list)
-        pre_tus, changed_tus, post_tus = self.detect_tus_diffs(
+        textunit_list = self._split_in_textunits(sentence_list)
+        merged_textunit_list = self._merge_double_textunits(textunit_list)
+        pre_tus, changed_tus, post_tus = self._detect_tus_diffs(
             merged_textunit_list, ts, prev_tpsf
         )
         print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|")
         print(f"TEXT: {text}")
         print(f"INITIAL SENTENCE LIST: {sentence_list}")
-        corrected_changed_tus = self.improve_segmentation_with_post_tus(
+        corrected_changed_tus = self._improve_segmentation_with_post_tus(
             changed_tus, post_tus
         )
-        tus_states = self.collect_tus_states(
+        tus_states = self._collect_tus_states(
             pre_tus, corrected_changed_tus, post_tus, ts
         )
         corrected_textunits = [*pre_tus, *corrected_changed_tus, *post_tus]
-        print(
-            f"FINAL TU LIST: {[(type(tu).__name__, tu.state.upper(), tu.text) for tu in corrected_textunits]}"
-        )
+        final_tu_list = [
+            (
+                type(tu).__name__,
+                tu.state if tu.state is None else tu.state.upper(),
+                tu.text,
+            )
+            for tu in corrected_textunits
+        ]
+        print(f"FINAL TU LIST: {final_tu_list}")
         return corrected_textunits, tus_states
 
-    def split_in_textunits(self, sentence_list: list[str]) -> list[TextUnit]:
+    def _split_in_textunits(self, sentence_list: list[str]) -> list[TextUnit]:
         textunit_list: list[TextUnit] = []
         for s in sentence_list:
             contains_only_ws = re.search(RegularExpressions.ONLY_WS_RE, s) is not None
@@ -56,17 +62,12 @@ class TextUnitFactory:
                 continue
             sen_wo_trailing_ws = re.sub(RegularExpressions.TRAILING_WS_RE, "", s)
             if sen_wo_trailing_ws == "»":
-                merged_tu_text = (
-                    textunit_list[len(textunit_list) - 1].text + sen_wo_trailing_ws
+                textunit_list[-1] = textunit_list[-1].copy_with_appended_text(
+                    sen_wo_trailing_ws
                 )
-                merged_tu = textunit_list[len(textunit_list) - 1].__class__(
-                    merged_tu_text
-                )
-                textunit_list[len(textunit_list) - 1] = merged_tu
                 sin_match = re.search(RegularExpressions.TRAILING_WS_RE, s)
-                sin_text = None if sin_match is None else sin_match.group(0)
-                if sin_text is not None:
-                    textunit_list.append(Sin(sin_text))
+                if sin_match is not None:
+                    textunit_list.append(Sin(sin_match.group(0)))
                 continue
             sin_match = re.search(RegularExpressions.INITIAL_WS_RE, s)
             if sin_match is not None:
@@ -90,13 +91,11 @@ class TextUnitFactory:
                     textunit_list.append(sin)
         return textunit_list
 
-    def merge_double_textunits(self, textunit_list: list[TextUnit]) -> list[TextUnit]:
-        doubles = [
-            (i, j)
-            for i, j in zip_longest(textunit_list, textunit_list[1:])
-            if type(i).__name__ == type(j).__name__ != "Sen"
-        ]
-        if len(doubles) == 0:
+    def _merge_double_textunits(self, textunit_list: list[TextUnit]) -> list[TextUnit]:
+        if not any(
+            type(i).__name__ == type(j).__name__ != "Sen"
+            for (i, j) in zip_longest(textunit_list, textunit_list[1:])
+        ):
             # print(f'No more doubles.')
             return textunit_list
 
@@ -112,7 +111,7 @@ class TextUnitFactory:
                 uppercase_letter = starts_with_uppercase_letter(text_wo_trailing_ws)
                 end_punctuation = ends_with_end_punctuation(text_wo_trailing_ws)
                 if not uppercase_letter or not end_punctuation:
-                    merged_tu = i.__class__(merged_tu_text)
+                    merged_tu = i.copy_with_text(merged_tu_text)
                     merged_textunits.append(merged_tu)
                 else:
                     sen = Sen(text_wo_trailing_ws)
@@ -125,9 +124,9 @@ class TextUnitFactory:
             elif i.text != prev_merged_text:
                 merged_textunits.append(i)
                 prev_merged_text = ""
-        return self.merge_double_textunits(merged_textunits)
+        return self._merge_double_textunits(merged_textunits)
 
-    def detect_tus_diffs(
+    def _detect_tus_diffs(
         self,
         textunits: list[TextUnit],
         ts: TransformingSequence,
@@ -137,12 +136,14 @@ class TextUnitFactory:
             prev_textunits: list[TextUnit] = (
                 [] if prev_tpsf is None else prev_tpsf.textunits
             )
-            pre_tus, changed_tus, post_tus = self.check_what_changed(prev_textunits, ts)
+            pre_tus, changed_tus, post_tus = self._check_what_changed(
+                prev_textunits, ts
+            )
             # if the edit consists in deleting or reducing sentence interspace
             if (
                 len(changed_tus) == 1
                 and type(changed_tus[0]).__name__ == "Sin"
-                and ts.label in [TSLabels.MID, TSLabels.DEL]
+                and ts.label in (TSLabels.MID, TSLabels.DEL)
             ):
                 reduced_sin_content = re.sub(ts.text, "", changed_tus[0].text, count=1)
                 if reduced_sin_content == "":
@@ -165,10 +166,10 @@ class TextUnitFactory:
                     ]
                 ]
         elif ts.label in [TSLabels.APP, TSLabels.INS, TSLabels.PAST]:
-            pre_tus, changed_tus, post_tus = self.check_what_changed(textunits, ts)
+            pre_tus, changed_tus, post_tus = self._check_what_changed(textunits, ts)
         return pre_tus, changed_tus, post_tus
 
-    def check_what_changed(
+    def _check_what_changed(
         self, tus: list[TextUnit], ts: TransformingSequence
     ) -> tuple[list[TextUnit], list[TextUnit], list[TextUnit]]:
         pre_tus = []
@@ -179,14 +180,14 @@ class TextUnitFactory:
             startpos, endpos = currentpos, currentpos + len(tu.text) - 1
             if endpos < ts.startpos:
                 pre_tus.append(tu)
-            elif startpos > ts.endpos:
+            elif ts.endpos is not None and startpos > ts.endpos:
                 post_tus.append(tu)
             else:
                 changed_tus.append(tu)
             currentpos = currentpos + len(tu.text)
         return pre_tus, changed_tus, post_tus
 
-    def improve_segmentation_with_post_tus(
+    def _improve_segmentation_with_post_tus(
         self, changed_tus: list[TextUnit], post_tus: list[TextUnit]
     ) -> list[TextUnit]:
         post_sens = [ptu for ptu in post_tus if type(ptu).__name__ == "Sen"]
@@ -221,7 +222,7 @@ class TextUnitFactory:
                 )
         return corrected_changed_tus
 
-    def collect_tus_states(
+    def _collect_tus_states(
         self,
         pre_tus: list[TextUnit],
         changed_tus: list[TextUnit],
@@ -231,28 +232,44 @@ class TextUnitFactory:
         tus_states = []
         currentpos = 0
         for tu in [*pre_tus, *changed_tus, *post_tus]:
-            if len(tu.text) > 0:
-                startpos, endpos = currentpos, currentpos + len(tu.text) - 1
-                tu_starts_within_ts = startpos in range(ts.startpos, ts.endpos + 1)
-                tu_ends_within_ts = endpos in range(ts.startpos, ts.endpos + 1)
-                if tu in pre_tus:
-                    tus_states.append(SenLabels.UNC_PRE)
-                    tu.set_state(SenLabels.UNC_PRE)
-                elif tu in post_tus:
-                    tus_states.append(SenLabels.UNC_POST)
-                    tu.set_state(SenLabels.UNC_POST)
-                else:
-                    if (
-                        ts.label in [TSLabels.INS, TSLabels.APP, TSLabels.PAST]
-                        and tu_starts_within_ts
-                        and tu_ends_within_ts
-                    ):
-                        tus_states.append(SenLabels.NEW)
-                        tu.set_state(SenLabels.NEW)
-                    else:
-                        tus_states.append(SenLabels.MOD)
-                        tu.set_state(SenLabels.MOD)
+            state = self._collect_tus_state(tu, currentpos, pre_tus, post_tus, ts)
+            if state is not None:
+                tu.set_state(state)
+                tus_states.append(state)
             currentpos = currentpos + len(
                 tu.text
             )  # it's the index of the beginning of the next tu
         return tus_states
+
+    def _collect_tus_state(
+        self,
+        tu: TextUnit,
+        currentpos: int,
+        pre_tus: list[TextUnit],
+        post_tus: list[TextUnit],
+        ts: TransformingSequence,
+    ) -> str | None:
+        if len(tu.text) == 0:
+            return None
+
+        if ts.endpos is None:
+            msg = f"The TransformingSequence should have an endpos: {ts}"
+            raise ValueError(msg)
+
+        startpos, endpos = currentpos, currentpos + len(tu.text) - 1
+        tu_starts_within_ts = startpos in range(ts.startpos, ts.endpos + 1)
+        tu_ends_within_ts = endpos in range(ts.startpos, ts.endpos + 1)
+        if tu in pre_tus:
+            return SenLabels.UNC_PRE
+
+        if tu in post_tus:
+            return SenLabels.UNC_POST
+
+        if (
+            ts.label in [TSLabels.INS, TSLabels.APP, TSLabels.PAST]
+            and tu_starts_within_ts
+            and tu_ends_within_ts
+        ):
+            return SenLabels.NEW
+
+        return SenLabels.MOD

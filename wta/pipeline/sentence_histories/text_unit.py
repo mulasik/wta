@@ -2,6 +2,8 @@ import json
 from abc import ABC
 from typing import TypedDict
 
+from typing_extensions import Self
+
 
 class TextUnitDict(TypedDict):
     text: str
@@ -46,6 +48,12 @@ class TextUnit(ABC):
         return f"""
                 {s["text"]}
                 """
+
+    def copy_with_text(self, new_text: str) -> Self:
+        return self.__class__(new_text)
+
+    def copy_with_appended_text(self, to_add: str) -> Self:
+        return self.copy_with_text(self.text + to_add)
 
 
 class Sin(TextUnit):

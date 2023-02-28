@@ -23,6 +23,7 @@ en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/down
 el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.5.0/el_core_news_md-3.5.0.tar.gz#egg=el_core_news_md"}
 language-tool-python = "2.5.4"
 lxml = "^4.9.2"
+typing-extensions = "^4.5.0"
 
 [tool.poetry.group.type-checking.dependencies]
 mypy = "^1.0.0"
