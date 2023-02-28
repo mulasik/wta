@@ -12,9 +12,9 @@ def segment_sentences_with_nltk(text: str) -> list[str]:
 
 _PUNCTUATION_IN_MIDDLE_RE = re.compile("([\\w\\s,;:\\-]*)([?!.])([\\w\\s,:;\\-]*)")
 _END_PUNCTIONATION_FROM_MIDDLE_RE = re.compile(r"([\w\s,;:\-]+)([?!]+)([\w\s,:;\-]+)")
-_END_PUNCTIONATION_RE = re.compile(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*$')
-_UPPERCASE_START_RE = re.compile(r"^(«|\"|\')*[A-ZÄÖÜ]")
-_LOWERCASE_START_RE = re.compile(r"^[a-zäöü]")
+_END_PUNCTIONATION_RE = re.compile(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*\Z')
+_UPPERCASE_START_RE = re.compile(r"\A(«|\"|\')*[A-ZÄÖÜ]")
+_LOWERCASE_START_RE = re.compile(r"\A[a-zäöü]")
 _NON_WHITESPACE_RE = re.compile(r"\S+")
 
 
