@@ -69,6 +69,9 @@ class DependencyTransformationFactory(TransformationFactory):
                 self.transhis[sen_id] = sen_dependency_transformations
 
 
+_WO_TOKENS_RE = re.compile(r"\(_ [A-ZÜÖÄa-züöä]+\)")
+
+
 class ConsituencyTransformationFactory(TransformationFactory):
     def __init__(self, parsed_senhis: dict[int, list[list[TokenProp]]]) -> None:
         super().__init__(parsed_senhis, "constituency")
@@ -81,15 +84,11 @@ class ConsituencyTransformationFactory(TransformationFactory):
         constituency_transformations: list[Transformation] = []
         for sen_id, sgl_senhis_parses in progress:
             for senver_id, parsed_sen in enumerate(sgl_senhis_parses):
-                parse_wo_tokens = re.sub(
-                    r"\(_ [A-ZÜÖÄa-züöä]+\)", "()", str(parsed_sen)
-                )
+                parse_wo_tokens = _WO_TOKENS_RE.sub("()", str(parsed_sen))
                 if senver_id > 0:
                     prev_senver_id = senver_id - 1
                     prev_parsed_sen = sgl_senhis_parses[prev_senver_id]
-                    prev_parse_wo_tokens = re.sub(
-                        r"\(_ [A-ZÜÖÄa-züöä]+\)", "()", str(prev_parsed_sen)
-                    )
+                    prev_parse_wo_tokens = _WO_TOKENS_RE.sub("()", str(prev_parsed_sen))
                     try:
                         # the constituents have changed
                         const_impacted = parse_wo_tokens != prev_parse_wo_tokens

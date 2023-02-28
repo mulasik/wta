@@ -10,20 +10,27 @@ def segment_sentences_with_nltk(text: str) -> list[str]:
     return list(sent_detector.tokenize(text.strip()))
 
 
+_PUNCTUATION_IN_MIDDLE_RE = re.compile("([\\w\\s,;:\\-]*)([?!.])([\\w\\s,:;\\-]*)")
+_END_PUNCTIONATION_FROM_MIDDLE_RE = re.compile(r"([\w\s,;:\-]+)([?!]+)([\w\s,:;\-]+)")
+_END_PUNCTIONATION_RE = re.compile(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*$')
+_UPPERCASE_START_RE = re.compile(r"^(«|\"|\')*[A-ZÄÖÜ]")
+_LOWERCASE_START_RE = re.compile(r"^[a-zäöü]")
+_NON_WHITESPACE_RE = re.compile(r"\S+")
+
+
 def contains_end_punctuation_in_the_middle(seq: str) -> bool:
-    return re.search("([\\w\\s,;:\\-]*)([?!.])([\\w\\s,:;\\-]*)", seq) is not None
+    return _PUNCTUATION_IN_MIDDLE_RE.search(seq) is not None
 
 
 def retrieve_end_punctuation_from_the_middle(seq: str) -> str | None:
-    end_punctuation = re.search(r"([\w\s,;:\-]+)([?!]+)([\w\s,:;\-]+)", seq)
+    end_punctuation = _END_PUNCTIONATION_FROM_MIDDLE_RE.search(seq)
     if end_punctuation:
         return end_punctuation.group(2)
     return None
 
 
 def ends_with_end_punctuation(seq: str) -> bool:
-    end_punctuation_at_end = re.search(r'([\w\s,;:"\-()]+)[.?!]+(»|\"|\')*$', seq)
-    return bool(end_punctuation_at_end)
+    return _END_PUNCTIONATION_RE.search(seq) is not None
 
 
 def is_short_sequence(seq: str, length: int) -> bool:
@@ -31,12 +38,12 @@ def is_short_sequence(seq: str, length: int) -> bool:
 
 
 def starts_with_uppercase_letter(seq: str) -> bool:
-    uppercase_at_beginning = re.search(r"^(«|\"|\')*[A-ZÄÖÜ]", seq)
+    uppercase_at_beginning = _UPPERCASE_START_RE.search(seq)
     return uppercase_at_beginning is not None
 
 
 def starts_with_lowercase_letter(seq: str) -> bool:
-    lowercase_at_beginning = re.search(r"^[a-zäöü]", seq)
+    lowercase_at_beginning = _LOWERCASE_START_RE.search(seq)
     return lowercase_at_beginning is not None
 
 
@@ -91,11 +98,11 @@ def retrieve_token_indices(
 ) -> tuple[list[tuple[str, int, int]], list[tuple[str, int, int]]]:
     prev_toks_with_indices = [
         (match.group(0), match.start(), match.end() - 1)
-        for match in re.finditer(r"\S+", prev_sen)
+        for match in _NON_WHITESPACE_RE.finditer(prev_sen)
     ]
     cur_toks_with_indices = [
         (match.group(0), match.start(), match.end() - 1)
-        for match in re.finditer(r"\S+", cur_sen)
+        for match in _NON_WHITESPACE_RE.finditer(cur_sen)
     ]
     return prev_toks_with_indices, cur_toks_with_indices
 
