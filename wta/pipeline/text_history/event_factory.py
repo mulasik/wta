@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from pathlib import Path
 
 from bs4 import BeautifulSoup, Tag
 from tqdm import tqdm
@@ -29,7 +30,7 @@ class EventFactory:
         * InsertEvent
     """
 
-    def run(self, idfx: str) -> list[BaseEvent]:
+    def run(self, idfx: Path) -> list[BaseEvent]:
         """
         Creates a list of Event objects.
         Args:
@@ -37,7 +38,7 @@ class EventFactory:
         Returns:
             list of Event objects
         """
-        with open(idfx) as fp:
+        with idfx.open() as fp:
             soup = BeautifulSoup(fp, features="lxml")
             idfx_events: Iterable[Tag] = soup.find_all("event")
         idfx_events = tqdm(idfx_events, "Processing keylogs")

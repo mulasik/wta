@@ -1,16 +1,9 @@
 import difflib
-import errno
-import os
+from pathlib import Path
 
 
-def ensure_path(path: str) -> None:
-    try:
-        os.makedirs(path)
-    except OSError as err:
-        if err.errno == errno.EEXIST:
-            pass
-        else:
-            raise
+def ensure_path(path: Path) -> None:
+    path.mkdir(parents=True, exist_ok=True)
 
 
 def retrieve_mismatch_range_for_sentence_pair(

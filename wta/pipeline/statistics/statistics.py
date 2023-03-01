@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from pathlib import Path
 from typing import cast
 
 import numpy as np
@@ -60,12 +61,12 @@ class BasicStatistics(Statistics):
 
 
 class EventStatistics(Statistics):
-    def __init__(self, idfx: str) -> None:
+    def __init__(self, idfx: Path) -> None:
         self.idfx = idfx
         self.data = self.retrieve_stats()
 
     def retrieve_stats(self) -> dict[str, int | float | str]:
-        with open(self.idfx) as fp:
+        with self.idfx.open() as fp:
             soup = BeautifulSoup(fp, features="lxml")
             events = soup.find_all("event")
         num_events = len(events)

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import paths
 import settings
@@ -22,21 +22,18 @@ from .base import BaseStorage
 
 
 class Txt(BaseStorage):
-    def __init__(self, filepath: str, output_str: str) -> None:
+    def __init__(self, filepath: Path, output_str: str) -> None:
         self.filepath = filepath
         self.output_str = output_str
 
     def to_file(self) -> None:
-        with open(self.filepath, "w") as f:
-            f.write(self.output_str)
+        self.filepath.write_text(self.output_str)
 
 
 class EventsTxt(Txt):
     def __init__(self, data: list[BaseEvent]) -> None:
         txt_file = f"{settings.filename}_{Names.EVENTS}.txt"
-        super().__init__(
-            os.path.join(paths.events_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.events_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, events: list[BaseEvent]) -> str:
         output_str = ""
@@ -48,9 +45,7 @@ class EventsTxt(Txt):
 class ActionsTxt(Txt):
     def __init__(self, data: list[Action]) -> None:
         txt_file = f"{settings.filename}_{Names.ACTIONS}.txt"
-        super().__init__(
-            os.path.join(paths.actions_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, actions: list[Action]) -> str:
         output_str = ""
@@ -64,9 +59,7 @@ class ActionsTxt(Txt):
 class ActionGroupsTxt(Txt):
     def __init__(self, data: dict[str, list[Action]]) -> None:
         txt_file = f"{settings.filename}_{Names.ACTION_GROUPS}.txt"
-        super().__init__(
-            os.path.join(paths.actions_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, action_groups: dict[str, list[Action]]) -> str:
         output_str = ""
@@ -78,9 +71,7 @@ class ActionGroupsTxt(Txt):
 class TssTxt(Txt):
     def __init__(self, data: list[TransformingSequence]) -> None:
         txt_file = f"{settings.filename}_{Names.TSS}.txt"
-        super().__init__(
-            os.path.join(paths.tss_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.tss_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, tss: list[TransformingSequence]) -> str:
         output_str = ""
@@ -92,9 +83,7 @@ class TssTxt(Txt):
 class TpsfsTxt(Txt):
     def __init__(self, data: list[TpsfECM]) -> None:
         txt_file = f"{settings.filename}_{Names.TPSFS}.txt"
-        super().__init__(
-            os.path.join(paths.tpsfs_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.tpsfs_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, tpsfs: list[TpsfECM]) -> str:
         output_str = ""
@@ -131,9 +120,7 @@ class TexthisTxt(Txt):
     ) -> None:
         filter_label = "" if not filtered else "_filtered"
         txt_file = f"{settings.filename}_{Names.TEXTHIS}_{mode}{filter_label}.txt"
-        super().__init__(
-            os.path.join(paths.texthis_txt_dir, txt_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.texthis_txt_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> str:
         output_str = ""
@@ -155,7 +142,7 @@ class SenhisTxt(Txt):
             f"{settings.filename}_{Names.SENHIS}{view_mode_name}{filter_label}.txt"
         )
         super().__init__(
-            os.path.join(paths.senhis_txt_dir, txt_file),
+            paths.senhis_txt_dir / txt_file,
             self.preprocess_data(data, view_mode),
         )
 
@@ -176,13 +163,11 @@ class StatsTxt(Txt):
         p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
-        idfx: str,
+        idfx: Path,
     ) -> None:
-        txt_file_path = os.path.join(
-            paths.stats_dir, settings.filename + "_basic_statistics.txt"
-        )
+        txt_file_path = paths.stats_dir / (settings.filename + "_basic_statistics.txt")
         super().__init__(
-            os.path.join(paths.senhis_txt_dir, txt_file_path),
+            paths.senhis_txt_dir / txt_file_path,
             self.preprocess_data(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx),
         )
 
@@ -193,10 +178,10 @@ class StatsTxt(Txt):
         p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
-        idfx: str,
+        idfx: Path,
     ) -> str:
         source_file = settings.filename + ".idfx"
-        task_name = os.path.split(os.path.split(idfx)[0])[-1]
+        task_name = idfx.parent.name
         user_name = settings.filename.split("_", 1)[0]
         return f"""TASK: {task_name}
 USER: {user_name}
@@ -240,19 +225,21 @@ SOURCE FILE: {source_file}
 
 
 class ParsesTxt(Txt):
-    def __init__(self, data: dict[int, list[list[TokenProp]]], output_dir: str) -> None:
+    def __init__(
+        self, data: dict[int, list[list[TokenProp]]], output_dir: Path
+    ) -> None:
         self.output_dir = output_dir
         self.output = self.preprocess_data(data)
 
     def preprocess_data(
         self, senhis_parses: dict[int, list[list[TokenProp]]]
-    ) -> list[tuple[str, str]]:
+    ) -> list[tuple[Path, str]]:
         output = []
         for sen_id, sgl_senhis_parses in senhis_parses.items():
-            output_path = os.path.join(self.output_dir, f"{sen_id}")
+            output_path = self.output_dir / str(sen_id)
             ensure_path(output_path)
             for senver_id, parsed_sen in enumerate(sgl_senhis_parses):
-                output_filepath = os.path.join(output_path, f"{senver_id}.txt")
+                output_filepath = output_path / f"{senver_id}.txt"
                 output_str = self.generate_str(parsed_sen)
                 output.append((output_filepath, output_str))
         return output
@@ -261,9 +248,8 @@ class ParsesTxt(Txt):
         raise NotImplementedError
 
     def to_file(self) -> None:
-        for o in self.output:
-            with open(o[0], "w") as f:
-                f.write(o[1])
+        for path, content in self.output:
+            path.write_text(content)
 
 
 class DepParsesTxt(ParsesTxt):

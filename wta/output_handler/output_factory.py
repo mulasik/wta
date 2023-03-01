@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import paths
 import settings
@@ -51,37 +51,33 @@ from .storage.txt import (
 class StorageSettings:
     @classmethod
     def set_paths(cls) -> None:
-        paths.events_dir = os.path.join(
-            settings.config["output_dir"], Names.PREPROCESSING, Names.EVENTS
+        paths.events_dir = (
+            settings.config["output_dir"] / Names.PREPROCESSING / Names.EVENTS
         )
-        paths.actions_dir = os.path.join(
-            settings.config["output_dir"], Names.PREPROCESSING, Names.ACTIONS
+        paths.actions_dir = (
+            settings.config["output_dir"] / Names.PREPROCESSING / Names.ACTIONS
         )
-        paths.tss_dir = os.path.join(
-            settings.config["output_dir"], Names.PREPROCESSING, Names.TSS
+        paths.tss_dir = settings.config["output_dir"] / Names.PREPROCESSING / Names.TSS
+        paths.tpsfs_dir = (
+            settings.config["output_dir"] / Names.PREPROCESSING / Names.TPSFS
         )
-        paths.tpsfs_dir = os.path.join(
-            settings.config["output_dir"], Names.PREPROCESSING, Names.TPSFS
-        )
-        paths.texthis_dir = os.path.join(settings.config["output_dir"], Names.TEXTHIS)
-        paths.texthis_json_dir = os.path.join(paths.texthis_dir, Names.JSON)
-        paths.texthis_txt_dir = os.path.join(paths.texthis_dir, Names.TXT)
-        paths.texthis_visual_dir = os.path.join(paths.texthis_dir, Names.VISUAL)
-        paths.stats_dir = os.path.join(settings.config["output_dir"], Names.STATS)
-        paths.senhis_dir = os.path.join(settings.config["output_dir"], Names.SENHIS)
-        paths.senhis_json_dir = os.path.join(paths.senhis_dir, Names.JSON)
-        paths.senhis_txt_dir = os.path.join(paths.senhis_dir, Names.TXT)
-        paths.senhis_visual_dir = os.path.join(paths.senhis_dir, Names.VISUAL)
-        paths.senhis_parses_dir = os.path.join(paths.senhis_dir, Names.SENPAR)
-        paths.dependency_senhis_parses_dir = os.path.join(
-            paths.senhis_parses_dir, Names.DEP
-        )
-        paths.constituency_senhis_parses_dir = os.path.join(
-            paths.senhis_parses_dir, Names.CONST
-        )
-        paths.transhis_dir = os.path.join(settings.config["output_dir"], Names.TRANSHIS)
-        paths.dependency_transhis_dir = os.path.join(paths.transhis_dir, Names.DEP)
-        paths.constituency_transhis_dir = os.path.join(paths.transhis_dir, Names.CONST)
+        paths.texthis_dir = settings.config["output_dir"] / Names.TEXTHIS
+        paths.texthis_json_dir = paths.texthis_dir / Names.JSON
+        paths.texthis_txt_dir = paths.texthis_dir / Names.TXT
+        paths.texthis_visual_dir = paths.texthis_dir / Names.VISUAL
+        paths.stats_dir = settings.config["output_dir"] / Names.STATS
+        paths.senhis_dir = settings.config["output_dir"] / Names.SENHIS
+        paths.senhis_json_dir = paths.senhis_dir / Names.JSON
+        paths.senhis_txt_dir = paths.senhis_dir / Names.TXT
+        paths.senhis_visual_dir = paths.senhis_dir / Names.VISUAL
+        paths.senhis_parses_dir = paths.senhis_dir / Names.SENPAR
+        paths.dependency_senhis_parses_dir = paths.senhis_parses_dir / Names.DEP
+
+        paths.constituency_senhis_parses_dir = paths.senhis_parses_dir / Names.CONST
+
+        paths.transhis_dir = settings.config["output_dir"] / Names.TRANSHIS
+        paths.dependency_transhis_dir = paths.transhis_dir / Names.DEP
+        paths.constituency_transhis_dir = paths.transhis_dir / Names.CONST
         paths_to_ensure = [d for d in dir(paths) if d.endswith("_dir")]
         for p in paths_to_ensure:
             ensure_path(getattr(paths, p))
@@ -198,7 +194,7 @@ class StatsOutputFactory:
         p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
-        idfx: str,
+        idfx: Path,
         texthis: list[TpsfECM],
         senhis: dict[int, list[TextUnit]],
     ) -> None:

@@ -1,11 +1,12 @@
+from pathlib import Path
 from typing import TypedDict
 
 from typing_extensions import NotRequired
 
 
 class ConfigData(TypedDict):
-    xml: list[str]
-    output_dir: str
+    xml: tuple[Path, ...]
+    output_dir: Path
     pause_duration: int
     min_edit_distance: int
     ts_min_tokens_number: int

@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 
@@ -28,11 +28,11 @@ from .base import BaseStorage
 
 
 class Svg(BaseStorage):
-    def __init__(self, filepath: str) -> None:
+    def __init__(self, filepath: Path) -> None:
         self.filepath = filepath
 
     def to_file(self) -> None:
-        plt.savefig(self.filepath, bbox_inches="tight")
+        plt.savefig(str(self.filepath), bbox_inches="tight")
         plt.close()
 
 
@@ -40,10 +40,8 @@ class TexthisSvg(Svg):
     def __init__(self, texthis: list[TpsfECM]) -> None:
         self.preprocess_data(texthis)
         super().__init__(
-            os.path.join(
-                paths.texthis_visual_dir,
-                f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}.svg",
-            )
+            paths.texthis_visual_dir
+            / f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}.svg"
         )
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> None:
@@ -54,10 +52,8 @@ class FilteredTexthisSvg(Svg):
     def __init__(self, texthis_fltr: list[TpsfECM]) -> None:
         self.preprocess_data(texthis_fltr)
         super().__init__(
-            os.path.join(
-                paths.texthis_visual_dir,
-                f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}_filtered.svg",
-            )
+            paths.texthis_visual_dir
+            / f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}_filtered.svg"
         )
 
     def preprocess_data(self, texthis_fltr: list[TpsfECM]) -> None:
@@ -74,10 +70,8 @@ class SenhisSvg(Svg):
         self.preprocess_data(texthis, senhis)
         filtered_lbl = "_filtered" if filtered else ""
         super().__init__(
-            os.path.join(
-                paths.senhis_visual_dir,
-                f"{settings.filename}_{Names.SENHIS}_{Names.VISUAL}{filtered_lbl}.svg",
-            )
+            paths.senhis_visual_dir
+            / f"{settings.filename}_{Names.SENHIS}_{Names.VISUAL}{filtered_lbl}.svg"
         )
 
     def preprocess_data(
@@ -90,10 +84,8 @@ class DepTranshisSvg(Svg):
     def __init__(self, dep_transhis: dict[int, list[Transformation]]) -> None:
         self.preprocess_data(dep_transhis)
         super().__init__(
-            os.path.join(
-                paths.dependency_transhis_dir,
-                f"{settings.filename}_{Names.TRANSHIS}_{Names.DEP}_{Names.VISUAL}.svg",
-            )
+            paths.dependency_transhis_dir
+            / f"{settings.filename}_{Names.TRANSHIS}_{Names.DEP}_{Names.VISUAL}.svg"
         )
 
     def preprocess_data(self, dep_transhis: dict[int, list[Transformation]]) -> None:
@@ -104,10 +96,8 @@ class ConstTranshisSvg(Svg):
     def __init__(self, const_transhis: dict[int, list[Transformation]]) -> None:
         self.preprocess_data(const_transhis)
         super().__init__(
-            os.path.join(
-                paths.constituency_transhis_dir,
-                f"{settings.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg",
-            )
+            paths.constituency_transhis_dir
+            / f"{settings.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg"
         )
 
     def preprocess_data(self, const_transhis: dict[int, list[Transformation]]) -> None:
@@ -122,10 +112,8 @@ class SynBarTranshisSvg(Svg):
     ) -> None:
         self.preprocess_data(dep_transhis, const_transhis)
         super().__init__(
-            os.path.join(
-                paths.transhis_dir,
-                f"{settings.filename}_syntactic_impact_{Names.VISUAL}_bar.svg",
-            )
+            paths.transhis_dir
+            / f"{settings.filename}_syntactic_impact_{Names.VISUAL}_bar.svg"
         )
 
     def preprocess_data(
@@ -144,10 +132,8 @@ class SynPieTranshisSvg(Svg):
     ) -> None:
         self.preprocess_data(dep_transhis, const_transhis)
         super().__init__(
-            os.path.join(
-                paths.transhis_dir,
-                f"{settings.filename}_syntactic_impact_{Names.VISUAL}_pie.svg",
-            )
+            paths.transhis_dir
+            / f"{settings.filename}_syntactic_impact_{Names.VISUAL}_pie.svg"
         )
 
     def preprocess_data(
@@ -164,9 +150,7 @@ class SenEditSvg(Svg):
     ) -> None:
         self.preprocess_data(texthis, senhis)
         super().__init__(
-            os.path.join(
-                paths.stats_dir, f"{settings.filename}_sentence_edits_stats.svg"
-            )
+            paths.stats_dir / f"{settings.filename}_sentence_edits_stats.svg"
         )
 
     def preprocess_data(
@@ -180,9 +164,7 @@ class TsLabelsSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
         self.preprocess_data(texthis, senhis)
-        super().__init__(
-            os.path.join(paths.stats_dir, f"{settings.filename}_ts_labels_stats.svg")
-        )
+        super().__init__(paths.stats_dir / f"{settings.filename}_ts_labels_stats.svg")
 
     def preprocess_data(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
@@ -195,9 +177,7 @@ class TsTokensSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
         self.preprocess_data(texthis, senhis)
-        super().__init__(
-            os.path.join(paths.stats_dir, f"{settings.filename}_ts_tokens_stats.svg")
-        )
+        super().__init__(paths.stats_dir / f"{settings.filename}_ts_tokens_stats.svg")
 
     def preprocess_data(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
@@ -210,9 +190,7 @@ class DeletionsSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
         self.preprocess_data(texthis, senhis)
-        super().__init__(
-            os.path.join(paths.stats_dir, f"{settings.filename}_deletions_stats.svg")
-        )
+        super().__init__(paths.stats_dir / f"{settings.filename}_deletions_stats.svg")
 
     def preprocess_data(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
@@ -225,9 +203,7 @@ class InsertionsSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
         self.preprocess_data(texthis, senhis)
-        super().__init__(
-            os.path.join(paths.stats_dir, f"{settings.filename}_insertions_stats.svg")
-        )
+        super().__init__(paths.stats_dir / f"{settings.filename}_insertions_stats.svg")
 
     def preprocess_data(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]

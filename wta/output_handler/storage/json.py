@@ -1,5 +1,5 @@
 import json
-import os
+from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
 import paths
@@ -17,12 +17,12 @@ _T = TypeVar("_T")
 
 
 class Json(BaseStorage, Generic[_T]):
-    def __init__(self, filepath: str, data: _T) -> None:
+    def __init__(self, filepath: Path, data: _T) -> None:
         self.filepath = filepath
         self.data = data
 
     def to_file(self) -> None:
-        with open(self.filepath, "w") as f:
+        with self.filepath.open("w") as f:
             json.dump(self.data, f)
 
 
@@ -35,9 +35,7 @@ class TexthisJson(Json[list[TpsfECMDict]]):
         json_file = (
             f"{settings.filename}_{Names.TEXTHIS}_{self.mode}{filter_label}.json"
         )
-        super().__init__(
-            os.path.join(paths.texthis_json_dir, json_file), self.preprocess_data(data)
-        )
+        super().__init__(paths.texthis_json_dir / json_file, self.preprocess_data(data))
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> list[TpsfECMDict]:
         return [tpsf.to_dict() for tpsf in texthis]
@@ -56,7 +54,7 @@ class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
         json_file = (
             f"{settings.filename}_{Names.SENHIS}{self.view_mode}{filter_label}.json"
         )
-        self.filepath = os.path.join(paths.senhis_json_dir, json_file)
+        self.filepath = paths.senhis_json_dir / json_file
 
     def preprocess_data(
         self, senhis: dict[int, list[TextUnit]]
@@ -77,7 +75,7 @@ class TranshisJson(Json[dict[int, list[_AnyDict]]]):
             if grammar == "dependency"
             else paths.constituency_transhis_dir
         )
-        self.filepath = os.path.join(output_dir, json_file)
+        self.filepath = output_dir / json_file
 
     def preprocess_data(
         self, transhis: dict[int, list[Transformation]]

@@ -1,5 +1,4 @@
 import argparse
-import os
 import sys
 import traceback
 from importlib import import_module
@@ -41,7 +40,7 @@ def run() -> None:
 
     for idfx in config["xml"]:
         try:
-            filename = os.path.split(idfx)[-1].replace(".idfx", "")
+            filename = idfx.with_suffix("").name
             settings.filename = filename
 
             print(f"\nProcessing the input file {idfx}...")

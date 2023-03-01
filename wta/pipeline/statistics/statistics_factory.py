@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from ..sentence_histories.text_unit import TextUnit
 from ..text_history.tpsf import TpsfECM
 from .statistics import (
@@ -13,7 +15,7 @@ class StatsFactory:
     @classmethod
     def run(
         cls,
-        idfx: str,
+        idfx: Path,
         texthis: list[TpsfECM],
         texthis_filtered: list[TpsfECM],
         texthis_pcm: list[TpsfECM],

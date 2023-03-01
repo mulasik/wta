@@ -110,7 +110,6 @@ ignore = [
     "PLR0913", # too many arguments
     "PLR0915", # too many statements
     "PLR2004", # magic value used
-    "PTH", # use pathlib
     "T201", # print used
 ]
 
