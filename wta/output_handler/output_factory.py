@@ -11,10 +11,10 @@ from wta.pipeline.statistics.statistics import (
     SentenceStatistics,
     TSStatistics,
 )
+from wta.pipeline.text_history.events.base import BaseEvent
 from wta.pipeline.transformation_histories.transformation import Transformation
 
 from ..pipeline.text_history.action import Action
-from ..pipeline.text_history.events.keyboard import KeyboardEvent
 from ..pipeline.text_history.tpsf import TpsfECM
 from ..pipeline.text_history.ts import TransformingSequence
 from ..utils.other import ensure_path
@@ -89,7 +89,7 @@ class StorageSettings:
 
 class EventsOutputFactory:
     @classmethod
-    def run(cls, events: list[KeyboardEvent]) -> None:
+    def run(cls, events: list[BaseEvent]) -> None:
         StorageSettings.set_paths()
         EventsTxt(events).to_file()
 
@@ -103,7 +103,7 @@ class ActionsOutputFactory:
 
 class ActionGroupsOutputFactory:
     @classmethod
-    def run(cls, action_groups: dict[int, list[Action]]) -> None:
+    def run(cls, action_groups: dict[str, list[Action]]) -> None:
         StorageSettings.set_paths()
         ActionGroupsTxt(action_groups).to_file()
 

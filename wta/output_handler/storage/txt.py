@@ -11,9 +11,9 @@ from wta.pipeline.statistics.statistics import (
     SentenceStatistics,
     TSStatistics,
 )
+from wta.pipeline.text_history.events.base import BaseEvent
 
 from ...pipeline.text_history.action import Action
-from ...pipeline.text_history.events.keyboard import KeyboardEvent
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.text_history.ts import TransformingSequence
 from ...utils.other import ensure_path
@@ -32,13 +32,13 @@ class Txt(BaseStorage):
 
 
 class EventsTxt(Txt):
-    def __init__(self, data: list[KeyboardEvent]) -> None:
+    def __init__(self, data: list[BaseEvent]) -> None:
         txt_file = f"{settings.filename}_{Names.EVENTS}.txt"
         super().__init__(
             os.path.join(paths.events_dir, txt_file), self.preprocess_data(data)
         )
 
-    def preprocess_data(self, events: list[KeyboardEvent]) -> str:
+    def preprocess_data(self, events: list[BaseEvent]) -> str:
         output_str = ""
         for event in events:
             output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
@@ -62,13 +62,13 @@ class ActionsTxt(Txt):
 
 
 class ActionGroupsTxt(Txt):
-    def __init__(self, data: dict[int, list[Action]]) -> None:
+    def __init__(self, data: dict[str, list[Action]]) -> None:
         txt_file = f"{settings.filename}_{Names.ACTION_GROUPS}.txt"
         super().__init__(
             os.path.join(paths.actions_dir, txt_file), self.preprocess_data(data)
         )
 
-    def preprocess_data(self, action_groups: dict[int, list[Action]]) -> str:
+    def preprocess_data(self, action_groups: dict[str, list[Action]]) -> str:
         output_str = ""
         for at, aa in action_groups.items():
             output_str += f'{at} * len {len(aa)} * ({aa[0].startpos}:{aa[-1].endpos}) \n*{"".join([a.__dict__["content"] for a in aa])}*\n\n'

@@ -2,8 +2,9 @@ from collections.abc import Collection
 
 from tqdm import tqdm
 
+from wta.pipeline.text_history.events.base import BaseEvent
+
 from .action import Action
-from .events.keyboard import KeyboardEvent
 
 
 class ActionFactory:
@@ -13,7 +14,7 @@ class ActionFactory:
     """
 
     @staticmethod
-    def run(evnts: Collection[KeyboardEvent]) -> list[Action]:
+    def run(evnts: Collection[BaseEvent]) -> list[Action]:
         """
         Generates a list of Action objects for all events.
         Args:
