@@ -65,8 +65,8 @@ class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
         self, senhis: dict[int, list[TextUnit]]
     ) -> dict[int, list[TextUnitDict]]:
         _senhis = {}
-        for id, sens in senhis.items():
-            _senhis[id] = [s.to_dict(self.view_mode) for s in sens]
+        for key, sens in senhis.items():
+            _senhis[key] = [s.to_dict(self.view_mode) for s in sens]
         return _senhis
 
 

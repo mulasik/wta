@@ -25,8 +25,8 @@ class Console:
 
     def senhis_to_console(self) -> None:
         _senhis = {}
-        for id, sens in self.senhis.items():
-            _senhis[id] = [s.to_dict() for s in sens]
+        for key, sens in self.senhis.items():
+            _senhis[key] = [s.to_dict() for s in sens]
         print(json.dumps(_senhis, indent=5))
 
     def revnum_to_console(self) -> None:

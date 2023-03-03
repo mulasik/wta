@@ -95,7 +95,6 @@ ignore = [
     # ignore documentations
     "D",
     # disabled for now:
-    "A001", # shadowing builtin
     "B905", # zip without strict
     "C901", # too complex
     "E722", # bare except

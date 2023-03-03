@@ -78,8 +78,8 @@ class Colors:
             The mapping of colors to sentences.
         """
         sen_colors = {}
-        for id, sen_id in enumerate(list(senhis.keys())):
-            sen_colors.update({sen_id: cls.AVAILABLE_COLORS[id]})
+        for i, sen_id in enumerate(list(senhis.keys())):
+            sen_colors.update({sen_id: cls.AVAILABLE_COLORS[i]})
         return sen_colors
 
     @classmethod

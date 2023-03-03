@@ -62,7 +62,7 @@ class TexthisPlot(BasePlot):
         return ax1, ax2
 
     def plot_data(self, ax1: Axes, ax2: Axes) -> None:
-        for id, sens in self.sen_lengths.items():
+        for key, sens in self.sen_lengths.items():
             starts = 0
             for s in sens:
                 lbl = (
@@ -71,7 +71,7 @@ class TexthisPlot(BasePlot):
                     else f"text units {s[0]}"
                 )
                 ax1.barh(
-                    str(id),
+                    str(key),
                     s[1],
                     left=starts,
                     height=1,
@@ -167,7 +167,7 @@ class FilteredTexthisPlot(TexthisPlot):
         return ax1, ax2
 
     def plot_data(self, ax1: Axes, ax2: Axes) -> None:
-        for id, sens in self.sen_lengths.items():
+        for key, sens in self.sen_lengths.items():
             starts = 0
             for s in sens:
                 lbl = (
@@ -176,7 +176,7 @@ class FilteredTexthisPlot(TexthisPlot):
                     else f"sentences {s[0]}"
                 )
                 ax1.barh(
-                    str(id),
+                    str(key),
                     s[1],
                     left=starts,
                     height=1,

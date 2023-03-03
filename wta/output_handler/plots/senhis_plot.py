@@ -69,11 +69,11 @@ class SenhisPlot(BasePlot):
         return ax1, ax2
 
     def plot_data(self, ax1: Axes, ax2: Axes) -> None:
-        for id, sens in self.data.items():
+        for key, sens in self.data.items():
             a1_starts = 0
             for s in sens:
                 ax1.barh(
-                    f"TPSF {id}",
+                    f"TPSF {key}",
                     s[0],
                     left=a1_starts,
                     height=1,

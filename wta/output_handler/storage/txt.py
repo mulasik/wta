@@ -161,8 +161,8 @@ class SenhisTxt(Txt):
 
     def preprocess_data(self, senhis: dict[int, list[TextUnit]], view_mode: str) -> str:
         output_str = ""
-        for id, sens in senhis.items():
-            output_str += f"\n******* {id} *******\n"
+        for key, sens in senhis.items():
+            output_str += f"\n******* {key} *******\n"
             for s in sens:
                 output_str += f"{s.to_text(view_mode)}\n\n"
         return output_str

@@ -164,7 +164,7 @@ class SynBarTranshisPlot(BasePlot):
         return ax1, ax2
 
     def plot_data(self, ax1: Axes, ax2: Axes) -> None:
-        for id, impact_values in self.data[3].items():
+        for key, impact_values in self.data[3].items():
             starts = 0
             for iv in impact_values:
                 lbl = (
@@ -173,7 +173,7 @@ class SynBarTranshisPlot(BasePlot):
                     else "Edit without syntactic impact"
                 )
                 ax1.barh(
-                    id,
+                    key,
                     1,
                     left=starts,
                     height=1,
@@ -182,7 +182,7 @@ class SynBarTranshisPlot(BasePlot):
                     label=lbl,
                 )
                 starts += 1
-        for id, impact_values in self.data[0].items():
+        for key, impact_values in self.data[0].items():
             starts = 0
             for iv in impact_values:
                 lbl = (
@@ -191,7 +191,7 @@ class SynBarTranshisPlot(BasePlot):
                     else "Edit without syntactic impact"
                 )
                 ax2.barh(
-                    id,
+                    key,
                     1,
                     left=starts,
                     height=1,

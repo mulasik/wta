@@ -46,11 +46,11 @@ class SentenceHistoryGenerator:
                             continue
                     elif ctu.state == SenLabels.NEW:
                         if ctu.text in global_new_sens:
-                            for id, sens in sentence_history.items():
+                            for key, sens in sentence_history.items():
                                 texts = [s.text for s in sens]
                                 if ctu.text in texts:
-                                    sentence_history[id].append(ctu)
-                                    ctu.set_id(id)
+                                    sentence_history[key].append(ctu)
+                                    ctu.set_id(key)
                         else:
                             uid = uuid.uuid1().int
                             sentence_history[uid] = [ctu]
@@ -64,12 +64,12 @@ class SentenceHistoryGenerator:
         self, sentence_history: dict[int, list[TextUnit]]
     ) -> dict[int, list[TextUnit]]:
         sentence_history_duplicates_eliminated = {}
-        for id, sens in sentence_history.items():
+        for key, sens in sentence_history.items():
             sens_duplicates_eliminated: list[TextUnit] = []
             for s in sens:
                 if s.text not in [sde.text for sde in sens_duplicates_eliminated]:
                     sens_duplicates_eliminated.append(s)
                 else:
                     continue
-            sentence_history_duplicates_eliminated[id] = sens_duplicates_eliminated
+            sentence_history_duplicates_eliminated[key] = sens_duplicates_eliminated
         return sentence_history_duplicates_eliminated
