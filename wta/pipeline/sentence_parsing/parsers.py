@@ -63,7 +63,7 @@ class Supar(BaseParserAdapter):
         for sen_id, sgl_senhis_sentexts in senhis_sentexts.items():
             print(f"Processing the sentence {sen_id}...")
             senhis_parses[sen_id] = []
-            for senver_id, sentext in enumerate(sgl_senhis_sentexts):
+            for sentext in sgl_senhis_sentexts:
                 result = pipeline.predict(
                     sentext, lang=self.lang, prob=True, verbose=False
                 )

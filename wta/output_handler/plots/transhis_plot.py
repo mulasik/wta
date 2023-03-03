@@ -98,7 +98,7 @@ class SynBarTranshisPlot(BasePlot):
         i_d = 0
         d_no_edits_with_impact = 0
         d_no_edits_wo_impact = 0
-        for sen_id, vals in self.dep_transhis.items():
+        for vals in self.dep_transhis.values():
             sen_ver_impact_values = [
                 v.syntactic_impact for v in vals if v.syntactic_impact is not None
             ]
@@ -114,7 +114,7 @@ class SynBarTranshisPlot(BasePlot):
         i_c = 0
         c_no_edits_with_impact = 0
         c_no_edits_wo_impact = 0
-        for sen_id, vals in self.const_transhis.items():
+        for vals in self.const_transhis.values():
             sen_ver_impact_values = [
                 v.syntactic_impact for v in vals if v.syntactic_impact is not None
             ]

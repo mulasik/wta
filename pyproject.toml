@@ -96,7 +96,6 @@ ignore = [
     "D",
     # disabled for now:
     "A001", # shadowing builtin
-    "B007", # loop variable not used
     "B905", # zip without strict
     "C901", # too complex
     "E722", # bare except

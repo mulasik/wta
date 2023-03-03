@@ -38,7 +38,7 @@ class SenhisPlot(BasePlot):
         tpsf_sentences = {}
         for tpsf in texthis:
             tpsf_sens: list[tuple[int, str, str]] = []
-            for id, sen in enumerate(tpsf.sentence_list):
+            for sen in tpsf.sentence_list:
                 for sen_id, sen_list in senhis.items():
                     if sen.content.strip() in [
                         s.content for s in sen_list
