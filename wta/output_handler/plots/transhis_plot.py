@@ -202,21 +202,21 @@ class SynBarTranshisPlot(BasePlot):
                 starts += 1
 
     def set_legend(self, ax1: Axes, ax2: Axes) -> None:
-        hand, labl = ax1.get_legend_handles_labels()
+        handles, labels = ax1.get_legend_handles_labels()
         handout = []
         lablout = []
-        for h, l in zip(hand, labl):
-            if l not in lablout:
-                lablout.append(l)
-                handout.append(h)
+        for handle, label in zip(handles, labels):
+            if label not in lablout:
+                lablout.append(label)
+                handout.append(handle)
         ax1.legend(handout, lablout, loc="upper right")
-        hand, labl = ax2.get_legend_handles_labels()
+        handles, labels = ax2.get_legend_handles_labels()
         handout = []
         lablout = []
-        for h, l in zip(hand, labl):
-            if l not in lablout:
-                lablout.append(l)
-                handout.append(h)
+        for handle, label in zip(handles, labels):
+            if label not in lablout:
+                lablout.append(label)
+                handout.append(handle)
         ax2.legend(handout, lablout, loc="upper right")
 
     def run(self) -> None:

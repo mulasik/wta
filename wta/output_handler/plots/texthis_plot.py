@@ -96,22 +96,22 @@ class TexthisPlot(BasePlot):
             )
 
     def set_legend(self, ax1: Axes, ax2: Axes) -> None:
-        hand, labl = ax1.get_legend_handles_labels()
+        handles, labels = ax1.get_legend_handles_labels()
         handout = []
         lablout = []
-        for h, l in zip(hand, labl):
-            if l not in lablout:
-                lablout.append(l)
-                handout.append(h)
+        for handle, label in zip(handles, labels):
+            if label not in lablout:
+                lablout.append(label)
+                handout.append(handle)
         ax1.legend(handout, lablout, loc="upper right")
 
-        hand2, labl2 = ax2.get_legend_handles_labels()
+        handles2, labels2 = ax2.get_legend_handles_labels()
         handout2 = []
         lablout2 = []
-        for h2, l2 in zip(hand2, labl2):
-            if l2 not in lablout2:
-                lablout2.append(l2)
-                handout2.append(h2)
+        for handle2, label2 in zip(handles2, labels2):
+            if label2 not in lablout2:
+                lablout2.append(label2)
+                handout2.append(handle2)
         ax2.legend(handout2, lablout2, loc="upper right")
 
     def run(self) -> None:

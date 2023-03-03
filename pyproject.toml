@@ -98,7 +98,6 @@ ignore = [
     "B905", # zip without strict
     "C901", # too complex
     "E722", # bare except
-    "E741", # ambiguous variable name
     "ERA001", # commented out code
     "FBT00", # boolean positional argument
     "PLR0911", # too many returns
