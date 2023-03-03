@@ -17,7 +17,7 @@ from ...pipeline.text_history.action import Action
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.text_history.ts import TransformingSequence
 from ...utils.other import ensure_path
-from ..names import Names
+from .. import names
 from .base import BaseStorage
 
 
@@ -32,7 +32,7 @@ class Txt(BaseStorage):
 
 class EventsTxt(Txt):
     def __init__(self, data: list[BaseEvent]) -> None:
-        txt_file = f"{settings.filename}_{Names.EVENTS}.txt"
+        txt_file = f"{settings.filename}_{names.EVENTS}.txt"
         super().__init__(paths.events_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, events: list[BaseEvent]) -> str:
@@ -44,7 +44,7 @@ class EventsTxt(Txt):
 
 class ActionsTxt(Txt):
     def __init__(self, data: list[Action]) -> None:
-        txt_file = f"{settings.filename}_{Names.ACTIONS}.txt"
+        txt_file = f"{settings.filename}_{names.ACTIONS}.txt"
         super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, actions: list[Action]) -> str:
@@ -58,7 +58,7 @@ class ActionsTxt(Txt):
 
 class ActionGroupsTxt(Txt):
     def __init__(self, data: dict[str, list[Action]]) -> None:
-        txt_file = f"{settings.filename}_{Names.ACTION_GROUPS}.txt"
+        txt_file = f"{settings.filename}_{names.ACTION_GROUPS}.txt"
         super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, action_groups: dict[str, list[Action]]) -> str:
@@ -70,7 +70,7 @@ class ActionGroupsTxt(Txt):
 
 class TssTxt(Txt):
     def __init__(self, data: list[TransformingSequence]) -> None:
-        txt_file = f"{settings.filename}_{Names.TSS}.txt"
+        txt_file = f"{settings.filename}_{names.TSS}.txt"
         super().__init__(paths.tss_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, tss: list[TransformingSequence]) -> str:
@@ -82,7 +82,7 @@ class TssTxt(Txt):
 
 class TpsfsTxt(Txt):
     def __init__(self, data: list[TpsfECM]) -> None:
-        txt_file = f"{settings.filename}_{Names.TPSFS}.txt"
+        txt_file = f"{settings.filename}_{names.TPSFS}.txt"
         super().__init__(paths.tpsfs_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, tpsfs: list[TpsfECM]) -> str:
@@ -119,7 +119,7 @@ class TexthisTxt(Txt):
         self, data: list[TpsfECM], mode: str = "ecm", filtered: bool = False
     ) -> None:
         filter_label = "" if not filtered else "_filtered"
-        txt_file = f"{settings.filename}_{Names.TEXTHIS}_{mode}{filter_label}.txt"
+        txt_file = f"{settings.filename}_{names.TEXTHIS}_{mode}{filter_label}.txt"
         super().__init__(paths.texthis_txt_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> str:
@@ -139,7 +139,7 @@ class SenhisTxt(Txt):
         view_mode_name = "" if view_mode == "normal" else f"_{view_mode}"
         filter_label = "" if not filtered else "_filtered"
         txt_file = (
-            f"{settings.filename}_{Names.SENHIS}{view_mode_name}{filter_label}.txt"
+            f"{settings.filename}_{names.SENHIS}{view_mode_name}{filter_label}.txt"
         )
         super().__init__(
             paths.senhis_txt_dir / txt_file,

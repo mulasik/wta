@@ -8,7 +8,7 @@ from wta.pipeline.sentence_histories.text_unit import TextUnit, TextUnitDict
 from wta.pipeline.transformation_histories.transformation import Transformation
 
 from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
-from ..names import Names
+from .. import names
 from .base import BaseStorage
 
 _AnyDict: TypeAlias = dict[str, Any]  # type: ignore[misc]
@@ -33,7 +33,7 @@ class TexthisJson(Json[list[TpsfECMDict]]):
         self.mode = mode
         filter_label = "" if not filtered else "_filtered"
         json_file = (
-            f"{settings.filename}_{Names.TEXTHIS}_{self.mode}{filter_label}.json"
+            f"{settings.filename}_{names.TEXTHIS}_{self.mode}{filter_label}.json"
         )
         super().__init__(paths.texthis_json_dir / json_file, self.preprocess_data(data))
 
@@ -52,7 +52,7 @@ class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
         self.data = self.preprocess_data(data)
         filter_label = "" if not filtered else "_filtered"
         json_file = (
-            f"{settings.filename}_{Names.SENHIS}{self.view_mode}{filter_label}.json"
+            f"{settings.filename}_{names.SENHIS}{self.view_mode}{filter_label}.json"
         )
         self.filepath = paths.senhis_json_dir / json_file
 
@@ -69,7 +69,7 @@ class TranshisJson(Json[dict[int, list[_AnyDict]]]):
     def __init__(self, data: dict[int, list[Transformation]], grammar: str) -> None:
         self.data = self.preprocess_data(data)
         self.grammar = grammar
-        json_file = f"{settings.filename}_{Names.TRANSHIS}_{grammar}.json"
+        json_file = f"{settings.filename}_{names.TRANSHIS}_{grammar}.json"
         output_dir = (
             paths.dependency_transhis_dir
             if grammar == "dependency"

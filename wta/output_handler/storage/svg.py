@@ -8,7 +8,7 @@ import settings
 from ...pipeline.sentence_histories.text_unit import TextUnit
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.transformation_histories.transformation import Transformation
-from ..names import Names
+from .. import names
 from ..plots.senhis_plot import SenhisPlot
 from ..plots.stats_plot import (
     DeletionsPlot,
@@ -41,7 +41,7 @@ class TexthisSvg(Svg):
         self.preprocess_data(texthis)
         super().__init__(
             paths.texthis_visual_dir
-            / f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}.svg"
+            / f"{settings.filename}_{names.TEXTHIS}_{names.VISUAL}.svg"
         )
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> None:
@@ -53,7 +53,7 @@ class FilteredTexthisSvg(Svg):
         self.preprocess_data(texthis_fltr)
         super().__init__(
             paths.texthis_visual_dir
-            / f"{settings.filename}_{Names.TEXTHIS}_{Names.VISUAL}_filtered.svg"
+            / f"{settings.filename}_{names.TEXTHIS}_{names.VISUAL}_filtered.svg"
         )
 
     def preprocess_data(self, texthis_fltr: list[TpsfECM]) -> None:
@@ -71,7 +71,7 @@ class SenhisSvg(Svg):
         filtered_lbl = "_filtered" if filtered else ""
         super().__init__(
             paths.senhis_visual_dir
-            / f"{settings.filename}_{Names.SENHIS}_{Names.VISUAL}{filtered_lbl}.svg"
+            / f"{settings.filename}_{names.SENHIS}_{names.VISUAL}{filtered_lbl}.svg"
         )
 
     def preprocess_data(
@@ -85,7 +85,7 @@ class DepTranshisSvg(Svg):
         self.preprocess_data(dep_transhis)
         super().__init__(
             paths.dependency_transhis_dir
-            / f"{settings.filename}_{Names.TRANSHIS}_{Names.DEP}_{Names.VISUAL}.svg"
+            / f"{settings.filename}_{names.TRANSHIS}_{names.DEP}_{names.VISUAL}.svg"
         )
 
     def preprocess_data(self, dep_transhis: dict[int, list[Transformation]]) -> None:
@@ -97,7 +97,7 @@ class ConstTranshisSvg(Svg):
         self.preprocess_data(const_transhis)
         super().__init__(
             paths.constituency_transhis_dir
-            / f"{settings.filename}_{Names.TRANSHIS}_{Names.CONST}_{Names.VISUAL}.svg"
+            / f"{settings.filename}_{names.TRANSHIS}_{names.CONST}_{names.VISUAL}.svg"
         )
 
     def preprocess_data(self, const_transhis: dict[int, list[Transformation]]) -> None:
@@ -113,7 +113,7 @@ class SynBarTranshisSvg(Svg):
         self.preprocess_data(dep_transhis, const_transhis)
         super().__init__(
             paths.transhis_dir
-            / f"{settings.filename}_syntactic_impact_{Names.VISUAL}_bar.svg"
+            / f"{settings.filename}_syntactic_impact_{names.VISUAL}_bar.svg"
         )
 
     def preprocess_data(
@@ -133,7 +133,7 @@ class SynPieTranshisSvg(Svg):
         self.preprocess_data(dep_transhis, const_transhis)
         super().__init__(
             paths.transhis_dir
-            / f"{settings.filename}_syntactic_impact_{Names.VISUAL}_pie.svg"
+            / f"{settings.filename}_syntactic_impact_{names.VISUAL}_pie.svg"
         )
 
     def preprocess_data(
