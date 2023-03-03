@@ -51,22 +51,19 @@ from .storage.txt import (
 class StorageSettings:
     @classmethod
     def set_paths(cls) -> None:
-        paths.events_dir = (
-            settings.config["output_dir"] / names.PREPROCESSING / names.EVENTS
-        )
-        paths.actions_dir = (
-            settings.config["output_dir"] / names.PREPROCESSING / names.ACTIONS
-        )
-        paths.tss_dir = settings.config["output_dir"] / names.PREPROCESSING / names.TSS
-        paths.tpsfs_dir = (
-            settings.config["output_dir"] / names.PREPROCESSING / names.TPSFS
-        )
-        paths.texthis_dir = settings.config["output_dir"] / names.TEXTHIS
+        output_dir = settings.config["output_dir"]
+        preprocessing_dir = output_dir / names.PREPROCESSING
+
+        paths.events_dir = preprocessing_dir / names.EVENTS
+        paths.actions_dir = preprocessing_dir / names.ACTIONS
+        paths.tss_dir = preprocessing_dir / names.TSS
+        paths.tpsfs_dir = preprocessing_dir / names.TPSFS
+        paths.texthis_dir = output_dir / names.TEXTHIS
         paths.texthis_json_dir = paths.texthis_dir / names.JSON
         paths.texthis_txt_dir = paths.texthis_dir / names.TXT
         paths.texthis_visual_dir = paths.texthis_dir / names.VISUAL
-        paths.stats_dir = settings.config["output_dir"] / names.STATS
-        paths.senhis_dir = settings.config["output_dir"] / names.SENHIS
+        paths.stats_dir = output_dir / names.STATS
+        paths.senhis_dir = output_dir / names.SENHIS
         paths.senhis_json_dir = paths.senhis_dir / names.JSON
         paths.senhis_txt_dir = paths.senhis_dir / names.TXT
         paths.senhis_visual_dir = paths.senhis_dir / names.VISUAL
@@ -75,7 +72,7 @@ class StorageSettings:
 
         paths.constituency_senhis_parses_dir = paths.senhis_parses_dir / names.CONST
 
-        paths.transhis_dir = settings.config["output_dir"] / names.TRANSHIS
+        paths.transhis_dir = output_dir / names.TRANSHIS
         paths.dependency_transhis_dir = paths.transhis_dir / names.DEP
         paths.constituency_transhis_dir = paths.transhis_dir / names.CONST
         paths_to_ensure = [d for d in dir(paths) if d.endswith("_dir")]
