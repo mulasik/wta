@@ -1,7 +1,6 @@
-from wta.pipeline.sentence_histories.text_unit import TextUnit
-from wta.pipeline.sentence_parsing.parsers import BaseParserAdapter, Supar, TokenProp
-
+from ..sentence_histories.text_unit import TextUnit
 from .models import Parsers
+from .parsers import BaseParserAdapter, Supar, TokenProp
 
 
 class ParsingFacade:

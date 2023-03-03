@@ -3,10 +3,9 @@ from itertools import zip_longest
 
 from tqdm import tqdm
 
-from wta.pipeline.sentence_histories.text_unit import TextUnit
-
 from ..names import SenLabels
 from ..text_history.tpsf import TpsfECM
+from .text_unit import TextUnit
 
 
 class SentenceHistoryGenerator:

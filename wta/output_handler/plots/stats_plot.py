@@ -3,11 +3,10 @@ from typing import Generic, TypeVar
 
 import matplotlib.pyplot as plt
 
-from wta.output_handler.plots.colors import Colors
-from wta.pipeline.sentence_histories.text_unit import TextUnit
-from wta.pipeline.text_history.tpsf import TpsfECM
-
+from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
+from .colors import Colors
 
 _T = TypeVar("_T")
 

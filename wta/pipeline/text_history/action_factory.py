@@ -2,9 +2,8 @@ from collections.abc import Collection
 
 from tqdm import tqdm
 
-from wta.pipeline.text_history.events.base import BaseEvent
-
 from .action import Action
+from .events.base import BaseEvent
 
 
 class ActionFactory:

@@ -9,7 +9,7 @@ from .. import regular_expressions
 from .text_unit import Sec, Sen, Sin, TextUnit
 
 if TYPE_CHECKING:
-    from wta.pipeline.text_history.tpsf import TpsfECM
+    from ..text_history.tpsf import TpsfECM
 
 
 class TextUnitFactory:

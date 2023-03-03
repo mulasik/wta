@@ -1,5 +1,4 @@
-from wta.pipeline.names import EventTypes
-
+from ...names import EventTypes
 from ..action import Action, Append, Deletion, Insertion, Midletion, Navigation, Pasting
 from .base import BaseEvent
 
