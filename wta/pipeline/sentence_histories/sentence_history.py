@@ -14,7 +14,7 @@ class SentenceHistoryGenerator:
         sentence_history = {}
         global_new_sens = []
         progress = tqdm(tpsfs, "Generating sentence histories")
-        for i, tpsf in enumerate(tpsfs):
+        for i, tpsf in enumerate(progress):
             print([(tu.state.upper(), tu.text) for tu in tpsf.textunits])
             if i == 0:
                 for tu in tpsf.textunits:

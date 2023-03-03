@@ -85,7 +85,6 @@ def run() -> None:
             # StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis, settings)
 
         except:
-            e = sys.exc_info()[0]
             traceback.print_exc()
             print(f"Failed for {idfx}", file=sys.stderr)
 

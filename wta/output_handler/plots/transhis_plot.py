@@ -227,9 +227,9 @@ class SynBarTranshisPlot(BasePlot):
 
 class SynPieTranshisPlot(SynBarTranshisPlot):
     def create_figure(self) -> tuple[Axes, Axes]:
-        lbls = ["syntactic impact", "no syntactic impact"]  # TODO add labels
+        # lbls = ["syntactic impact", "no syntactic impact"]  # TODO add labels
         plt.rcParams.update({"font.size": 35})
-        fig, (ax1, ax2) = plt.subplots(
+        _fig, (ax1, ax2) = plt.subplots(
             1, 2, sharey=True, figsize=(40, 20), gridspec_kw={"width_ratios": [1, 1]}
         )
         ax1.set_title("CONSTITUENCY")
