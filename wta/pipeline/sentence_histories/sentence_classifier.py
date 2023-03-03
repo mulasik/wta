@@ -21,13 +21,13 @@ class SentenceClassifier:
         self.sens = sens
         self.ts = ts
         self.nlp_model = settings.nlp_model
-        self.delta_current_previous = []
-        self.delta_previous_current = []
-        self.new_sentences = []
-        self.modified_sentences = []
-        self.deleted_sentences = []
-        self.unchanged_sentences = []
-        self.transposed_sentences = []
+        self.delta_current_previous: list[TpsfECM] = []
+        self.delta_previous_current: list[TpsfECM] = []
+        self.new_sentences: list[TpsfECM] = []
+        self.modified_sentences: list[TpsfECM] = []
+        self.deleted_sentences: list[TpsfECM] = []
+        self.unchanged_sentences: list[TpsfECM] = []
+        self.transposed_sentences: list[TpsfECM] = []
         self.classify_sentence_level_changes()
 
     def classify_sentence_level_changes(self) -> None:

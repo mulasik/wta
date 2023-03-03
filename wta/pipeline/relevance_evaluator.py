@@ -17,7 +17,7 @@ class RelevanceEvaluator:
         self.nlp_model = settings.nlp_model
         self.sens_to_evaluate = self.tpsf.modified_sentences + self.tpsf.new_sentences
         self.relevance = None
-        self.relevance_eval_results = {}
+        self.relevance_eval_results: dict[str, int | bool] = {}
         self.determine_tpsf_relevance()
         for s in self.sens_to_evaluate:
             self.determine_sentence_relevance(s)
