@@ -1,21 +1,19 @@
 from pathlib import Path
 
-import paths
-import settings
-from wta.pipeline.sentence_histories.text_unit import TextUnit
-from wta.pipeline.sentence_parsing.parsers import TokenProp
-from wta.pipeline.statistics.statistics import (
+from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.sentence_parsing.parsers import TokenProp
+from ...pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
     PauseStatistics,
     SentenceStatistics,
     TSStatistics,
 )
-from wta.pipeline.text_history.events.base import BaseEvent
-
 from ...pipeline.text_history.action import Action
+from ...pipeline.text_history.events.base import BaseEvent
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.text_history.ts import TransformingSequence
+from ...settings import Settings
 from ...utils.other import ensure_path
 from .. import names
 from .base import BaseStorage
@@ -31,9 +29,11 @@ class Txt(BaseStorage):
 
 
 class EventsTxt(Txt):
-    def __init__(self, data: list[BaseEvent]) -> None:
+    def __init__(self, data: list[BaseEvent], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.EVENTS}.txt"
-        super().__init__(paths.events_dir / txt_file, self.preprocess_data(data))
+        super().__init__(
+            settings.paths.events_dir / txt_file, self.preprocess_data(data)
+        )
 
     def preprocess_data(self, events: list[BaseEvent]) -> str:
         output_str = ""
@@ -43,9 +43,11 @@ class EventsTxt(Txt):
 
 
 class ActionsTxt(Txt):
-    def __init__(self, data: list[Action]) -> None:
+    def __init__(self, data: list[Action], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.ACTIONS}.txt"
-        super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
+        super().__init__(
+            settings.paths.actions_dir / txt_file, self.preprocess_data(data)
+        )
 
     def preprocess_data(self, actions: list[Action]) -> str:
         output_str = ""
@@ -57,9 +59,11 @@ class ActionsTxt(Txt):
 
 
 class ActionGroupsTxt(Txt):
-    def __init__(self, data: dict[str, list[Action]]) -> None:
+    def __init__(self, data: dict[str, list[Action]], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.ACTION_GROUPS}.txt"
-        super().__init__(paths.actions_dir / txt_file, self.preprocess_data(data))
+        super().__init__(
+            settings.paths.actions_dir / txt_file, self.preprocess_data(data)
+        )
 
     def preprocess_data(self, action_groups: dict[str, list[Action]]) -> str:
         output_str = ""
@@ -69,9 +73,9 @@ class ActionGroupsTxt(Txt):
 
 
 class TssTxt(Txt):
-    def __init__(self, data: list[TransformingSequence]) -> None:
+    def __init__(self, data: list[TransformingSequence], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.TSS}.txt"
-        super().__init__(paths.tss_dir / txt_file, self.preprocess_data(data))
+        super().__init__(settings.paths.tss_dir / txt_file, self.preprocess_data(data))
 
     def preprocess_data(self, tss: list[TransformingSequence]) -> str:
         output_str = ""
@@ -81,9 +85,11 @@ class TssTxt(Txt):
 
 
 class TpsfsTxt(Txt):
-    def __init__(self, data: list[TpsfECM]) -> None:
+    def __init__(self, data: list[TpsfECM], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.TPSFS}.txt"
-        super().__init__(paths.tpsfs_dir / txt_file, self.preprocess_data(data))
+        super().__init__(
+            settings.paths.tpsfs_dir / txt_file, self.preprocess_data(data)
+        )
 
     def preprocess_data(self, tpsfs: list[TpsfECM]) -> str:
         output_str = ""
@@ -116,11 +122,17 @@ class TpsfsTxt(Txt):
 
 class TexthisTxt(Txt):
     def __init__(
-        self, data: list[TpsfECM], mode: str = "ecm", filtered: bool = False
+        self,
+        data: list[TpsfECM],
+        settings: Settings,
+        mode: str = "ecm",
+        filtered: bool = False,
     ) -> None:
         filter_label = "" if not filtered else "_filtered"
         txt_file = f"{settings.filename}_{names.TEXTHIS}_{mode}{filter_label}.txt"
-        super().__init__(paths.texthis_txt_dir / txt_file, self.preprocess_data(data))
+        super().__init__(
+            settings.paths.texthis_txt_dir / txt_file, self.preprocess_data(data)
+        )
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> str:
         output_str = ""
@@ -133,6 +145,7 @@ class SenhisTxt(Txt):
     def __init__(
         self,
         data: dict[int, list[TextUnit]],
+        settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,
     ) -> None:
@@ -142,7 +155,7 @@ class SenhisTxt(Txt):
             f"{settings.filename}_{names.SENHIS}{view_mode_name}{filter_label}.txt"
         )
         super().__init__(
-            paths.senhis_txt_dir / txt_file,
+            settings.paths.senhis_txt_dir / txt_file,
             self.preprocess_data(data, view_mode),
         )
 
@@ -164,11 +177,16 @@ class StatsTxt(Txt):
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
+        settings: Settings,
     ) -> None:
-        txt_file_path = paths.stats_dir / (settings.filename + "_basic_statistics.txt")
+        txt_file_path = settings.paths.stats_dir / (
+            settings.filename + "_basic_statistics.txt"
+        )
         super().__init__(
-            paths.senhis_txt_dir / txt_file_path,
-            self.preprocess_data(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx),
+            settings.paths.senhis_txt_dir / txt_file_path,
+            self.preprocess_data(
+                b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
+            ),
         )
 
     def preprocess_data(
@@ -179,6 +197,7 @@ class StatsTxt(Txt):
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
+        settings: Settings,
     ) -> str:
         source_file = settings.filename + ".idfx"
         task_name = idfx.parent.name
@@ -253,8 +272,10 @@ class ParsesTxt(Txt):
 
 
 class DepParsesTxt(ParsesTxt):
-    def __init__(self, data: dict[int, list[list[TokenProp]]]) -> None:
-        super().__init__(data, paths.dependency_senhis_parses_dir)
+    def __init__(
+        self, data: dict[int, list[list[TokenProp]]], settings: Settings
+    ) -> None:
+        super().__init__(data, settings.paths.dependency_senhis_parses_dir)
 
     def generate_str(self, parsed_sen: list[TokenProp]) -> str:
         output_str = ""
@@ -264,8 +285,10 @@ class DepParsesTxt(ParsesTxt):
 
 
 class ConstParsesTxt(ParsesTxt):
-    def __init__(self, data: dict[int, list[list[TokenProp]]]) -> None:
-        super().__init__(data, paths.constituency_senhis_parses_dir)
+    def __init__(
+        self, data: dict[int, list[list[TokenProp]]], settings: Settings
+    ) -> None:
+        super().__init__(data, settings.paths.constituency_senhis_parses_dir)
 
     def generate_str(self, parsed_sen: list[TokenProp]) -> str:
         return f"{str(parsed_sen)}\n"

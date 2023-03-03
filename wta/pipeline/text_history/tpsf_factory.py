@@ -1,5 +1,6 @@
 from tqdm import tqdm
 
+from ...settings import Settings
 from .tpsf import TpsfECM
 from .ts import TransformingSequence
 
@@ -22,7 +23,7 @@ class ECMFactory:
     """
 
     @staticmethod
-    def run(tss: list[TransformingSequence]) -> list[TpsfECM]:
+    def run(tss: list[TransformingSequence], settings: Settings) -> list[TpsfECM]:
         """
         Generates a list of objects of type Tpsf based on a list of transforming sequences.
         Args:
@@ -51,7 +52,7 @@ class ECMFactory:
                     output.insert(startpos, char)
                     startpos += 1
             content = "".join(output)
-            tpsf = TpsfECM(i, content, ts, prev_tpsf)
+            tpsf = TpsfECM(i, content, ts, prev_tpsf, settings)
             tpsfs.append(tpsf)
             prev_tpsf = tpsf
         return tpsfs

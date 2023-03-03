@@ -1,8 +1,7 @@
 import unicodedata
 
-import settings
-from wta.pipeline.text_history.tpsf import TpsfECM
-
+from ...pipeline.text_history.tpsf import TpsfECM
+from ...settings import Settings
 from ...utils.nlp import (
     calculate_sequence_similarity,
     check_overlap_with_seq_beginning,
@@ -12,7 +11,11 @@ from ..text_history.ts import TransformingSequence
 
 class SentenceClassifier:
     def __init__(
-        self, prev_sens: list[TpsfECM], sens: list[TpsfECM], ts: TransformingSequence
+        self,
+        prev_sens: list[TpsfECM],
+        sens: list[TpsfECM],
+        ts: TransformingSequence,
+        settings: Settings,
     ) -> None:
         self.prev_sens = prev_sens
         self.sens = sens

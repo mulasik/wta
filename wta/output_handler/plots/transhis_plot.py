@@ -2,9 +2,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 
-import settings
-from wta.pipeline.transformation_histories.transformation import Transformation
-
+from ...pipeline.transformation_histories.transformation import Transformation
+from ...settings import Settings
 from .base import BasePlot
 from .colors import Colors
 
@@ -83,6 +82,7 @@ class SynBarTranshisPlot(BasePlot):
         self,
         dep_transhis: dict[int, list[Transformation]],
         const_transhis: dict[int, list[Transformation]],
+        settings: Settings,
     ) -> None:
         self.output_directory = settings.config["output_dir"]
         self.filename = settings.filename

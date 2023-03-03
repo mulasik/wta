@@ -1,10 +1,9 @@
 from itertools import zip_longest
 from typing import TYPE_CHECKING
 
-import settings
-from wta.pipeline.names import SenLabels, TSLabels
-from wta.pipeline.text_history.ts import TransformingSequence
-
+from ...pipeline.names import SenLabels, TSLabels
+from ...pipeline.text_history.ts import TransformingSequence
+from ...settings import Settings
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
 from .. import regular_expressions
 from .text_unit import Sec, Sen, Sin, TextUnit
@@ -20,6 +19,7 @@ class TextUnitFactory:
         revision_id: int,
         ts: TransformingSequence,
         prev_tpsf: "TpsfECM | None",
+        settings: Settings,
     ) -> tuple[list[TextUnit], list[str]]:
         print(
             f"\n\n=============================={revision_id}==============================\n"

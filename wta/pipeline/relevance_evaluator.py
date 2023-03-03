@@ -1,12 +1,11 @@
-import settings
-
+from ..settings import Settings
 from .sentence_histories.sentence_classifier import SentenceClassifier
 from .text_history.tpsf import TpsfECM
 from .text_history.ts import TransformingSequence
 
 
 class RelevanceEvaluator:
-    def __init__(self, tpsf: TpsfECM) -> None:
+    def __init__(self, tpsf: TpsfECM, settings: Settings) -> None:
         self.tpsf = tpsf
         self.min_edit_distance = settings.config["min_edit_distance"]
         self.spellchecking = settings.config["enable_spellchecking"]
