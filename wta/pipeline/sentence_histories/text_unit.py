@@ -9,7 +9,7 @@ class TextUnitDict(TypedDict):
     text: str
 
 
-class TextUnit(ABC):
+class TextUnit(ABC):  # noqa: B024
     """
     TextUnits are elements that the text is composed of.
     There are two types of TextUnits:
