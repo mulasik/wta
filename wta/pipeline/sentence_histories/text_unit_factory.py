@@ -190,9 +190,7 @@ class TextUnitFactory:
         post_sens = [ptu for ptu in post_tus if type(ptu).__name__ == "Sen"]
         corrected_changed_tus: list[TextUnit] = []
         for ctu in changed_tus:
-            matching_sens = [
-                psen for psen in post_sens if psen.text in ctu.text is not None
-            ]
+            matching_sens = [psen for psen in post_sens if psen.text in ctu.text]
             if len(matching_sens) == 1:
                 matching_sen = matching_sens[0]
                 new_ctu_text = ctu.text.replace(matching_sen.text, "")
