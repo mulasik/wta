@@ -12,15 +12,24 @@ class Action:
     - Pasting: pasting a text segment
     """
 
-    def __init__(self, content, startpos, endpos):
+    def __init__(self, content: str, startpos: int, endpos: int | None) -> None:
         self.content = content
         self.startpos = startpos
         self.endpos = endpos
 
 
 class KeyboardAction(Action):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
+    def __init__(
+        self,
+        content: str,
+        startpos: int,
+        endpos: int | None,
+        keyname: str,
+        starttime: int,
+        endtime: int,
+        pause: int | None,
+        textlen: int,
+    ) -> None:
         super().__init__(content, startpos, endpos)
         self.keyname = keyname
         self.starttime = starttime
@@ -30,46 +39,39 @@ class KeyboardAction(Action):
 
 
 class Append(KeyboardAction):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
+    pass
 
 
 class Insertion(KeyboardAction):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
+    pass
 
 
 class Navigation(KeyboardAction):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
+    pass
 
 
 class Deletion(KeyboardAction):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
+    pass
 
 
 class Midletion(KeyboardAction):
-
-    def __init__(self, content, startpos, endpos, keyname, starttime, endtime, pause, textlen):
-        super().__init__(content, startpos, endpos, keyname, starttime, endtime, pause, textlen)
+    pass
 
 
 class Replacement(Action):
-
-    def __init__(self, content, startpos, endpos, rplcmt_endpos, rplcmt_textlen):
+    def __init__(
+        self,
+        content: str,
+        startpos: int,
+        endpos: int | None,
+        rplcmt_endpos: int,
+        rplcmt_textlen: int,
+    ) -> None:
         super().__init__(content, startpos, endpos)
         self.rplcmt_endpos = rplcmt_endpos
         self.textlen = rplcmt_textlen
 
 
 class Pasting(Action):
-
-    def __init__(self, content, startpos, endpos):
+    def __init__(self, content: str, startpos: int, endpos: int | None) -> None:
         super().__init__(content, startpos, endpos)
-
-

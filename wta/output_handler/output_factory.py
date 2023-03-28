@@ -1,158 +1,167 @@
-import os
+from pathlib import Path
 
-import paths
-import settings
-from wta.output_handler.names import Names
-from wta.utils.other import ensure_path
-from .storage.json import TexthisJson, SenhisJson, TranshisJson
-from .storage.txt import EventsTxt, ActionsTxt, ActionGroupsTxt, TssTxt, TpsfsTxt, TexthisTxt, SenhisTxt, StatsTxt, DepParsesTxt, ConstParsesTxt
-from .storage.svg import (TexthisSvg, FilteredTexthisSvg,
-                          SenhisSvg,
-                          DepTranshisSvg, ConstTranshisSvg, SynBarTranshisSvg, SynPieTranshisSvg,
-                          SenEditSvg, TsLabelsSvg, TsTokensSvg, DeletionsSvg, InsertionsSvg)
+from ..pipeline.sentence_histories.text_unit import TextUnit
+from ..pipeline.sentence_parsing.parsers import TokenProp
+from ..pipeline.statistics.statistics import (
+    BasicStatistics,
+    EventStatistics,
+    PauseStatistics,
+    SentenceStatistics,
+    TSStatistics,
+)
+from ..pipeline.text_history.action import Action
+from ..pipeline.text_history.events.base import BaseEvent
+from ..pipeline.text_history.tpsf import TpsfECM
+from ..pipeline.text_history.ts import TransformingSequence
+from ..pipeline.transformation_histories.transformation import Transformation
+from ..settings import Settings
+from .storage.json import SenhisJson, TexthisJson, TranshisJson
+from .storage.svg import (
+    ConstTranshisSvg,
+    DeletionsSvg,
+    DepTranshisSvg,
+    FilteredTexthisSvg,
+    InsertionsSvg,
+    SenEditSvg,
+    SenhisSvg,
+    SynBarTranshisSvg,
+    SynPieTranshisSvg,
+    TexthisSvg,
+    TsLabelsSvg,
+    TsTokensSvg,
+)
+from .storage.txt import (
+    ActionGroupsTxt,
+    ActionsTxt,
+    ConstParsesTxt,
+    DepParsesTxt,
+    EventsTxt,
+    SenhisTxt,
+    StatsTxt,
+    TexthisTxt,
+    TpsfsTxt,
+    TssTxt,
+)
 
 
-class StorageSettings:
-
+class EventsOutputFactory:
     @classmethod
-    def set_paths(cls):
-        paths.events_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.EVENTS)
-        paths.actions_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.ACTIONS)
-        paths.tss_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.TSS)
-        paths.tpsfs_dir = os.path.join(settings.config['output_dir'], Names.PREPROCESSING, Names.TPSFS)
-        paths.texthis_dir = os.path.join(settings.config['output_dir'], Names.TEXTHIS)
-        paths.texthis_json_dir = os.path.join(paths.texthis_dir, Names.JSON)
-        paths.texthis_txt_dir = os.path.join(paths.texthis_dir, Names.TXT)
-        paths.texthis_visual_dir = os.path.join(paths.texthis_dir, Names.VISUAL)
-        paths.stats_dir = os.path.join(settings.config['output_dir'], Names.STATS)
-        paths.senhis_dir = os.path.join(settings.config['output_dir'], Names.SENHIS)
-        paths.senhis_json_dir = os.path.join(paths.senhis_dir, Names.JSON)
-        paths.senhis_txt_dir = os.path.join(paths.senhis_dir, Names.TXT)
-        paths.senhis_visual_dir = os.path.join(paths.senhis_dir, Names.VISUAL)
-        paths.senhis_parses_dir = os.path.join(paths.senhis_dir, Names.SENPAR)
-        paths.dependency_senhis_parses_dir = os.path.join(paths.senhis_parses_dir, Names.DEP)
-        paths.constituency_senhis_parses_dir = os.path.join(paths.senhis_parses_dir, Names.CONST)
-        paths.transhis_dir = os.path.join(settings.config['output_dir'], Names.TRANSHIS)
-        paths.dependency_transhis_dir = os.path.join(paths.transhis_dir, Names.DEP)
-        paths.constituency_transhis_dir = os.path.join(paths.transhis_dir, Names.CONST)
-        paths_to_ensure = [d for d in dir(paths) if d.endswith('_dir')]
-        for p in paths_to_ensure:
-            ensure_path(getattr(paths, p))
+    def run(cls, events: list[BaseEvent], settings: Settings) -> None:
+        EventsTxt(events, settings).to_file()
 
 
-class OutputFactory:
-
+class ActionsOutputFactory:
     @classmethod
-    def run(cls):
-        raise NotImplementedError
+    def run(cls, actions: list[Action], settings: Settings) -> None:
+        ActionsTxt(actions, settings).to_file()
 
 
-class EventsOutputFactory(OutputFactory):
-
+class ActionGroupsOutputFactory:
     @classmethod
-    def run(cls, events):
-        StorageSettings.set_paths()
-        EventsTxt(events).to_file()
+    def run(cls, action_groups: dict[str, list[Action]], settings: Settings) -> None:
+        ActionGroupsTxt(action_groups, settings).to_file()
 
 
-class ActionsOutputFactory(OutputFactory):
-
+class TssOutputFactory:
     @classmethod
-    def run(cls, actions):
-        StorageSettings.set_paths()
-        ActionsTxt(actions).to_file()
+    def run(cls, tss: list[TransformingSequence], settings: Settings) -> None:
+        TssTxt(tss, settings).to_file()
 
 
-class ActionGroupsOutputFactory(OutputFactory):
-
+class TpsfsOutputFactory:
     @classmethod
-    def run(cls, action_groups):
-        StorageSettings.set_paths()
-        ActionGroupsTxt(action_groups).to_file()
+    def run(cls, tpsfs: list[TpsfECM], settings: Settings) -> None:
+        TpsfsTxt(tpsfs, settings).to_file()
 
 
-class TssOutputFactory(OutputFactory):
-
+class TexthisOutputFactory:
     @classmethod
-    def run(cls, tss):
-        StorageSettings.set_paths()
-        TssTxt(tss).to_file()
+    def run(cls, texthis: list[TpsfECM], settings: Settings) -> None:  # + texthis_pcm
+        TexthisJson(texthis, settings).to_file()
+        # TODO: TexthisJson(texthis_pcm, settings, mode='pcm').to_file()
+        TexthisTxt(texthis, settings).to_file()
+        TexthisSvg(texthis, settings).to_file()
 
 
-class TpsfsOutputFactory(OutputFactory):
-
+class TexthisFltrOutputFactory:
     @classmethod
-    def run(cls, tpsfs):
-        StorageSettings.set_paths()
-        TpsfsTxt(tpsfs).to_file()
+    def run(
+        cls, texthis_fltr: list[TpsfECM], settings: Settings
+    ) -> None:  # + texthis_pcm
+        TexthisJson(texthis_fltr, settings, filtered=True).to_file()
+        TexthisTxt(texthis_fltr, settings, filtered=True).to_file()
+        FilteredTexthisSvg(texthis_fltr, settings).to_file()
 
 
-class TexthisOutputFactory(OutputFactory):
-
+class SenhisOutputFactory:
     @classmethod
-    def run(cls, texthis):  # + texthis_pcm
-        StorageSettings.set_paths()
-        TexthisJson(texthis).to_file()
-        # TODO: TexthisJson(texthis_pcm, mode='pcm').to_file()
-        TexthisTxt(texthis).to_file()
-        TexthisSvg(texthis).to_file()
+    def run(
+        cls,
+        texthis: list[TpsfECM],
+        texthis_fltr: list[TpsfECM],
+        senhis: dict[int, list[TextUnit]],
+        senhis_fltr: dict[int, list[TextUnit]],
+        settings: Settings,
+    ) -> None:
+        SenhisJson(senhis, settings).to_file()
+        SenhisJson(senhis, settings, "simplified").to_file()
+        SenhisJson(senhis_fltr, settings, filtered=True).to_file()
+        SenhisJson(senhis_fltr, settings, "simplified", filtered=True).to_file()
+        SenhisTxt(senhis, settings).to_file()
+        SenhisTxt(senhis_fltr, settings, filtered=True).to_file()
+        SenhisTxt(senhis, settings, view_mode="extended").to_file()
+        SenhisTxt(senhis, settings, view_mode="extended", filtered=True).to_file()
+        SenhisSvg(texthis, senhis, settings).to_file()
+        SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
 
 
-class TexthisFltrOutputFactory(OutputFactory):
-
+class ParseOutputFactory:
     @classmethod
-    def run(cls, texthis_fltr):  # + texthis_pcm
-        StorageSettings.set_paths()
-        TexthisJson(texthis_fltr, filtered=True).to_file()
-        TexthisTxt(texthis_fltr, filtered=True).to_file()
-        FilteredTexthisSvg(texthis_fltr).to_file()
+    def run(
+        cls,
+        dep_senhis_parses: dict[int, list[list[TokenProp]]],
+        const_senhis_parses: dict[int, list[list[TokenProp]]],
+        settings: Settings,
+    ) -> None:
+        DepParsesTxt(dep_senhis_parses, settings).to_file()
+        ConstParsesTxt(const_senhis_parses, settings).to_file()
 
-class SenhisOutputFactory(OutputFactory):
 
+class TranshisOutputFactory:
     @classmethod
-    def run(cls, texthis, texthis_fltr, senhis, senhis_fltr):
-        StorageSettings.set_paths()
-        SenhisJson(senhis).to_file()
-        SenhisJson(senhis, 'simplified').to_file()
-        SenhisJson(senhis_fltr, filtered=True).to_file()
-        SenhisJson(senhis_fltr, 'simplified', filtered=True).to_file()
-        SenhisTxt(senhis).to_file()
-        SenhisTxt(senhis_fltr, filtered=True).to_file()
-        SenhisTxt(senhis, view_mode='extended').to_file()
-        SenhisTxt(senhis, view_mode='extended', filtered=True).to_file()
-        SenhisSvg(texthis, senhis).to_file()
-        SenhisSvg(texthis_fltr, senhis_fltr, filtered=True).to_file()
+    def run(
+        cls,
+        dep_transhis: dict[int, list[Transformation]],
+        const_transhis: dict[int, list[Transformation]],
+        settings: Settings,
+    ) -> None:
+        TranshisJson(dep_transhis, settings, "dependency").to_file()
+        TranshisJson(const_transhis, settings, "constituency").to_file()
+        DepTranshisSvg(dep_transhis, settings).to_file()
+        ConstTranshisSvg(const_transhis, settings).to_file()
+        SynBarTranshisSvg(dep_transhis, const_transhis, settings).to_file()
+        SynPieTranshisSvg(dep_transhis, const_transhis, settings).to_file()
 
 
-class ParseOutputFactory(OutputFactory):
-
+class StatsOutputFactory:
     @classmethod
-    def run(cls, dep_senhis_parses, const_senhis_parses):
-        DepParsesTxt(dep_senhis_parses).to_file()
-        ConstParsesTxt(const_senhis_parses).to_file()
-
-
-class TranshisOutputFactory(OutputFactory):
-
-    @classmethod
-    def run(cls, dep_transhis, const_transhis):
-        TranshisJson(dep_transhis, 'dependency').to_file()
-        TranshisJson(const_transhis, 'constituency').to_file()
-        DepTranshisSvg(dep_transhis).to_file()
-        ConstTranshisSvg(const_transhis).to_file()
-        SynBarTranshisSvg(dep_transhis, const_transhis).to_file()
-        SynPieTranshisSvg(dep_transhis, const_transhis).to_file()
-
-
-class StatsOutputFactory(OutputFactory):
-
-    @classmethod
-    def run(cls, b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, texthis, senhis):
-        StorageSettings.set_paths()
-        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx).to_file()
-        SenEditSvg(texthis, senhis).to_file()
-        TsTokensSvg(texthis, senhis).to_file()
-        TsLabelsSvg(texthis, senhis).to_file()
-        DeletionsSvg(texthis, senhis).to_file()
-        InsertionsSvg(texthis, senhis).to_file()
-
+    def run(
+        cls,
+        b_stats: BasicStatistics,
+        e_stats: EventStatistics,
+        p_stats: PauseStatistics,
+        ts_stats: TSStatistics,
+        sen_stats: SentenceStatistics,
+        idfx: Path,
+        texthis: list[TpsfECM],
+        senhis: dict[int, list[TextUnit]],
+        settings: Settings,
+    ) -> None:
+        StatsTxt(
+            b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
+        ).to_file()
+        SenEditSvg(texthis, senhis, settings).to_file()
+        TsTokensSvg(texthis, senhis, settings).to_file()
+        TsLabelsSvg(texthis, senhis, settings).to_file()
+        DeletionsSvg(texthis, senhis, settings).to_file()
+        InsertionsSvg(texthis, senhis, settings).to_file()

@@ -1,11 +1,19 @@
-from bs4 import BeautifulSoup
+from collections.abc import Iterable
+from pathlib import Path
+
+from bs4 import BeautifulSoup, Tag
 from tqdm import tqdm
 
-from wta.pipeline.names import KeyNames
-from .events.keyboard import (NavigationKeyboardEvent, ProductionKeyboardEvent,
-                              BDeletionKeyboardEvent, DDeletionKeyboardEvent)
-from .events.replacement import ReplacementEvent
+from ..names import KeyNames
+from .events.base import BaseEvent
 from .events.insert import InsertEvent
+from .events.keyboard import (
+    BDeletionKeyboardEvent,
+    DDeletionKeyboardEvent,
+    NavigationKeyboardEvent,
+    ProductionKeyboardEvent,
+)
+from .events.replacement import ReplacementEvent
 
 
 class EventFactory:
@@ -22,7 +30,7 @@ class EventFactory:
         * InsertEvent
     """
 
-    def run(self, idfx) -> list:
+    def run(self, idfx: Path) -> list[BaseEvent]:
         """
         Creates a list of Event objects.
         Args:
@@ -30,13 +38,18 @@ class EventFactory:
         Returns:
             list of Event objects
         """
-        soup = BeautifulSoup(open(idfx), features="lxml")
-        idfx_events = soup.find_all('event')
-        idfx_events = tqdm(idfx_events, 'Processing keylogs')
-        events = [self.create_event(event) for event in idfx_events]
+        with idfx.open() as fp:
+            soup = BeautifulSoup(fp, features="lxml")
+            idfx_events: Iterable[Tag] = soup.find_all("event")
+        idfx_events = tqdm(idfx_events, "Processing keylogs")
+        events = [
+            event_obj
+            for event_obj in (self.create_event(event) for event in idfx_events)
+            if event_obj is not None
+        ]
         for i, event in enumerate(events):
-            event.set_next_evnt(events[i+1] if i < len(events)-1 else None)
-            event.set_prev_evnt(events[i-1] if i >= 1 else None)
+            event.set_next_evnt(events[i + 1] if i < len(events) - 1 else None)
+            event.set_prev_evnt(events[i - 1] if i >= 1 else None)
             if event.prev_evnt:
                 event.set_pause()
             if event.next_evnt:
@@ -44,7 +57,7 @@ class EventFactory:
         return events
 
     @staticmethod
-    def create_event(event):
+    def create_event(event: Tag) -> BaseEvent | None:
         """
         Collects event attributes and creates an object of type Event.
         Args:
@@ -113,8 +126,8 @@ class EventFactory:
                 </event>
         """
         # CHARACTER PRODUCTION: characters are typed or deleted one by one OR writer navigates without editing
-        if event['type'] == 'keyboard':
-            parts = event.find_all('part')
+        if event["type"] == "keyboard":
+            parts = event.find_all("part")
             try:
                 wordlog = parts[0]
                 winlog = parts[1]
@@ -126,43 +139,72 @@ class EventFactory:
                 textlen = int(wordlog.documentlength.get_text())
                 if keyname in KeyNames.NAVIGATION_KEYS:
                     endpos = None
-                    evnt = NavigationKeyboardEvent(content, startpos, endpos, keyname, starttime, endtime, textlen)
-                elif keyname in KeyNames.DELETION_KEYS:
+                    return NavigationKeyboardEvent(
+                        content, startpos, endpos, keyname, starttime, endtime, textlen
+                    )
+                if keyname in KeyNames.DELETION_KEYS:
                     if keyname == KeyNames.BACKSPACE:
                         startpos = startpos - 1
                         endpos = startpos
-                        evnt = BDeletionKeyboardEvent(content, startpos, endpos, keyname, starttime, endtime, textlen)
-                    elif keyname == KeyNames.DELETE:
+                        return BDeletionKeyboardEvent(
+                            content,
+                            startpos,
+                            endpos,
+                            keyname,
+                            starttime,
+                            endtime,
+                            textlen,
+                        )
+                    if keyname == KeyNames.DELETE:
                         endpos = startpos
-                        evnt = DDeletionKeyboardEvent(content, startpos, endpos, keyname, starttime, endtime, textlen)
+                        return DDeletionKeyboardEvent(
+                            content,
+                            startpos,
+                            endpos,
+                            keyname,
+                            starttime,
+                            endtime,
+                            textlen,
+                        )
                 else:
                     # first char is placed at startpos, so the char must be deduced from length:
                     endpos = startpos + (len(content) - 1)
-                    evnt = ProductionKeyboardEvent(content, startpos, endpos, keyname, starttime, endtime, textlen)
+                    return ProductionKeyboardEvent(
+                        content, startpos, endpos, keyname, starttime, endtime, textlen
+                    )
             except IndexError:
-                print('FAILURE: Keyboard event information not available in the IDFX file.')
+                print(
+                    "FAILURE: Keyboard event information not available in the IDFX file."
+                )
         # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
-        elif event['type'] == 'replacement':
+        elif event["type"] == "replacement":
             try:
-                content = event.part.newtext.get_text()  # character to replace marked sequence
+                content = (
+                    event.part.newtext.get_text()
+                )  # character to replace marked sequence
                 orig_startpos = int(event.part.start.get_text())
                 orig_endpos = int(event.part.end.get_text())
                 endpos = orig_startpos + len(content)
                 rplcmt_textlen = orig_endpos - orig_startpos
                 rplcmt_endpos = orig_endpos - 1
-                evnt = ReplacementEvent(content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen)
+                return ReplacementEvent(  # noqa: TRY300
+                    content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
+                )
             except:
-                print('FAILURE: Replacement event information not available in the IDFX file.')
+                print(
+                    "FAILURE: Replacement event information not available in the IDFX file."
+                )
         # SEQUENCE INSERTION: a text sequence is inserted
-        elif event['type'] == 'insert':
+        elif event["type"] == "insert":
             try:
                 content = event.part.before.get_text()  # inserted text
                 startpos = int(event.part.position.get_text()) - len(content)
                 endpos = int(event.part.position.get_text()) - 1
-                evnt = InsertEvent(content, startpos, endpos)
+                return InsertEvent(content, startpos, endpos)  # noqa: TRY300
             except:
-                print('FAILURE: Insert event information not available in the IDFX file.')
+                print(
+                    "FAILURE: Insert event information not available in the IDFX file."
+                )
         else:
             print(f'ATTENTION: Encountered a new event type: {event["type"]}')
-        return evnt
-
+        return None

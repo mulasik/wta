@@ -1,5 +1,6 @@
 from tqdm import tqdm
 
+from .action import Action
 from .ts import TransformingSequence
 
 
@@ -11,7 +12,7 @@ class TsFactory:
     """
 
     @staticmethod
-    def run(action_groups):
+    def run(action_groups: dict[str, list[Action]]) -> list[TransformingSequence]:
         """
         Generates objects of type TransformingSequence from action groups.
         Args:
@@ -22,10 +23,11 @@ class TsFactory:
         tss = []
         prev_endtime = None
         rplcmt_textlen = None
-        action_groups = tqdm(action_groups.items(), 'Extracting transforming sequences')
-        for acttyp, actgro in action_groups:
-            text = ''.join([a.content for a in actgro])
-            actlbl = acttyp.split('_')[0].lower()
+        for acttyp, actgro in tqdm(
+            action_groups.items(), "Extracting transforming sequences"
+        ):
+            text = "".join([a.content for a in actgro])
+            actlbl = acttyp.split("_")[0].lower()
             startpos = actgro[0].startpos
             endpos = actgro[-1].endpos
             try:
@@ -35,13 +37,22 @@ class TsFactory:
                 preceding_pause = None if not prev_endtime else starttime - prev_endtime
             except AttributeError:
                 starttime, endtime, duration, preceding_pause = None, None, None, None
-            if actlbl in ['deletion', 'midletion']:
+            if actlbl in ["deletion", "midletion"]:
                 startpos, endpos = endpos, startpos
-            elif actlbl == 'replacement':
+            elif actlbl == "replacement":
                 endpos = actgro[-1].rplcmt_endpos
                 rplcmt_textlen = actgro[0].textlen
             prev_endtime = endtime
-            ts = TransformingSequence(text, actlbl, startpos, endpos, starttime, endtime, duration, preceding_pause, rplcmt_textlen)
+            ts = TransformingSequence(
+                text,
+                actlbl,
+                startpos,
+                endpos,
+                starttime,
+                endtime,
+                duration,
+                preceding_pause,
+                rplcmt_textlen,
+            )
             tss.append(ts)
         return tss
-

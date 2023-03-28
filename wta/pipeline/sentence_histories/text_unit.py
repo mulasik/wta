@@ -1,18 +1,15 @@
-from wta.utils.nlp import (ends_with_end_punctuation,
-                           contains_end_punctuation_in_the_middle,
-                           retrieve_end_punctuation_from_the_middle,
-                           is_short_sequence,
-                           starts_with_lowercase_letter,
-                           retrieve_mismatch_range_for_sentence_pair)
-from wta.pipeline.text_history.ts import TransformingSequence
 import json
-import uuid
 from abc import ABC
+from typing import TypedDict
 
-import settings
+from typing_extensions import Self
 
 
-class TextUnit(ABC):
+class TextUnitDict(TypedDict):
+    text: str
+
+
+class TextUnit(ABC):  # noqa: B024
     """
     TextUnits are elements that the text is composed of.
     There are two types of TextUnits:
@@ -20,60 +17,52 @@ class TextUnit(ABC):
     - SentenceInterspace (the space between the sentences such as a whitespace or a newline)
     """
 
-    def __init__(self, text):
+    def __init__(self, text: str) -> None:
         self.text: str = text
-        self.tu_id: int = None
-        self.state: str = None
+        self.tu_id: int | None = None
+        self.state: str | None = None
         # TODO:
         #  - retrieve tu transforming sequence,
         #  - detect tu relevance,
         #  - collect preceding transforming sequences of irrelevant tus
 
-    def set_id(self, tu_id):
+    def set_id(self, tu_id: int) -> None:
         self.tu_id = tu_id
 
-    def set_state(self, state):
+    def set_state(self, state: str) -> None:
         self.state = state
 
-    def __str__(self):
-        return f'{self.text}'
+    def __str__(self) -> str:
+        return f"{self.text}"
 
-    def to_json(self):
+    def to_json(self) -> str:
         return json.dumps(self, default=lambda o: o.__dict__)
 
-    def to_dict(self):
+    def to_dict(self) -> TextUnitDict:
         # TODO: extend with more tu properties
-        tu_dict = {
-            'text': self.text
-        }
-        return tu_dict
+        return {"text": self.text}
 
-    def to_text(self):
+    def to_text(self) -> str:
         # TODO: extend with more tu properties
         s = self.to_dict()
-        return f'''
+        return f"""
                 {s["text"]}
-                '''
+                """
+
+    def copy_with_text(self, new_text: str) -> Self:
+        return self.__class__(new_text)
+
+    def copy_with_appended_text(self, to_add: str) -> Self:
+        return self.copy_with_text(self.text + to_add)
 
 
 class Sin(TextUnit):
-    text: str
-
-    def __init__(self, text):
-        super().__init__(text)
+    pass
 
 
 class Sec(TextUnit):
-    text: str
-
-    def __init__(self, text):
-        super().__init__(text)
+    pass
 
 
 class Sen(TextUnit):
-    text: str
-
-    def __init__(self, text):
-        super().__init__(text)
-
-
+    pass
