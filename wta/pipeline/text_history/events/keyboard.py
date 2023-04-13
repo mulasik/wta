@@ -92,7 +92,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
             return None
         # if more than 1 character has been produced at one go, the action is pasting
         if len(self.content) > 1:
-            return Pasting(self.content, self.startpos, self.endpos)
+            return Pasting(self.content, self.startpos, self.endpos, cur_textlen)
         # if position is smaller then text length
         if len(self.content) == 1 and self.startpos < cur_textlen:
             return Insertion(

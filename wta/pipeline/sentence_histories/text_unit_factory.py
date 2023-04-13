@@ -1,3 +1,5 @@
+import copy
+import re
 from itertools import zip_longest
 from typing import TYPE_CHECKING
 
@@ -20,77 +22,100 @@ class TextUnitFactory:
         ts: TransformingSequence,
         prev_tpsf: "TpsfECM | None",
         settings: Settings,
-    ) -> tuple[list[TextUnit], list[str]]:
+    ) -> list[TextUnit]:
+        """
+        Generate a list of textunits for the given TPSF.
+        """
+
         print(
             f"\n\n=============================={revision_id}==============================\n"
         )
+
         sentence_list = settings.nlp_model.segment_text(text)
+
         textunit_list = self._split_in_textunits(sentence_list)
+
         merged_textunit_list = self._merge_double_textunits(textunit_list)
-        pre_tus, changed_tus, post_tus = self._detect_tus_diffs(
-            merged_textunit_list, ts, prev_tpsf
-        )
+
         print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|")
         print(f"TEXT: {text}")
-        print(f"INITIAL SENTENCE LIST: {sentence_list}")
-        corrected_changed_tus = self._improve_segmentation_with_post_tus(
-            changed_tus, post_tus
+        print(f"\nINITIAL SENTENCE LIST: {sentence_list}")
+        print(
+            f"\nINITIAL TEXTUNITS: {[(tu.text, type(tu).__name__) for tu in textunit_list]}"
         )
-        tus_states = self._collect_tus_states(
-            pre_tus, corrected_changed_tus, post_tus, ts
+        print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}")
+        corrected_tus = self._improve_segmentation_with_prev_tus(
+            merged_textunit_list, prev_tpsf
         )
-        corrected_textunits = [*pre_tus, *corrected_changed_tus, *post_tus]
+        print(f"\nCORRECTED TUS: {[tu.text for tu in corrected_tus]}")
+
+        # collect TU states
+
+        pre_tus, impacted_tus, post_tus = self._detect_diffs(
+            corrected_tus, ts, prev_tpsf
+        )
+
+        self._set_tus_states(pre_tus, impacted_tus, post_tus, ts, prev_tpsf)
+
+        tus = [*pre_tus, *impacted_tus, *post_tus]
+
+        self._assign_tpsf_ids(tus, revision_id)
+
+        # TODO remove final_tu_list var after testing
         final_tu_list = [
             (
                 type(tu).__name__,
                 tu.state if tu.state is None else tu.state.upper(),
                 tu.text,
             )
-            for tu in corrected_textunits
+            for tu in tus
         ]
         print(f"FINAL TU LIST: {final_tu_list}")
-        return corrected_textunits, tus_states
+
+        return tus
 
     def _split_in_textunits(self, sentence_list: list[str]) -> list[TextUnit]:
         textunit_list: list[TextUnit] = []
+
         for s in sentence_list:
             contains_only_ws = regular_expressions.ONLY_WS_RE.search(s) is not None
             if contains_only_ws is True:
                 sin = Sin(s)
                 textunit_list.append(sin)
                 continue
-            sen_wo_trailing_ws = regular_expressions.TRAILING_WS_RE.sub("", s)
-            if sen_wo_trailing_ws == "»":
-                textunit_list[-1] = textunit_list[-1].copy_with_appended_text(
-                    sen_wo_trailing_ws
-                )
-                sin_match = regular_expressions.TRAILING_WS_RE.search(s)
-                if sin_match is not None:
-                    textunit_list.append(Sin(sin_match.group(0)))
-                continue
-            sin_match = regular_expressions.INITIAL_WS_RE.search(s)
-            if sin_match is not None:
-                sin = Sin(sin_match.group(0))
+
+            # Handling special cases: incorrect SpaCy segmentation in case of citations with «»
+            # sentence returned by SpaCy starts with end citation mark (which should be part of the previous sentence)
+            found_end_citation_at_beginning = re.search(r"\A»", s)
+            if found_end_citation_at_beginning is not None:
+                textunit_list[-1] = textunit_list[-1].copy_with_appended_text("»")
+                s = re.sub(r"\A»", "", s)
+
+            found_sin_match = regular_expressions.INITIAL_WS_RE.search(s)
+            if found_sin_match is not None:
+                sin = Sin(found_sin_match.group(0))
                 textunit_list.append(sin)
-            sen_with_ws_trimmed = regular_expressions.INITIAL_WS_RE.sub(
-                "", sen_wo_trailing_ws
-            )
-            uppercase_letter = starts_with_uppercase_letter(sen_with_ws_trimmed)
-            end_punctuation = ends_with_end_punctuation(sen_with_ws_trimmed)
-            if not uppercase_letter or not end_punctuation:
-                s_wo_init_ws = regular_expressions.INITIAL_WS_RE.sub("", s)
-                sec = Sec(s_wo_init_ws)
-                textunit_list.append(sec)
-            else:
-                sen = Sen(sen_with_ws_trimmed)
-                textunit_list.append(sen)
-                sin_match = regular_expressions.TRAILING_WS_RE.search(s)
-                if sin_match is not None:
-                    sin = Sin(sin_match.group(0))
-                    textunit_list.append(sin)
+                s = s.replace(found_sin_match.group(0), "")
+
+            sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", s)
+            if sen_with_ws_trimmed != "":
+                uppercase_letter = starts_with_uppercase_letter(sen_with_ws_trimmed)
+                end_punctuation = ends_with_end_punctuation(sen_with_ws_trimmed)
+                if not uppercase_letter or not end_punctuation:
+                    sec = Sec(s)
+                    textunit_list.append(sec)
+                else:
+                    sen = Sen(sen_with_ws_trimmed)
+                    textunit_list.append(sen)
+                    found_sin_match = regular_expressions.TRAILING_WS_RE.search(s)
+                    if found_sin_match is not None:
+                        sin = Sin(found_sin_match.group(0))
+                        textunit_list.append(sin)
+
         return textunit_list
 
     def _merge_double_textunits(self, textunit_list: list[TextUnit]) -> list[TextUnit]:
+        # TODO: Issue with merging: 'So hat sie eine Qualt\n\nDie Qualitätsstrategie ', 'Die Qualitätsstrategie
         if not any(
             type(i).__name__ == type(j).__name__ != "Sen"
             for (i, j) in zip_longest(textunit_list, textunit_list[1:])
@@ -102,7 +127,10 @@ class TextUnitFactory:
         prev_merged_text = ""
         merged_textunits = []
         for i, j in zip_longest(textunit_list, textunit_list[1:]):
-            if type(i).__name__ == type(j).__name__ != "Sen":
+            if (
+                type(i).__name__ == type(j).__name__ != "Sen"
+                and i.text != prev_merged_text
+            ):
                 merged_tu_text = i.text + j.text
                 text_wo_trailing_ws = regular_expressions.TRAILING_WS_RE.sub(
                     "", merged_tu_text
@@ -125,7 +153,57 @@ class TextUnitFactory:
                 prev_merged_text = ""
         return self._merge_double_textunits(merged_textunits)
 
-    def _detect_tus_diffs(
+    def _improve_segmentation_with_prev_tus(
+        self, tus: list[TextUnit], prev_tpsf: "TpsfECM | None"
+    ) -> list[TextUnit]:
+        prev_sens = (
+            []
+            if prev_tpsf is None
+            else [
+                ptu
+                for ptu in copy.deepcopy(prev_tpsf.textunits)
+                if type(ptu).__name__ == "Sen"
+            ]
+        )
+        corrected_tus: list[TextUnit] = []
+
+        for tu in tus:
+            matching_prev_sens = [
+                psen for psen in prev_sens if psen.text in tu.text
+            ]  # is any previous sentence part of the detected text unit?
+            if len(matching_prev_sens) == 1:
+                matching_sen = matching_prev_sens[0]
+                matching_sen_index = tu.text.find(matching_sen.text)
+                if matching_sen_index == 0:
+                    corrected_tus.append(matching_sen)
+                new_ctu_text = tu.text.replace(matching_sen.text, "")
+                if new_ctu_text != "":
+                    uppercase_letter = starts_with_uppercase_letter(new_ctu_text)
+                    end_punctuation = ends_with_end_punctuation(new_ctu_text)
+                    if not uppercase_letter or not end_punctuation:
+                        sec = Sec(new_ctu_text)
+                        corrected_tus.append(sec)
+                    else:
+                        sen = Sen(
+                            regular_expressions.TRAILING_WS_RE.sub("", new_ctu_text)
+                        )
+                        corrected_tus.append(sen)
+                        match = regular_expressions.TRAILING_WS_RE.search(new_ctu_text)
+                        sin_content = None if match is None else match.group(0)
+                        if sin_content is not None:
+                            sin = Sin(sin_content)
+                            corrected_tus.append(sin)
+                if matching_sen_index > 0:
+                    corrected_tus.append(matching_sen)
+            elif len(matching_prev_sens) == 0:
+                corrected_tus.append(tu)
+            else:
+                print(
+                    f"ATTENTION: {len(matching_prev_sens)} textunits have been found within the textunit {tu.text}"
+                )
+        return corrected_tus
+
+    def _detect_diffs(
         self,
         textunits: list[TextUnit],
         ts: TransformingSequence,
@@ -133,27 +211,27 @@ class TextUnitFactory:
     ) -> tuple[list[TextUnit], list[TextUnit], list[TextUnit]]:
         if ts.label in [TSLabels.MID, TSLabels.DEL, TSLabels.REPL]:
             prev_textunits: list[TextUnit] = (
-                [] if prev_tpsf is None else prev_tpsf.textunits
+                [] if prev_tpsf is None else copy.deepcopy(prev_tpsf.textunits)
             )
-            pre_tus, changed_tus, post_tus = self._check_what_changed(
+            pre_tus, impacted_tus, post_tus = self._check_what_is_impacted(
                 prev_textunits, ts
             )
             # if the edit consists in deleting or reducing sentence interspace
             if (
-                len(changed_tus) == 1
-                and type(changed_tus[0]).__name__ == "Sin"
+                len(impacted_tus) == 1
+                and type(impacted_tus[0]).__name__ == "Sin"
                 and ts.label in (TSLabels.MID, TSLabels.DEL)
             ):
-                reduced_sin_content = changed_tus[0].text.replace(ts.text, "", 1)
+                reduced_sin_content = impacted_tus[0].text.replace(ts.text, "", 1)
                 if reduced_sin_content == "":
-                    changed_tus = []
+                    impacted_tus = []
                 else:
                     match = regular_expressions.ONLY_WS_RE.search(reduced_sin_content)
                     if match is not None:
                         sin_content = match.group(0)
-                        changed_tus = [Sin(sin_content)]
+                        impacted_tus = [Sin(sin_content)]
             else:
-                changed_tus = [
+                impacted_tus = [
                     tu
                     for tu in textunits
                     if tu.text
@@ -163,84 +241,59 @@ class TextUnitFactory:
                     ]
                 ]
         elif ts.label in [TSLabels.APP, TSLabels.INS, TSLabels.PAST]:
-            pre_tus, changed_tus, post_tus = self._check_what_changed(textunits, ts)
-        return pre_tus, changed_tus, post_tus
+            pre_tus, impacted_tus, post_tus = self._check_what_is_impacted(
+                textunits, ts
+            )
+        return pre_tus, impacted_tus, post_tus
 
-    def _check_what_changed(
-        self, tus: list[TextUnit], ts: TransformingSequence
+    def _check_what_is_impacted(
+        self, tus_to_compare: list[TextUnit], ts: TransformingSequence
     ) -> tuple[list[TextUnit], list[TextUnit], list[TextUnit]]:
         pre_tus = []
         post_tus = []
-        changed_tus = []
+        impacted_tus = []
         currentpos = 0
-        for tu in tus:
+        for tu in tus_to_compare:
             startpos, endpos = currentpos, currentpos + len(tu.text) - 1
             if endpos < ts.startpos:
                 pre_tus.append(tu)
             elif ts.endpos is not None and startpos > ts.endpos:
                 post_tus.append(tu)
             else:
-                changed_tus.append(tu)
+                impacted_tus.append(tu)
             currentpos = currentpos + len(tu.text)
-        return pre_tus, changed_tus, post_tus
+        return pre_tus, impacted_tus, post_tus
 
-    def _improve_segmentation_with_post_tus(
-        self, changed_tus: list[TextUnit], post_tus: list[TextUnit]
-    ) -> list[TextUnit]:
-        post_sens = [ptu for ptu in post_tus if type(ptu).__name__ == "Sen"]
-        corrected_changed_tus: list[TextUnit] = []
-        for ctu in changed_tus:
-            matching_sens = [psen for psen in post_sens if psen.text in ctu.text]
-            if len(matching_sens) == 1:
-                matching_sen = matching_sens[0]
-                new_ctu_text = ctu.text.replace(matching_sen.text, "")
-                uppercase_letter = starts_with_uppercase_letter(new_ctu_text)
-                end_punctuation = ends_with_end_punctuation(new_ctu_text)
-                if not uppercase_letter or not end_punctuation:
-                    sec = Sec(new_ctu_text)
-                    corrected_changed_tus.append(sec)
-                else:
-                    sen = Sen(regular_expressions.TRAILING_WS_RE.sub("", new_ctu_text))
-                    corrected_changed_tus.append(sen)
-                    match = regular_expressions.TRAILING_WS_RE.search(new_ctu_text)
-                    sin_content = None if match is None else match.group(0)
-                    if sin_content is not None:
-                        sin = Sin(sin_content)
-                        corrected_changed_tus.append(sin)
-            elif len(matching_sens) == 0:
-                corrected_changed_tus.append(ctu)
-            else:
-                print(
-                    f"ATTENTION: {len(matching_sens)} textunits have been found within the textunit {ctu.text}"
-                )
-        return corrected_changed_tus
-
-    def _collect_tus_states(
+    def _set_tus_states(
         self,
         pre_tus: list[TextUnit],
-        changed_tus: list[TextUnit],
+        impacted_tus: list[TextUnit],
         post_tus: list[TextUnit],
         ts: TransformingSequence,
-    ) -> list[str]:
-        tus_states = []
+        prev_tpsf: "TpsfECM | None",
+    ) -> None:
         currentpos = 0
-        for tu in [*pre_tus, *changed_tus, *post_tus]:
-            state = self._collect_tus_state(tu, currentpos, pre_tus, post_tus, ts)
+        prev_tus = [] if prev_tpsf is None else prev_tpsf.textunits
+        no_tus_increased = len(prev_tus) < len([*pre_tus, *impacted_tus, *post_tus])
+        for tu in [*pre_tus, *impacted_tus, *post_tus]:
+            state = self._retrieve_tu_state(
+                tu, currentpos, pre_tus, post_tus, ts, prev_tus, no_tus_increased
+            )
             if state is not None:
                 tu.set_state(state)
-                tus_states.append(state)
             currentpos = currentpos + len(
                 tu.text
             )  # it's the index of the beginning of the next tu
-        return tus_states
 
-    def _collect_tus_state(
+    def _retrieve_tu_state(
         self,
         tu: TextUnit,
         currentpos: int,
         pre_tus: list[TextUnit],
         post_tus: list[TextUnit],
         ts: TransformingSequence,
+        prev_tus: list[TextUnit],
+        no_tus_increased: bool,
     ) -> str | None:
         if len(tu.text) == 0:
             return None
@@ -251,12 +304,24 @@ class TextUnitFactory:
 
         startpos, endpos = currentpos, currentpos + len(tu.text) - 1
         tu_starts_within_ts = startpos in range(ts.startpos, ts.endpos + 1)
-        tu_ends_within_ts = endpos in range(ts.startpos, ts.endpos + 1)
+        # two options in case the textunit ends with space
+        # if it ends with space this space might have previously build a SIN, but as a SEC has been inserted
+        # the SIN became part of the SEC as per definition (see paper)
+        no_trailing_ws = (
+            0
+            if re.search(r"\s+$", tu.text) is None
+            else len(re.search(r"\s+$", tu.text).group(0))
+        )
+        tu_ends_within_ts = endpos in range(ts.startpos, ts.endpos + 1 + no_trailing_ws)
+
         if tu in pre_tus:
             return SenLabels.UNC_PRE
 
-        if tu in post_tus:
+        if tu in post_tus and tu.text in [t.text for t in prev_tus]:
             return SenLabels.UNC_POST
+
+        if tu in post_tus and tu.text not in [t.text for t in prev_tus]:
+            return SenLabels.SPLIT
 
         if (
             ts.label in [TSLabels.INS, TSLabels.APP, TSLabels.PAST]
@@ -265,4 +330,23 @@ class TextUnitFactory:
         ):
             return SenLabels.NEW
 
+        if no_tus_increased is True:
+            # check if tu without the ts was is prev tus list
+            # then the status is "split"
+            ts_split_by_tu = re.split(r"(\.|\?|!)", ts.text)
+            ts_first_tu = "".join(ts_split_by_tu[:2])
+            tu_wo_ts = tu.text.replace(ts_first_tu, "")
+            tu_wo_ts_found_in_prev = False
+            for i, ptu in enumerate(prev_tus):
+                if tu_wo_ts in ptu.text:
+                    tu_wo_ts_found_in_prev = True
+                    last_prev_tu = i == len(prev_tus) - 1
+                    break
+            if tu_wo_ts_found_in_prev and not last_prev_tu:
+                return SenLabels.SPLIT
+
         return SenLabels.MOD
+
+    def _assign_tpsf_ids(self, tus: list[TextUnit], revision_id: int) -> None:
+        for tu in tus:
+            tu.set_tpsf_id(revision_id)

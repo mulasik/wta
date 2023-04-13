@@ -7,6 +7,8 @@ class Colors:
     SEN_COLORS = {
         "unchanged_pre": "mistyrose",
         "unchanged_post": "mistyrose",
+        "unchanged": "mistyrose",
+        "split": "rosybrown",
         "new": "darkslategrey",
         "deleted": "seashell",
         "modified through deletion": "lightcoral",
@@ -15,6 +17,7 @@ class Colors:
         "modified through append": "cadetblue",
         "modified through replacement": "tan",
         "modified through pasting": "orange",
+        "created through pasting": "orange",
     }
     TS_COLORS = {
         "deletion": "lightcoral",

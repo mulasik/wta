@@ -45,18 +45,15 @@ class BasicStatistics(Statistics):
         self,
         texthis: list[TpsfECM],
         texthis_filtered: list[TpsfECM],
-        texthis_pcm: list[TpsfECM],
     ) -> None:
         self.texthis = texthis
         self.texthis_filtered = texthis_filtered
-        self.texthis_pcm = texthis_pcm
         self.data = self.retrieve_stats()
 
     def retrieve_stats(self) -> dict[str, int | float | str]:
         return {
             "num_tpsfs": len(self.texthis),
             "num_tpsfs_filtered": len(self.texthis_filtered),
-            "num_tpsfs_pcm": len(self.texthis_pcm),
         }
 
 
@@ -117,18 +114,18 @@ class TSStatistics(Statistics):
         num_ins, number_dels, num_apps = 0, 0, 0
         num_ins_chars, num_del_chars, num_app_chars = 0, 0, 0
         for tpsf in self.texthis:
-            if len(tpsf.ts.content) > 0:
+            if len(tpsf.ts.text) > 0:
                 num_nonempty_ts += 1
-                transforming_sequences_texts.append(tpsf.ts.content)
+                transforming_sequences_texts.append(tpsf.ts.text)
             if tpsf.ts.label == "insertion":
                 num_ins += 1
-                num_ins_chars += len(tpsf.ts.content)
+                num_ins_chars += len(tpsf.ts.text)
             if tpsf.ts.label == "deletion":
                 number_dels += 1
-                num_del_chars += len(tpsf.ts.content)
+                num_del_chars += len(tpsf.ts.text)
             if tpsf.ts.label == "append":
                 num_apps += 1
-                num_app_chars += len(tpsf.ts.content)
+                num_app_chars += len(tpsf.ts.text)
         total_ts_length = 0
         for tst in transforming_sequences_texts:
             total_ts_length += len(tst)
@@ -167,10 +164,10 @@ class SentenceStatistics(Statistics):
                 num_potentially_erroneous_sens += 1
             if len(sh) > max_num_sen_versions:
                 max_num_sen_versions = len(sh)
-                sen_with_most_versions = sh[-1].content
+                sen_with_most_versions = sh[-1].text
             num_sen_versions.append(len(sh))
         mean_num_sentence_versions = cast(float, round(np.mean(num_sen_versions), 2))
-        final_num_sentences = len(self.texthis[-1].sentence_list)
+        final_num_sentences = len(self.texthis[-1].textunits)
         return {
             "detected_sens": detected_sens,
             "final_num_sentences": final_num_sentences,

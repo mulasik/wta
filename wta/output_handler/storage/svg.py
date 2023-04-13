@@ -182,7 +182,9 @@ class TsLabelsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self,
+        texthis: list[TpsfECM],
+        senhis: dict[int, list[TextUnit]],
     ) -> None:
         TsLabelsPlot(texthis, senhis).run()
 

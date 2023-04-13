@@ -56,3 +56,14 @@ class ECMFactory:
             tpsfs.append(tpsf)
             prev_tpsf = tpsf
         return tpsfs
+
+
+def filter_tpsfs(tpsfs: list[TpsfECM]) -> list[TpsfECM]:
+    aggregated_tss = []
+    for tpsf in tpsfs:
+        if tpsf.relevance is False:
+            aggregated_tss.append(tpsf.ts)
+        else:
+            tpsf.set_irrelevant_tss_aggregated(aggregated_tss)
+            aggregated_tss = []
+    return [tpsf for tpsf in tpsfs if tpsf.relevance is True]

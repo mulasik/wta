@@ -38,9 +38,31 @@ class TpsfECM:
         self.ts = ts
         self.prev_tpsf = prev_tpsf
         self.final = final
-        self.textunits, self.tus_states = TextUnitFactory().run(
+        self.textunits = TextUnitFactory().run(
             self.text, self.revision_id, self.ts, self.prev_tpsf, settings
         )
+        self.relevance = (
+            self.ts.relevance
+            if settings.config["enable_spellchecking"] is False
+            else self._determine_tpsf_relevance(settings)
+        )
+
+    def _determine_tpsf_relevance(self, settings: Settings) -> bool:
+        impacted_tus = [tu for tu in self.textunits if tu.state in ["new", "modified"]]
+        for itu in impacted_tus:
+            tagged_tokens = (
+                []
+                if itu.text is None or itu.text == ""
+                else settings.nlp_model.tag_words(itu.text)
+            )
+            if True in [t["is_typo"] for t in tagged_tokens]:
+                return False
+        return True
+
+    def set_irrelevant_tss_aggregated(
+        self, aggregated_tss: list[TransformingSequence]
+    ) -> None:
+        self.irrelevant_tss_aggregated = aggregated_tss
 
     def __str__(self) -> str:
         return f"""
@@ -55,6 +77,9 @@ RESULT TEXT:
 
 TRANSFORMING SEQUENCE:
 {self.ts.label.upper()} *{self.ts.text}*
+
+TEXT UNITS:
+{[(tu.state, tu.text) for tu in self.textunits]}
 
             """
 
@@ -80,4 +105,6 @@ TPSF version {self.revision_id}:
 {self.text}
 TS:
 {(self.ts.text, self.ts.label.upper())}
+TEXT UNITS:
+{[(tu.state, tu.text) for tu in self.textunits]}
             """

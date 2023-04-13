@@ -1,5 +1,10 @@
+import difflib
+
 from tqdm import tqdm
 
+from wta.pipeline.sentence_histories.text_unit import TextUnit
+
+from ...settings import Settings
 from .action import Action
 from .ts import TransformingSequence
 
@@ -12,7 +17,9 @@ class TsFactory:
     """
 
     @staticmethod
-    def run(action_groups: dict[str, list[Action]]) -> list[TransformingSequence]:
+    def run(
+        action_groups: dict[str, list[Action]], settings: Settings
+    ) -> list[TransformingSequence]:
         """
         Generates objects of type TransformingSequence from action groups.
         Args:
@@ -53,6 +60,53 @@ class TsFactory:
                 duration,
                 preceding_pause,
                 rplcmt_textlen,
+                settings,
             )
             tss.append(ts)
         return tss
+
+
+def retrieve_sen_ts(
+    s1: TextUnit, s2: TextUnit, settings: Settings
+) -> TransformingSequence:
+    seq_match = difflib.SequenceMatcher(None, s1.text, s2.text)
+    prev_cur_comparison_results = seq_match.get_opcodes()
+    prev_cur_mismatch = [
+        res for res in prev_cur_comparison_results if res[0] != "equal"
+    ]
+    # there is always one mismatch range, as TPSF capturing happens upon each edit,
+    # two separate edits on the same TPSF are not possible
+    for m in prev_cur_mismatch:
+        if m[0] == "delete":
+            startpos = m[1]
+            endpos = m[2] + 1
+            relevant = s1
+            label = "midletion" if endpos < len(relevant.text) else "deletion"
+        elif m[0] == "insert":
+            startpos = m[3]
+            endpos = m[4] + 1
+            relevant = s2
+            label = "insertion" if endpos < len(relevant.text) else "append"
+        elif m[0] == "replace":
+            startpos = m[3]
+            endpos = m[4] + 1
+            relevant = s2
+            label = "replacement"
+        else:
+            print(
+                "ATTENTION: Encountered replacement or a different type of transforming operation."
+            )
+        mismatch_text = relevant.text[startpos:endpos]
+        sen_ts = TransformingSequence(
+            mismatch_text,
+            label,
+            startpos,
+            endpos,
+            None,
+            None,
+            None,
+            None,
+            None,
+            settings,
+        )
+    return sen_ts

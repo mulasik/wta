@@ -1,5 +1,4 @@
-from ...language_models.spacy import TaggedWord
-from ...utils.nlp import contains_end_punctuation_in_the_middle
+from ...settings import Settings
 
 
 class TransformingSequence:
@@ -26,6 +25,7 @@ class TransformingSequence:
         duration: int | None,
         preceding_pause: int | None,
         rplcmt_textlen: int | None,
+        settings: Settings,
     ) -> None:
         """
         Initializes an object of type TransformingSequence (TS).
@@ -47,25 +47,36 @@ class TransformingSequence:
         self.endtime = endtime
         self.duration = duration
         self.preceding_pause = preceding_pause
-        self.tagged_tokens: list[
-            TaggedWord
-        ] = (
-            []
-        )  # if text is None or text == '' else settings.nlp_model.tag_words(self.text)
-        self.contains_punctuation = "PUNCT" in [
-            tok["pos"] for tok in self.tagged_tokens
-        ]
-        self.contains_end_punctuation_in_the_middle = (
-            contains_end_punctuation_in_the_middle(self.text)
+
+        self.relevance = (
+            False
+            if text is None or text == ""
+            else self._determine_ts_relevance(settings)
         )
-        self.ts_relevance: bool | None = None
         self.rplcmt_textlen = rplcmt_textlen
 
     def set_text(self, text: str) -> None:
         self.text = text
 
-    def set_ts_relevance(self, relevance: bool) -> None:
-        self.ts_relevance = relevance
+    def _determine_ts_relevance(self, settings: Settings) -> bool:
+        min_edit_distance = settings.config["min_edit_distance"]
+        ts_min_tokens_number = settings.config["ts_min_tokens_number"]
+        edit_dist_combined_with_tok_number = settings.config[
+            "combine_edit_distance_with_tok_number"
+        ]
+        punctuation_rel = settings.config["include_punctuation_edits"]
+
+        ts_longer_than_min = len(self.text) >= min_edit_distance
+        more_toks_than_min = len(self.text.split(" ")) >= ts_min_tokens_number
+
+        if punctuation_rel is True:
+            tagged_tokens = settings.nlp_model.tag_words(self.text)
+            contains_punctuation = "PUNCT" in [tok["pos"] for tok in tagged_tokens]
+            if contains_punctuation:
+                return True
+        if edit_dist_combined_with_tok_number is True:
+            return ts_longer_than_min and more_toks_than_min
+        return ts_longer_than_min or more_toks_than_min
 
     def __str__(self) -> str:
         return (

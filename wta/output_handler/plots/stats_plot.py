@@ -70,11 +70,11 @@ class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
         appended_tokens, inserted_tokens, deleted_tokens = 0, 0, 0
         for tpsf in self.texthis:
             if tpsf.ts.label == "append":
-                appended_tokens += len(tpsf.ts.tagged_tokens)
+                appended_tokens += len(tpsf.ts.text.split(" "))
             if tpsf.ts.label == "insertion":
-                inserted_tokens += len(tpsf.ts.tagged_tokens)
+                inserted_tokens += len(tpsf.ts.text.split(" "))
             if tpsf.ts.label == "deletion":
-                deleted_tokens += len(tpsf.ts.tagged_tokens)
+                deleted_tokens += len(tpsf.ts.text.split(" "))
         return appended_tokens, inserted_tokens, deleted_tokens
 
     def create_figure(self) -> None:
@@ -94,9 +94,9 @@ class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
     def preprocess_data(self) -> tuple[list[int], list[int]]:
         tpsf_ids, ts_tokens = [], []
         for tpsf in self.texthis:
-            if tpsf.ts.tagged_tokens != "":
+            if tpsf.ts.text:
                 tpsf_ids.append(tpsf.revision_id)
-                no_edited_tokens = len(tpsf.ts.tagged_tokens)
+                no_edited_tokens = len(tpsf.ts.text.split(" "))
                 if tpsf.ts.label == "deletion":
                     no_edited_tokens = no_edited_tokens * -1
                 ts_tokens.append(no_edited_tokens)
@@ -148,7 +148,9 @@ class InsertionsPlot(StatsPlot[list[tuple[str, int]]]):
         ts_content: dict[str, int] = {}
         for tpsf in self.texthis:
             if tpsf.ts.label in ["insertion"]:
-                for t in tpsf.ts.tagged_tokens:
+                # tagged_tokens = settings.nlp_model.tag_words(tpsf.ts.text)
+                tagged_tokens: list[str] = []  # TODO
+                for t in tagged_tokens:
                     if (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
                         and t["pos"] not in ts_content.keys()

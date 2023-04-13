@@ -24,6 +24,7 @@ el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/dow
 language-tool-python = "2.5.4"
 lxml = "^4.9.2"
 typing-extensions = "^4.5.0"
+pandas = "^2.0.0"
 
 [tool.poetry.group.type-checking.dependencies]
 mypy = "^1.0.0"

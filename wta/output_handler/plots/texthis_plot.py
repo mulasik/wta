@@ -13,16 +13,19 @@ class TexthisPlot(BasePlot):
         self.sen_lengths = self.preprocess_data()
         self.filtered = ""
 
-    def preprocess_data(self) -> dict[int, list[tuple[str, int]]]:
+    def preprocess_data(self) -> dict[int, list[tuple[str | None, int]]]:
         sentences_lengths = {}
         for tpsf in self.texthis:
             sentences_lens = []
-            for tu, tu_state in zip(tpsf.textunits, tpsf.tus_states):
-                label = (
-                    f"modified through {tpsf.ts.label}"
-                    if tu_state == SenLabels.MOD
-                    else tu_state
-                )
+            for tu in tpsf.textunits:
+                if tu.state == SenLabels.MOD:
+                    label = f"modified through {tpsf.ts.label}"
+                elif tu.state == SenLabels.NEW and tpsf.ts.label == "pasting":
+                    label = f"created through {tpsf.ts.label}"
+                elif tu.state in [SenLabels.UNC_POST, SenLabels.UNC_PRE]:
+                    label = "unchanged"
+                else:
+                    label = tu.state
                 sentences_lens.append((label, len(tu.text)))
             sentences_lengths.update({tpsf.revision_id: sentences_lens})
         return sentences_lengths
@@ -67,7 +70,7 @@ class TexthisPlot(BasePlot):
             for s in sens:
                 lbl = (
                     f"{s[0]} text units"
-                    if s[0] in ["new", "deleted", "unchanged_pre", "unchanged_post"]
+                    if s[0] in ["new", "deleted", "unchanged"]
                     else f"text units {s[0]}"
                 )
                 ax1.barh(
@@ -210,7 +213,7 @@ class FilteredTexthisPlot(TexthisPlot):
                     bar_lbl = "pas"
                 else:
                     print(
-                        f"ATTENTION: Label undefined for the following transforming sequence: {ts.sen_text}. The transforming sequence will not be visible in the visualisation."
+                        f"ATTENTION: Label undefined for the following transforming sequence: {ts.text}. The transforming sequence will not be visible in the visualisation."
                     )
                 ts_len = 2
                 ax2.barh(
@@ -222,7 +225,7 @@ class FilteredTexthisPlot(TexthisPlot):
                     edgecolor="white",
                     label=lbl,
                 )  # label=lbl,
-                ax2.sen_text(
+                ax2.text(
                     s=bar_lbl,
                     x=1 + starts,
                     y=ypos,

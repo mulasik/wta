@@ -5,7 +5,6 @@ from ...pipeline.sentence_parsing.parsers import TokenProp
 from ...pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
-    PauseStatistics,
     SentenceStatistics,
     TSStatistics,
 )
@@ -98,8 +97,8 @@ class TpsfsTxt(Txt):
                 []
                 if not tpsf.textunits
                 else [
-                    f"({tu_state}) {type(tu).__name__.upper()}:   |{tu.text}|\n"
-                    for tu, tu_state in zip(tpsf.textunits, tpsf.tus_states)
+                    f"({tu.state}) {type(tu).__name__.upper()}:   |{tu.text}|\n"
+                    for tu in tpsf.textunits
                 ]
             )
             tus_str = ""
@@ -156,15 +155,15 @@ class SenhisTxt(Txt):
         )
         super().__init__(
             settings.paths.senhis_txt_dir / txt_file,
-            self.preprocess_data(data, view_mode),
+            self.preprocess_data(data),
         )
 
-    def preprocess_data(self, senhis: dict[int, list[TextUnit]], view_mode: str) -> str:
+    def preprocess_data(self, senhis: dict[int, list[TextUnit]]) -> str:
         output_str = ""
         for key, sens in senhis.items():
             output_str += f"\n******* {key} *******\n"
             for s in sens:
-                output_str += f"{s.to_text(view_mode)}\n\n"
+                output_str += f"{s.to_text()}\n\n"
         return output_str
 
 
@@ -173,7 +172,7 @@ class StatsTxt(Txt):
         self,
         b_stats: BasicStatistics,
         e_stats: EventStatistics,
-        p_stats: PauseStatistics,
+        # p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
@@ -184,16 +183,14 @@ class StatsTxt(Txt):
         )
         super().__init__(
             settings.paths.senhis_txt_dir / txt_file_path,
-            self.preprocess_data(
-                b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
-            ),
+            self.preprocess_data(b_stats, e_stats, ts_stats, sen_stats, idfx, settings),
         )
 
     def preprocess_data(
         self,
         b_stats: BasicStatistics,
         e_stats: EventStatistics,
-        p_stats: PauseStatistics,
+        # p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
@@ -215,12 +212,6 @@ SOURCE FILE: {source_file}
 - TEXT VERSIONS -
             Number text versions in edit capturing mode (unfiltered): {b_stats.data['num_tpsfs']}
             Number text versions in edit capturing mode (filtered): {b_stats.data['num_tpsfs_filtered']}
-            Number text versions in pause capturing mode: {b_stats.data['num_tpsfs_pcm']}
-
-- PAUSES -
-            Average pauses duration: {p_stats.data['avg_duration']}
-            Maximum pauses duration: {p_stats.data['max_duration']}
-            Minimum pauses duration: {p_stats.data['min_duration']}
 
 - TRANSFORMING SEQUENCES -
             Number transforming sequences: {ts_stats.data['num_nonempty_ts']}
@@ -241,6 +232,13 @@ SOURCE FILE: {source_file}
             Mean number sentence versions: {sen_stats.data['mean_num_sentence_versions']}
             Number unchanged sentences: {sen_stats.data['num_unchanged_sens']}
 """
+
+
+# Number text versions in pause capturing mode: {b_stats.data['num_tpsfs_pcm']}
+# - PAUSES -
+#             Average pauses duration: {p_stats.data['avg_duration']}
+#             Maximum pauses duration: {p_stats.data['max_duration']}
+#             Minimum pauses duration: {p_stats.data['min_duration']}
 
 
 class ParsesTxt(Txt):

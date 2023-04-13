@@ -45,3 +45,4 @@ class SenLabels:
     NEW = "new"
     UNC_PRE = "unchanged_pre"
     UNC_POST = "unchanged_post"
+    SPLIT = "split"

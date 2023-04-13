@@ -3,8 +3,9 @@ from pathlib import Path
 from wta.config_data import ConfigData
 from wta.pipeline.sentence_parsing.models import Languages
 
-_VIDEO_DATA_DIR = Path("input_data", "video")
-_VIDEO_OUTPUT_DATA_DIR = Path("output_data", "video")
+usr_home = Path.home()
+_VIDEO_DATA_DIR = Path(usr_home, "thetool", "input_data", "video")
+_VIDEO_OUTPUT_DATA_DIR = Path(usr_home, "thetool", "output_data", "video")
 
 DEFAULT_PAUSE_DURATION = 2
 DEFAULT_MIN_EDIT_DISTANCE = 3
