@@ -27,9 +27,9 @@ class TextUnitFactory:
         Generate a list of textunits for the given TPSF.
         """
 
-        print(
-            f"\n\n=============================={revision_id}==============================\n"
-        )
+        # print(
+        #     f"\n\n=============================={revision_id}==============================\n"
+        # )
 
         sentence_list = settings.nlp_model.segment_text(text)
 
@@ -37,17 +37,17 @@ class TextUnitFactory:
 
         merged_textunit_list = self._merge_double_textunits(textunit_list)
 
-        print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|")
-        print(f"TEXT: {text}")
-        print(f"\nINITIAL SENTENCE LIST: {sentence_list}")
-        print(
-            f"\nINITIAL TEXTUNITS: {[(tu.text, type(tu).__name__) for tu in textunit_list]}"
-        )
-        print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}")
+        # print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|")
+        # print(f"TEXT: {text}")
+        # print(f"\nINITIAL SENTENCE LIST: {sentence_list}")
+        # print(
+        #     f"\nINITIAL TEXTUNITS: {[(tu.text, type(tu).__name__) for tu in textunit_list]}"
+        # )
+        # print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}")
         corrected_tus = self._improve_segmentation_with_prev_tus(
             merged_textunit_list, prev_tpsf
         )
-        print(f"\nCORRECTED TUS: {[tu.text for tu in corrected_tus]}")
+        # print(f"\nCORRECTED TUS: {[tu.text for tu in corrected_tus]}")
 
         # collect TU states
 
@@ -70,7 +70,7 @@ class TextUnitFactory:
             )
             for tu in tus
         ]
-        print(f"FINAL TU LIST: {final_tu_list}")
+        # print(f"FINAL TU LIST: {final_tu_list}")
 
         return tus
 

@@ -5,12 +5,13 @@ from ..pipeline.sentence_parsing.parsers import TokenProp
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
+    PauseStatistics,
     SentenceStatistics,
     TSStatistics,
 )
 from ..pipeline.text_history.action import Action
 from ..pipeline.text_history.events.base import BaseEvent
-from ..pipeline.text_history.tpsf import TpsfECM
+from ..pipeline.text_history.tpsf import TpsfECM, TpsfPCM
 from ..pipeline.text_history.ts import TransformingSequence
 from ..pipeline.transformation_histories.transformation import Transformation
 from ..settings import Settings
@@ -22,6 +23,7 @@ from .storage.svg import (
     FilteredTexthisSvg,
     InsertionsSvg,
     SenEditSvg,
+    SenhisSvg,
     SynBarTranshisSvg,
     SynPieTranshisSvg,
     TexthisSvg,
@@ -37,6 +39,7 @@ from .storage.txt import (
     SenhisTxt,
     StatsTxt,
     TexthisTxt,
+    TpsfsPCMTxt,
     TpsfsTxt,
     TssTxt,
 )
@@ -71,6 +74,11 @@ class TpsfsOutputFactory:
     def run(cls, tpsfs: list[TpsfECM], settings: Settings) -> None:
         TpsfsTxt(tpsfs, settings).to_file()
 
+class TpsfsPCMOutputFactory:
+    @classmethod
+    def run(cls, tpsfs: list[TpsfPCM], settings: Settings) -> None:
+        TpsfsPCMTxt(tpsfs, settings).to_file()
+
 
 class TexthisOutputFactory:
     @classmethod
@@ -95,22 +103,18 @@ class SenhisOutputFactory:
     @classmethod
     def run(
         cls,
-        # texthis: list[TpsfECM],
-        # texthis_fltr: list[TpsfECM],
+        texthis: list[TpsfECM],
+        texthis_fltr: list[TpsfECM],
         senhis: dict[int, list[TextUnit]],
         senhis_fltr: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
         SenhisJson(senhis, settings).to_file()
-        # SenhisJson(senhis, settings, "simplified").to_file()
         SenhisJson(senhis_fltr, settings, filtered=True).to_file()
-        # SenhisJson(senhis_fltr, settings, "simplified", filtered=True).to_file()
         SenhisTxt(senhis, settings).to_file()
         SenhisTxt(senhis_fltr, settings, filtered=True).to_file()
-        # SenhisTxt(senhis, settings, view_mode="extended").to_file()
-        # SenhisTxt(senhis, settings, view_mode="extended", filtered=True).to_file()
-        # SenhisSvg(texthis, senhis, settings).to_file()
-        # SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
+        SenhisSvg(texthis, senhis, settings).to_file()
+        SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
 
 
 class ParseOutputFactory:
@@ -147,7 +151,7 @@ class StatsOutputFactory:
         cls,
         b_stats: BasicStatistics,
         e_stats: EventStatistics,
-        # p_stats: PauseStatistics,
+        p_stats: PauseStatistics,
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
@@ -155,7 +159,7 @@ class StatsOutputFactory:
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        StatsTxt(b_stats, e_stats, ts_stats, sen_stats, idfx, settings).to_file()
+        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings).to_file()
         SenEditSvg(texthis, senhis, settings).to_file()
         TsTokensSvg(texthis, senhis, settings).to_file()
         TsLabelsSvg(texthis, senhis, settings).to_file()

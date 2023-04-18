@@ -108,3 +108,14 @@ TS:
 TEXT UNITS:
 {[(tu.state, tu.text) for tu in self.textunits]}
             """
+
+class TpsfPCM():
+    def __init__(
+        self,
+        revision_id: int,
+        content: str,
+        pause: float | None
+    ) -> None:
+        self.revision_id = revision_id
+        self.text = content
+        self.preceeding_pause = pause

@@ -38,4 +38,4 @@ class InsertEvent(BaseEvent):
         # print(f'InsertEvent: {self.__dict__["content"]} {self.__dict__["startpos"]} {self.__dict__["endpos"]}')
 
     def to_action(self) -> Pasting:
-        return Pasting(self.content, self.startpos, self.endpos)
+        return Pasting(self.content, self.startpos, self.endpos, None)

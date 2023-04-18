@@ -158,15 +158,15 @@ class SenEditSvg(Svg):
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        self.preprocess_data(texthis, senhis)
+        self.preprocess_data(texthis, senhis, settings)
         super().__init__(
             settings.paths.stats_dir / f"{settings.filename}_sentence_edits_stats.svg"
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
     ) -> None:
-        SenEditPlot(texthis, senhis).run()
+        SenEditPlot(texthis, senhis, settings).run()
 
 
 class TsLabelsSvg(Svg):
@@ -176,7 +176,7 @@ class TsLabelsSvg(Svg):
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        self.preprocess_data(texthis, senhis)
+        self.preprocess_data(texthis, senhis, settings)
         super().__init__(
             settings.paths.stats_dir / f"{settings.filename}_ts_labels_stats.svg"
         )
@@ -185,8 +185,9 @@ class TsLabelsSvg(Svg):
         self,
         texthis: list[TpsfECM],
         senhis: dict[int, list[TextUnit]],
+        settings: Settings
     ) -> None:
-        TsLabelsPlot(texthis, senhis).run()
+        TsLabelsPlot(texthis, senhis, settings).run()
 
 
 class TsTokensSvg(Svg):
@@ -196,15 +197,15 @@ class TsTokensSvg(Svg):
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        self.preprocess_data(texthis, senhis)
+        self.preprocess_data(texthis, senhis, settings)
         super().__init__(
             settings.paths.stats_dir / f"{settings.filename}_ts_tokens_stats.svg"
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
     ) -> None:
-        TsTokensPlot(texthis, senhis).run()
+        TsTokensPlot(texthis, senhis, settings).run()
 
 
 class DeletionsSvg(Svg):
@@ -214,15 +215,15 @@ class DeletionsSvg(Svg):
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        self.preprocess_data(texthis, senhis)
+        self.preprocess_data(texthis, senhis, settings)
         super().__init__(
             settings.paths.stats_dir / f"{settings.filename}_deletions_stats.svg"
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
     ) -> None:
-        DeletionsPlot(texthis, senhis).run()
+        DeletionsPlot(texthis, senhis, settings).run()
 
 
 class InsertionsSvg(Svg):
@@ -232,12 +233,12 @@ class InsertionsSvg(Svg):
         senhis: dict[int, list[TextUnit]],
         settings: Settings,
     ) -> None:
-        self.preprocess_data(texthis, senhis)
+        self.preprocess_data(texthis, senhis, settings)
         super().__init__(
             settings.paths.stats_dir / f"{settings.filename}_insertions_stats.svg"
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
     ) -> None:
-        InsertionsPlot(texthis, senhis).run()
+        InsertionsPlot(texthis, senhis, settings).run()

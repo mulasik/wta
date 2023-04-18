@@ -3,6 +3,8 @@ from typing import Generic, TypeVar
 
 import matplotlib.pyplot as plt
 
+from wta.settings import Settings
+
 from ...pipeline.sentence_histories.text_unit import TextUnit
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
@@ -13,10 +15,11 @@ _T = TypeVar("_T")
 
 class StatsPlot(BasePlot, Generic[_T]):
     def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
     ) -> None:
         self.texthis = texthis
         self.senhis = senhis
+        self.settings = settings
         self.data = self.preprocess_data()
 
     def preprocess_data(self) -> _T:
@@ -66,16 +69,20 @@ class SenEditPlot(StatsPlot[tuple[list[str], list[int]]]):
 
 
 class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
-    def preprocess_data(self) -> tuple[int, int, int]:
-        appended_tokens, inserted_tokens, deleted_tokens = 0, 0, 0
+    def preprocess_data(self) -> tuple[int, int, int, int, int]:
+        appended_tokens, inserted_tokens, deleted_tokens, pasted_tokens, replaced_tokens = 0, 0, 0, 0, 0
         for tpsf in self.texthis:
             if tpsf.ts.label == "append":
                 appended_tokens += len(tpsf.ts.text.split(" "))
             if tpsf.ts.label == "insertion":
                 inserted_tokens += len(tpsf.ts.text.split(" "))
-            if tpsf.ts.label == "deletion":
+            if tpsf.ts.label in ["deletion", "midletion"]:
                 deleted_tokens += len(tpsf.ts.text.split(" "))
-        return appended_tokens, inserted_tokens, deleted_tokens
+            if tpsf.ts.label == "pasting":
+                pasted_tokens += len(tpsf.ts.text.split(" "))
+            if tpsf.ts.label == "replacement":
+                replaced_tokens += len(tpsf.ts.text.split(" "))
+        return appended_tokens, inserted_tokens, pasted_tokens, deleted_tokens, replaced_tokens
 
     def create_figure(self) -> None:
         plt.rcParams.update({"font.size": 35})
@@ -85,10 +92,9 @@ class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
     def plot_data(self) -> None:
         plt.pie(
             self.data,
-            labels=["appends", "insertions", "deletions"],
-            colors=["teal", "lightcoral", "cadetblue"],
+            labels=["insertions", "appends", "pastings", "deletions", "replacements"],
+            colors=["teal", "cadetblue", "orange", "lightcoral", "tan"],
         )
-
 
 class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
     def preprocess_data(self) -> tuple[list[int], list[int]]:
@@ -97,7 +103,7 @@ class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
             if tpsf.ts.text:
                 tpsf_ids.append(tpsf.revision_id)
                 no_edited_tokens = len(tpsf.ts.text.split(" "))
-                if tpsf.ts.label == "deletion":
+                if tpsf.ts.label in ["deletion", "midletion"]:
                     no_edited_tokens = no_edited_tokens * -1
                 ts_tokens.append(no_edited_tokens)
         return tpsf_ids, ts_tokens
@@ -118,13 +124,14 @@ class DeletionsPlot(StatsPlot[list[tuple[str, int]]]):
     def preprocess_data(self) -> list[tuple[str, int]]:
         ts_content: dict[str, int] = {}
         for tpsf in self.texthis:
-            if tpsf.ts.label in ["deletion"]:
-                for t in tpsf.ts.tagged_tokens:
+            if tpsf.ts.label in ["deletion", "midletion"]:
+                tagged_tokens = self.settings.nlp_model.tag_words(tpsf.ts.text)
+                for t in tagged_tokens:
                     if (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
                         and t["pos"] not in ts_content.keys()
                     ):
-                        ts_content.update({t["pos"]: 1})
+                        ts_content[t["pos"]] = 1
                     elif (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
                         and t["pos"] in ts_content
@@ -148,8 +155,7 @@ class InsertionsPlot(StatsPlot[list[tuple[str, int]]]):
         ts_content: dict[str, int] = {}
         for tpsf in self.texthis:
             if tpsf.ts.label in ["insertion"]:
-                # tagged_tokens = settings.nlp_model.tag_words(tpsf.ts.text)
-                tagged_tokens: list[str] = []  # TODO
+                tagged_tokens = self.settings.nlp_model.tag_words(tpsf.ts.text)
                 for t in tagged_tokens:
                     if (
                         t["pos"] not in ["X", "SPACE", "PUNCT"]
@@ -172,5 +178,5 @@ class InsertionsPlot(StatsPlot[list[tuple[str, int]]]):
         lbls = [t[0] for t in self.data]
         vals = [t[1] for t in self.data]
         plt.pie(
-            vals, labels=lbls, colors=Colors.assign_color_to_pos(lbls), normalize=False
+            vals, labels=lbls, colors=Colors.assign_color_to_pos(lbls), normalize=True
         )  # TODO check the normalization impact

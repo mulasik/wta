@@ -1,7 +1,8 @@
 from tqdm import tqdm
 
 from ...settings import Settings
-from .tpsf import TpsfECM
+from .action import Action
+from .tpsf import TpsfECM, TpsfPCM
 from .ts import TransformingSequence
 
 
@@ -29,7 +30,7 @@ class ECMFactory:
         Args:
             tss: a list of objects of type TransformingSequence
         Returns:
-            a list of objects of type Tpsf
+            a list of objects of type TpsfECM
         """
         output: list[str] = []
         tpsfs = []
@@ -67,3 +68,53 @@ def filter_tpsfs(tpsfs: list[TpsfECM]) -> list[TpsfECM]:
             tpsf.set_irrelevant_tss_aggregated(aggregated_tss)
             aggregated_tss = []
     return [tpsf for tpsf in tpsfs if tpsf.relevance is True]
+
+class PCMFactory:
+    """
+    A class to retrieve text versions in Pause Capturing Mode (PCM).
+    """
+
+    @staticmethod
+    def run(actions: list[Action], settings: Settings) -> list[TpsfPCM]:
+        """
+        Generates a list of objects of type Tpsf based on a list of actions.
+        Args:
+            actions: a list of objects of type Action
+        Returns:
+            a list of objects of type TpsfPCM
+        """
+        output: list[str] = []
+        revision_id = 0
+        tpsfs_pcm = []
+        prev_pause: float | None = None
+        burst_actions: list[Action] = []
+        for act in tqdm(actions, "Extracting tpsfs in PCM"):
+            act_type = type(act).__name__
+            act_startpos = act.startpos
+            if act_type in ["Insertion", "Append", "Pasting"]:
+                for char in act.content:
+                    output.insert(act_startpos, char)
+                    act_startpos += 1
+                print(f"Collected chars from action {act_type}: {''.join(output)}")
+            elif act_type in ["Deletion", "Midletion"]:
+                del output[act_startpos : act.endpos + 1]
+                print(f"Deleted chars from action {act_type}: {''.join(output)}")
+            elif act_type == "Replacement":
+                del output[act_startpos : act.rplcmt_endpos + 1]
+                for char in act.content:
+                    output.insert(act_startpos, char)
+                    act_startpos += 1
+                print(f"Collected chars from action {act_type}: {''.join(output)}")
+            print()
+            burst_actions.append(act)
+            # TODO add actions to Tpsf
+            try:
+                if act.pause is not None and act.pause >= settings.config["pause_duration"]:
+                    content = "".join(output[:-1])
+                    tpsf_pcm = TpsfPCM(revision_id, content, prev_pause)
+                    tpsfs_pcm.append(tpsf_pcm)
+                    revision_id += 1
+                    prev_pause = act.pause
+            except AttributeError:
+                continue
+        return tpsfs_pcm

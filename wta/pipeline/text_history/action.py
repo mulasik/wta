@@ -74,7 +74,7 @@ class Replacement(Action):
 
 class Pasting(Action):
     def __init__(
-        self, content: str, startpos: int, endpos: int | None, textlen: int
+        self, content: str, startpos: int, endpos: int | None, textlen: int | None
     ) -> None:
         super().__init__(content, startpos, endpos)
         self.textlen = textlen

@@ -6,7 +6,8 @@ import numpy as np
 from bs4 import BeautifulSoup
 
 from ..sentence_histories.text_unit import TextUnit
-from ..text_history.tpsf import TpsfECM
+from ..text_history.action import Action
+from ..text_history.tpsf import TpsfECM, TpsfPCM
 
 
 class Statistics(ABC):
@@ -84,22 +85,30 @@ class EventStatistics(Statistics):
 
 
 class PauseStatistics(Statistics):
-    def __init__(self, texthis: list[TpsfECM]) -> None:
+    def __init__(self, texthis: list[TpsfPCM], actions: list[Action]) -> None:
         self.texthis = texthis
-        self.data = self.retrieve_stats()
+        self.data = self.retrieve_stats(actions)
 
-    def retrieve_stats(self) -> dict[str, int | float | str]:
-        pauses = []
-        total_pauses_duration = 0
-        for tpsf in self.texthis:
-            if tpsf.preceeding_pause:
-                pauses.append(tpsf.preceeding_pause)
-                total_pauses_duration += tpsf.preceeding_pause
-        avg_pause_duration = round(total_pauses_duration / len(pauses))
+    def retrieve_stats(self, actions: list[Action]) -> dict[str, int | float | str]:
+        pauses: list[float] = []
+        total_pauses_duration: float = 0
+        actions_pause_unknown: int = 0
+        for act in actions:
+            if (
+                type(act).__name__ in ["Append", "Insertion", "Deletion", "Midletion", "Navigation"]
+                and act.pause is not None
+            ):
+                pauses.append(act.pause)
+                total_pauses_duration += act.pause
+            else:
+                actions_pause_unknown += 1
+        avg_pause_duration = round(total_pauses_duration / len(pauses), 2)
         return {
+            "num_tpsfs": len(self.texthis),
             "avg_duration": avg_pause_duration,
             "max_duration": max(pauses),
             "min_duration": min(pauses),
+            "events_wo_pause_info": actions_pause_unknown
         }
 
 
@@ -167,7 +176,7 @@ class SentenceStatistics(Statistics):
                 sen_with_most_versions = sh[-1].text
             num_sen_versions.append(len(sh))
         mean_num_sentence_versions = cast(float, round(np.mean(num_sen_versions), 2))
-        final_num_sentences = len(self.texthis[-1].textunits)
+        final_num_sentences = len([tu for tu in self.texthis[-1].textunits if type(tu).__name__ in ["Sen", "Sec"]])
         return {
             "detected_sens": detected_sens,
             "final_num_sentences": final_num_sentences,

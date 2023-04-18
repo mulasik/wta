@@ -11,15 +11,18 @@ from .output_handler.output_factory import (
     ActionsOutputFactory,
     EventsOutputFactory,
     SenhisOutputFactory,
+    StatsOutputFactory,
     TexthisFltrOutputFactory,
     TexthisOutputFactory,
     TpsfsOutputFactory,
+    TpsfsPCMOutputFactory,
     TssOutputFactory,
 )
 from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
+from .pipeline.statistics.statistics_factory import StatsFactory
 from .pipeline.text_history.action_factory import ActionAggregator, ActionFactory
 from .pipeline.text_history.event_factory import EventFactory
-from .pipeline.text_history.tpsf_factory import ECMFactory, filter_tpsfs
+from .pipeline.text_history.tpsf_factory import ECMFactory, PCMFactory, filter_tpsfs
 from .pipeline.text_history.ts_factory import TsFactory
 from .settings import Settings
 
@@ -50,6 +53,8 @@ def run() -> None:
             EventsOutputFactory.run(events, settings)
             actions = ActionFactory().run(events)
             ActionsOutputFactory.run(actions, settings)
+            tpsfs_pcm = PCMFactory().run(actions, settings)
+            TpsfsPCMOutputFactory.run(tpsfs_pcm, settings)
             action_groups = ActionAggregator.run(actions)
             ActionGroupsOutputFactory.run(action_groups, settings)
             tss = TsFactory().run(action_groups, settings)
@@ -67,6 +72,7 @@ def run() -> None:
             senhis = senhis_generator.run(tpsfs, settings)
             senhis_fltr = senhis_generator.filter_senhis(senhis)
             SenhisOutputFactory.run(tpsfs, tpsfs_fltr, senhis, senhis_fltr, settings)
+
             #
             # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
@@ -83,10 +89,10 @@ def run() -> None:
             # TranshisOutputFactory.run(dep_transhis_classifier.transhis, const_transhis_classifier.transhis, settings)
             #
             # GENERATE STATS
-            # print("\n== STATISTICS GENERATION ==")
-            # print("Generating statistics...")
-            # b_stats, e_stats, ts_stats, sen_stats = StatsFactory().run(idfx, tpsfs, tpsfs_fltr, senhis)
-            # StatsOutputFactory.run(b_stats, e_stats, ts_stats, sen_stats, idfx, tpsfs, senhis, settings)
+            print("\n== STATISTICS GENERATION ==")
+            print("Generating statistics...")
+            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory().run(idfx, tpsfs, tpsfs_fltr, tpsfs_pcm, actions, senhis)
+            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, tpsfs, senhis, settings)
 
         except:
             traceback.print_exc()

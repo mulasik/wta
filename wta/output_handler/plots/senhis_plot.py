@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
+from wta.pipeline.names import SenLabels
+
 from ...pipeline.sentence_histories.text_unit import TextUnit
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
@@ -11,14 +13,10 @@ class SenhisPlot(BasePlot):
     def __init__(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
+        
         texthis = [
-            tpsf
-            for tpsf in texthis
-            if (
-                len(tpsf.new_sentences) > 0
-                or len(tpsf.modified_sentences) > 0
-                or len(tpsf.deleted_sentences) > 0
-            )
+            tpsf for tpsf in texthis
+            if len([tu for tu in tpsf.textunits if tu.state not in [SenLabels.UNC_PRE, SenLabels.UNC_POST]]) > 0
         ]
         self.title_ax1 = "Sentence Histories"
         self.xlabel_ = "Number of characters"
@@ -38,16 +36,16 @@ class SenhisPlot(BasePlot):
         tpsf_sentences = {}
         for tpsf in texthis:
             tpsf_sens: list[tuple[int, str, str]] = []
-            for sen in tpsf.sentence_list:
+            for sen in [tu for tu in tpsf.textunits if type(tu).__name__ in ["Sen", "Sec"]]:
                 for sen_id, sen_list in senhis.items():
-                    if sen.content.strip() in [
-                        s.content for s in sen_list
-                    ] and sen.content.strip() not in [s[2] for s in tpsf_sens]:
+                    if sen.text.strip() in [
+                        s.text for s in sen_list
+                    ] and sen.text.strip() not in [s[2] for s in tpsf_sens]:
                         tpsf_sens.append(
-                            (len(sen.content), self.sen_colors[sen_id], sen.content)
+                            (len(sen.text), self.sen_colors[sen_id], sen.text)
                         )
-                if sen.content.strip() not in [s[2] for s in tpsf_sens]:
-                    tpsf_sens.append((len(sen.content), "beige", sen.content))
+                if sen.text.strip() not in [s[2] for s in tpsf_sens]:
+                    tpsf_sens.append((len(sen.text), "beige", sen.text))
             tpsf_sentences.update({tpsf.revision_id: tpsf_sens})
         return tpsf_sentences
 
@@ -87,7 +85,7 @@ class SenhisPlot(BasePlot):
         a2_starts = 0.95
         for s in last_sen_versions:
             a2_starts -= 0.01
-            ax2.content(
+            ax2.text(
                 0,
                 a2_starts,
                 s[2].strip(),
