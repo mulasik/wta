@@ -18,3 +18,4 @@ docs/charts/.DS_Store
 wta/.DS_Store
 pyvenv.cfg
 /wta/myconfig.py
+/wta/local_config.py
