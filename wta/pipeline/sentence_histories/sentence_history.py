@@ -19,13 +19,13 @@ class SentenceHistoryGenerator:
         global_new_sens = []
         progress = tqdm(tpsfs, "Generating sentence histories")
         for i, tpsf in enumerate(progress):
-            print(f"****{tpsf.revision_id}****")
+            # print(f"****{tpsf.revision_id}****")
             current_tus = [
                 tu for tu in tpsf.textunits if type(tu).__name__ in ["Sen", "Sec"]
             ]
             for ind, tu in enumerate(current_tus):
                 tu.set_pos_in_text(ind + 1)
-            print([(tu.state, tu.text, tu.pos_in_text) for tu in current_tus])
+            # print([(tu.state, tu.text, tu.pos_in_text) for tu in current_tus])
             prev_tus = [
                 tu
                 for tu in tpsfs[i - 1].textunits
@@ -39,14 +39,14 @@ class SentenceHistoryGenerator:
                     sentence_history[uid] = [tu]
                     tu.set_id(uid)
             elif i > 0 and len(current_tus) == len(prev_tus):
-                print(f"Number of sentences ({len(current_tus)}) has not changed.")
+                # print(f"Number of sentences ({len(current_tus)}) has not changed.")
                 for ctu, ptu in zip(current_tus, prev_tus):
                     ctu.set_id(ptu.tu_id)
                     sentence_history[ptu.tu_id].append(ctu)
             elif i > 0 and len(current_tus) < len(prev_tus):
-                print(
-                    f"Sentence deletion detected: from {len(prev_tus)} to {len(current_tus)}"
-                )
+                # print(
+                #     f"Sentence deletion detected: from {len(prev_tus)} to {len(current_tus)}"
+                # )
                 number_deleted = abs(len(current_tus) - len(prev_tus))
                 for i, ctu in enumerate(current_tus):
                     if ctu.state == SenLabels.UNC_PRE:
@@ -56,9 +56,9 @@ class SentenceHistoryGenerator:
                         ctu.set_id(prev_tus[i - number_new].tu_id)
                         sentence_history[prev_tus[i + number_deleted].tu_id].append(ctu)
             elif i > 0 and len(current_tus) > len(prev_tus):
-                print(
-                    f"Sentence creation detected: from {len(prev_tus)} to {len(current_tus)}"
-                )
+                # print(
+                #     f"Sentence creation detected: from {len(prev_tus)} to {len(current_tus)}"
+                # )
                 for i, ctu in enumerate(current_tus):
                     if ctu.state == SenLabels.UNC_PRE:
                         ctu.set_id(prev_tus[i].tu_id)

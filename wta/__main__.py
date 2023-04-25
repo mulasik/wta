@@ -64,7 +64,6 @@ def run() -> None:
             TexthisOutputFactory.run(tpsfs, settings)  # + texthis_pcm
             tpsfs_fltr = filter_tpsfs(tpsfs)
             TexthisFltrOutputFactory.run(tpsfs_fltr, settings)
-            # TODO: create text history in pause capturing mode, texthis_pcm = idfx_parser.all_tpsfs_pcm
 
             # GENERATE SENHIS
             print("\n== SENTENCE HISTORIES GENERATION ==")

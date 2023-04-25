@@ -95,17 +95,13 @@ class PCMFactory:
                 for char in act.content:
                     output.insert(act_startpos, char)
                     act_startpos += 1
-                print(f"Collected chars from action {act_type}: {''.join(output)}")
             elif act_type in ["Deletion", "Midletion"]:
                 del output[act_startpos : act.endpos + 1]
-                print(f"Deleted chars from action {act_type}: {''.join(output)}")
             elif act_type == "Replacement":
                 del output[act_startpos : act.rplcmt_endpos + 1]
                 for char in act.content:
                     output.insert(act_startpos, char)
                     act_startpos += 1
-                print(f"Collected chars from action {act_type}: {''.join(output)}")
-            print()
             burst_actions.append(act)
             # TODO add actions to Tpsf
             try:
