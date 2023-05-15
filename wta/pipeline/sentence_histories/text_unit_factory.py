@@ -1,4 +1,5 @@
 import re
+from collections.abc import Mapping
 from itertools import zip_longest
 from typing import TYPE_CHECKING
 
@@ -11,6 +12,13 @@ from .text_unit import TextUnit, TextUnitBuilder, TextUnitType
 
 if TYPE_CHECKING:
     from ..text_history.tpsf import TpsfECM
+
+
+# TODO: remove example
+# Mutable:
+test1: dict[str, object] = ...
+# Immutable:
+test2: Mapping[str, object] = ...
 
 
 class TextUnitFactory:
