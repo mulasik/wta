@@ -3,7 +3,7 @@ from matplotlib.axes import Axes
 
 from wta.pipeline.names import SenLabels
 
-from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.sentence_histories.text_unit import TextUnit, TextUnitType
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
@@ -13,10 +13,17 @@ class SenhisPlot(BasePlot):
     def __init__(
         self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
     ) -> None:
-        
         texthis = [
-            tpsf for tpsf in texthis
-            if len([tu for tu in tpsf.textunits if tu.state not in [SenLabels.UNC_PRE, SenLabels.UNC_POST]]) > 0
+            tpsf
+            for tpsf in texthis
+            if len(
+                [
+                    tu
+                    for tu in tpsf.textunits
+                    if tu.state not in [SenLabels.UNC_PRE, SenLabels.UNC_POST]
+                ]
+            )
+            > 0
         ]
         self.title_ax1 = "Sentence Histories"
         self.xlabel_ = "Number of characters"
@@ -36,7 +43,11 @@ class SenhisPlot(BasePlot):
         tpsf_sentences = {}
         for tpsf in texthis:
             tpsf_sens: list[tuple[int, str, str]] = []
-            for sen in [tu for tu in tpsf.textunits if type(tu).__name__ in ["Sen", "Sec"]]:
+            for sen in [
+                tu
+                for tu in tpsf.textunits
+                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
+            ]:
                 for sen_id, sen_list in senhis.items():
                     if sen.text.strip() in [
                         s.text for s in sen_list

@@ -98,7 +98,7 @@ class TpsfsTxt(Txt):
                 []
                 if not tpsf.textunits
                 else [
-                    f"({tu.state}) {type(tu).__name__.upper()}:   |{tu.text}|\n"
+                    f"({tu.state}) {tu.text_unit_type}:   |{tu.text}|\n"
                     for tu in tpsf.textunits
                 ]
             )
@@ -202,7 +202,9 @@ class StatsTxt(Txt):
         )
         super().__init__(
             settings.paths.senhis_txt_dir / txt_file_path,
-            self.preprocess_data(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings),
+            self.preprocess_data(
+                b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
+            ),
         )
 
     def preprocess_data(
@@ -258,10 +260,6 @@ SOURCE FILE: {source_file}
             Mean number sentence versions: {sen_stats.data['mean_num_sentence_versions']}
             Number unchanged sentences: {sen_stats.data['num_unchanged_sens']}
 """
-
-
-
-
 
 
 class ParsesTxt(Txt):

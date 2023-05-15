@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 from bs4 import BeautifulSoup
 
-from ..sentence_histories.text_unit import TextUnit
+from ..sentence_histories.text_unit import TextUnit, TextUnitType
 from ..text_history.action import Action
 from ..text_history.tpsf import TpsfECM, TpsfPCM
 
@@ -95,7 +95,8 @@ class PauseStatistics(Statistics):
         actions_pause_unknown: int = 0
         for act in actions:
             if (
-                type(act).__name__ in ["Append", "Insertion", "Deletion", "Midletion", "Navigation"]
+                type(act).__name__
+                in ["Append", "Insertion", "Deletion", "Midletion", "Navigation"]
                 and act.pause is not None
             ):
                 pauses.append(act.pause)
@@ -108,7 +109,7 @@ class PauseStatistics(Statistics):
             "avg_duration": avg_pause_duration,
             "max_duration": max(pauses),
             "min_duration": min(pauses),
-            "events_wo_pause_info": actions_pause_unknown
+            "events_wo_pause_info": actions_pause_unknown,
         }
 
 
@@ -176,7 +177,13 @@ class SentenceStatistics(Statistics):
                 sen_with_most_versions = sh[-1].text
             num_sen_versions.append(len(sh))
         mean_num_sentence_versions = cast(float, round(np.mean(num_sen_versions), 2))
-        final_num_sentences = len([tu for tu in self.texthis[-1].textunits if type(tu).__name__ in ["Sen", "Sec"]])
+        final_num_sentences = len(
+            [
+                tu
+                for tu in self.texthis[-1].textunits
+                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
+            ]
+        )
         return {
             "detected_sens": detected_sens,
             "final_num_sentences": final_num_sentences,

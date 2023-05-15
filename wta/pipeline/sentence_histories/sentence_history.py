@@ -8,7 +8,7 @@ from wta.settings import Settings
 
 from ..names import SenLabels
 from ..text_history.tpsf import TpsfECM
-from .text_unit import TextUnit
+from .text_unit import TextUnit, TextUnitType
 
 
 class SentenceHistoryGenerator:
@@ -21,7 +21,9 @@ class SentenceHistoryGenerator:
         for i, tpsf in enumerate(progress):
             # print(f"****{tpsf.revision_id}****")
             current_tus = [
-                tu for tu in tpsf.textunits if type(tu).__name__ in ["Sen", "Sec"]
+                tu
+                for tu in tpsf.textunits
+                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
             ]
             for ind, tu in enumerate(current_tus):
                 tu.set_pos_in_text(ind + 1)
@@ -29,7 +31,7 @@ class SentenceHistoryGenerator:
             prev_tus = [
                 tu
                 for tu in tpsfs[i - 1].textunits
-                if type(tu).__name__ in ["Sen", "Sec"]
+                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
             ]
 
             number_new = 0
