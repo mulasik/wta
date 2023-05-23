@@ -36,7 +36,7 @@ class ECMFactory:
         """
         output: list[str] = []
         tpsfs = []
-        aggregated_tss: list[TransformingSequence] = []
+        aggregated_tss: tuple[TransformingSequence, ...] = ()
         tss = [ts for ts in tss if ts.label != "navigation"]
         prev_tpsf = None
         for i, ts in enumerate(tqdm(tss, "Extracting tpsfs")):
@@ -65,10 +65,7 @@ class ECMFactory:
             tpsf = TpsfECM(
                 i, content, ts, prev_tpsf, text_units, relevance, aggregated_tss
             )
-            if tpsf.relevance:
-                aggregated_tss.clear()
-            else:
-                aggregated_tss.append(ts)
+            aggregated_tss = () if tpsf.relevance else (*aggregated_tss, ts)
             tpsfs.append(tpsf)
             prev_tpsf = tpsf
         return tpsfs

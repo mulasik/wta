@@ -14,13 +14,6 @@ if TYPE_CHECKING:
     from ..text_history.tpsf import TpsfECM
 
 
-# TODO: remove example
-# Mutable:
-test1: dict[str, object] = ...
-# Immutable:
-test2: Mapping[str, object] = ...
-
-
 class TextUnitFactory:
     def run(
         self,
@@ -54,7 +47,6 @@ class TextUnitFactory:
         corrected_tus = self._improve_segmentation_with_prev_tus(
             merged_textunit_list, prev_tpsf
         )
-        # print(f"\nCORRECTED TUS: {[tu.text for tu in corrected_tus]}")
 
         # collect TU states
 
@@ -129,7 +121,7 @@ class TextUnitFactory:
         # TODO: Issue with merging: 'So hat sie eine Qualt\n\nDie Qualitätsstrategie ', 'Die Qualitätsstrategie
         if not any(
             i.text_unit_type == j.text_unit_type != TextUnitType.SEN
-            for (i, j) in zip_longest(textunit_list, textunit_list[1:])
+            for (i, j) in zip(textunit_list, textunit_list[1:])
         ):
             # print(f'No more doubles.')
             return textunit_list
@@ -137,7 +129,7 @@ class TextUnitFactory:
         # print(f'Detected doubles. Need to merge.')
         prev_merged_text = ""
         merged_textunits = []
-        for i, j in zip_longest(textunit_list, textunit_list[1:]):
+        for i, j in zip(textunit_list, textunit_list[1:]):
             if (
                 i.text_unit_type == j.text_unit_type != TextUnitType.SEN
                 and i.text != prev_merged_text

@@ -19,3 +19,4 @@ wta/.DS_Store
 pyvenv.cfg
 /wta/myconfig.py
 /wta/local_config.py
+local_config.py

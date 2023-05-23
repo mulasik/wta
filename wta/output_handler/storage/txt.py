@@ -132,8 +132,8 @@ class TpsfsPCMTxt(Txt):
         for tpsf in tpsfs:
             output_str += (
                 f"======================{tpsf.revision_id}====================\n\n"
-                f"PRECEDING PAUSE: {tpsf.preceeding_pause}\n\n"
-                f"|{tpsf.text}|\n\n"
+                f"PRECEDING PAUSE: {tpsf.pause}\n\n"
+                f"|{tpsf.content}|\n\n"
             )
         return output_str
 
