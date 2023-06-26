@@ -20,6 +20,7 @@ supar = "^1.1.4"
 spacy = "~3.5.0"
 de-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.5.0/de_core_news_md-3.5.0.tar.gz#egg=de_core_news_md"}
 en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.5.0/en_core_web_md-3.5.0.tar.gz#egg=en_core_web_md"}
+fr_core_news_md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.5.0/fr_core_news_md-3.5.0-py3-none-any.whl"}
 el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.5.0/el_core_news_md-3.5.0.tar.gz#egg=el_core_news_md"}
 language-tool-python = "2.5.4"
 lxml = "^4.9.2"
