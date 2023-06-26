@@ -64,7 +64,7 @@ class TextUnit:
         # TODO: extend with more tu properties
         s = self.to_dict()
         return f"""
-TPSF {s["tpsf_id"]}, type {s["text_unit_type"]}, state {s["state"]}:
+TPSF {s["tpsf_id"]}, type {s["text_unit_type"].name}, state {s["state"]}:
     |{s["text"]}|
 """
 

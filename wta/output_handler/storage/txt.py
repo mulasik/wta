@@ -98,7 +98,7 @@ class TpsfsTxt(Txt):
                 []
                 if not tpsf.textunits
                 else [
-                    f"({tu.state}) {tu.text_unit_type}:   |{tu.text}|\n"
+                    f"({tu.state}) {tu.text_unit_type.name}:   |{tu.text}|\n"
                     for tu in tpsf.textunits
                 ]
             )
