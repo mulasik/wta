@@ -1,6 +1,8 @@
 from tqdm import tqdm
 
 from ...settings import Settings
+from ..sentence_histories.text_unit import TextUnit
+from ..sentence_histories.text_unit_factory import TextUnitFactory
 from .action import Action
 from .tpsf import TpsfECM, TpsfPCM
 from .ts import TransformingSequence
@@ -34,6 +36,7 @@ class ECMFactory:
         """
         output: list[str] = []
         tpsfs = []
+        aggregated_tss: tuple[TransformingSequence, ...] = ()
         tss = [ts for ts in tss if ts.label != "navigation"]
         prev_tpsf = None
         for i, ts in enumerate(tqdm(tss, "Extracting tpsfs")):
@@ -53,21 +56,39 @@ class ECMFactory:
                     output.insert(startpos, char)
                     startpos += 1
             content = "".join(output)
-            tpsf = TpsfECM(i, content, ts, prev_tpsf, settings)
+            text_units = TextUnitFactory().run(content, i, ts, prev_tpsf, settings)
+            relevance = (
+                ts.relevance
+                if settings.config["enable_spellchecking"] is False
+                else _determine_tpsf_relevance(text_units, settings)
+            )
+            tpsf = TpsfECM(
+                i, content, ts, prev_tpsf, text_units, relevance, aggregated_tss
+            )
+            aggregated_tss = () if tpsf.relevance else (*aggregated_tss, ts)
             tpsfs.append(tpsf)
             prev_tpsf = tpsf
         return tpsfs
 
 
+def _determine_tpsf_relevance(
+    textunits: tuple[TextUnit, ...], settings: Settings
+) -> bool:
+    impacted_tus = [tu for tu in textunits if tu.state in ["new", "modified"]]
+    for itu in impacted_tus:
+        tagged_tokens = (
+            []
+            if itu.text is None or itu.text == ""
+            else settings.nlp_model.tag_words(itu.text)
+        )
+        if True in [t["is_typo"] for t in tagged_tokens]:
+            return False
+    return True
+
+
 def filter_tpsfs(tpsfs: list[TpsfECM]) -> list[TpsfECM]:
-    aggregated_tss = []
-    for tpsf in tpsfs:
-        if tpsf.relevance is False:
-            aggregated_tss.append(tpsf.ts)
-        else:
-            tpsf.set_irrelevant_tss_aggregated(aggregated_tss)
-            aggregated_tss = []
     return [tpsf for tpsf in tpsfs if tpsf.relevance is True]
+
 
 class PCMFactory:
     """
@@ -105,7 +126,10 @@ class PCMFactory:
             burst_actions.append(act)
             # TODO add actions to Tpsf
             try:
-                if act.pause is not None and act.pause >= settings.config["pause_duration"]:
+                if (
+                    act.pause is not None
+                    and act.pause >= settings.config["pause_duration"]
+                ):
                     content = "".join(output[:-1])
                     tpsf_pcm = TpsfPCM(revision_id, content, prev_pause)
                     tpsfs_pcm.append(tpsf_pcm)

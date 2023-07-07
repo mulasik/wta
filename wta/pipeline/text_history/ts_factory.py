@@ -2,7 +2,7 @@ import difflib
 
 from tqdm import tqdm
 
-from wta.pipeline.sentence_histories.text_unit import TextUnit
+from wta.pipeline.sentence_histories.text_unit import SentenceVersionBuilder, TextUnit
 
 from ...settings import Settings
 from .action import Action
@@ -67,7 +67,7 @@ class TsFactory:
 
 
 def retrieve_sen_ts(
-    s1: TextUnit, s2: TextUnit, settings: Settings
+    s1: SentenceVersionBuilder, s2: SentenceVersionBuilder, settings: Settings
 ) -> TransformingSequence:
     seq_match = difflib.SequenceMatcher(None, s1.text, s2.text)
     prev_cur_comparison_results = seq_match.get_opcodes()
