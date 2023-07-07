@@ -5,7 +5,8 @@ from typing_extensions import NotRequired
 
 
 class ConfigData(TypedDict):
-    xml: tuple[Path, ...]
+    ksl_source_format: str
+    ksl_files: tuple[Path, ...]
     output_dir: Path
     pause_duration: int
     min_edit_distance: int
