@@ -19,19 +19,43 @@ def check_texthis_correctness(last_tpsf: TpsfECM, filename: str, settings: Setti
         return True
     diffs = retrieve_mismatch_ranges(text.strip(), last_tpsf.text.strip())
     print("INFO: Failure when generating text history. Last text version is not the same as the text produced.")
-    print(f"\n\nThe final text in text history:\n{last_tpsf.text.strip()}")
-    print(f"\n\nThe original text:\n{text.strip()}")
-    print("\n\nThe differences:\n")
+    print(f"\nThe final text in text history:\n{last_tpsf.text.strip()}")
+    print(f"\nThe original text:\n{text.strip()}")
+    print("\nATTENTION: The differences between the original and the retrieved text:\n")
+    empty_diffs = []
     for diff in diffs:
         if diff[0] == "insert":
-            print("INSERT")
-            print(last_tpsf.text.strip()[diff[3]:diff[4]])
+            print("INSERTED TEXT:")
+            inserted_text = last_tpsf.text.strip()[diff[3]:diff[4]]
+            print(f"|{inserted_text}|")
+            if re.search(r"^\s+$", inserted_text):
+                empty_diffs.append(True)
+            else:
+                empty_diffs.append(False)
         elif diff[0] == "delete":
-            print("DELETE")
-            print(text.strip()[diff[1]:diff[2]])
+            print("DELETED TEXT:")
+            deleted_text = text.strip()[diff[1]:diff[2]]
+            print(f"|{deleted_text}|")
+            if re.search(r"^\s+$", deleted_text):
+                empty_diffs.append(True)
+            else:
+                empty_diffs.append(False)
         elif diff[0] == "replace":
-            print("REPLACE")
-            print(text.strip()[diff[1]:diff[2]])
-            print("though:")
-            print(last_tpsf.text.strip()[diff[1]:diff[2]])
+            print("REPLACED TEXT:")
+            replaced_text = text.strip()[diff[1]:diff[2]]
+            print(f"|{replaced_text}|")
+            if re.search(r"^\s+$", replaced_text):
+                empty_diffs.append(True)
+            else:
+                empty_diffs.append(False)
+            print("REPLACED THROUGH:")
+            replacing_text = last_tpsf.text.strip()[diff[1]:diff[2]]
+            print(f"|{replacing_text}|")
+            if re.search(r"^\s+$", replacing_text):
+                empty_diffs.append(True)
+            else:
+                empty_diffs.append(False)
+    if False not in empty_diffs:
+        print("INFO: Successfully generated a text history. The difference to original contains only whitespaces.")
+        return True
     return False

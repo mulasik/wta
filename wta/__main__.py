@@ -69,6 +69,7 @@ def run() -> None:
             TexthisOutputFactory.run(tpsfs, settings)  # + texthis_pcm
             tpsfs_fltr = filter_tpsfs(tpsfs)
             TexthisFltrOutputFactory.run(tpsfs_fltr, settings)
+            print("\n== TEXT HISTORY EVALUATION ==")
             correct = check_texthis_correctness(tpsfs[-1], filename, settings)
             if correct:
                 correctly_processed.append(logfile)
@@ -76,7 +77,6 @@ def run() -> None:
                 cp_dir.mkdir(exist_ok=True)
                 cp_path = Path(cp_dir, logfile.name)
                 shutil.copy(logfile, cp_path)
-            print("\n== TEXT HISTORY EVALUATION ==")
             print(f"{len(correctly_processed)} idfx files processed successfully so far: The final version of the text corresponds to the original text.")
 
             # GENERATE SENHIS
