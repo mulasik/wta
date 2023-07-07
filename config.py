@@ -1,8 +1,11 @@
-import os
+from pathlib import Path
 
-DATA_DIR = "example_data"
-VIDEO_DATA_DIR = os.path.join(DATA_DIR, "video")
+from wta.config_data import ConfigData
+from wta.pipeline.sentence_parsing.models import Languages
 
+usr_home = Path.home()
+_VIDEO_DATA_DIR = Path(usr_home, "thetool", "input_data", "video")
+_VIDEO_OUTPUT_DATA_DIR = Path(usr_home, "thetool", "output_data", "video")
 
 DEFAULT_PAUSE_DURATION = 2
 DEFAULT_MIN_EDIT_DISTANCE = 3
@@ -10,15 +13,17 @@ DEFAULT_TS_MIN_TOKENS_NUMBER = 2
 EDIT_DIST_COMBINED_WITH_TOK_NUMBER_DEFAULT = False
 SPELLCHECKING_ENABLED_DEFAULT = False
 PUNCTUATION_INCLUDED_DEFAULT = False
-DEFAULT_LANGUAGE = "German"
+DEFAULT_LANGUAGE = Languages.DE
 
-VIDEO = {
-    "xml": [
-        os.path.join(VIDEO_DATA_DIR, f)
-        for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("N")
-    ],
-    "output": os.path.join("output_data", "video", "conf0"),
+_VIDEO_IDFX_FILES = tuple(
+    f for f in _VIDEO_DATA_DIR.iterdir() if f.is_file() and f.suffix == ".idfx"
+)
+
+
+VIDEO: ConfigData = {
+    "ksl_source_format": "scriptlog_idfx",
+    "ksl_files": _VIDEO_IDFX_FILES,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf0",
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -28,13 +33,10 @@ VIDEO = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF1 = {
-    "xml": [
-        os.path.join(VIDEO_DATA_DIR, f)
-        for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
-    ],
-    "output": os.path.join("output_data", "video"),
+VIDEO_CONF1: ConfigData = {
+    "ksl_source_format": "scriptlog_idfx",
+    "ksl_files": _VIDEO_IDFX_FILES,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -44,13 +46,10 @@ VIDEO_CONF1 = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF2 = {
-    "xml": [
-        os.path.join(VIDEO_DATA_DIR, f)
-        for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx")
-    ],
-    "output": os.path.join("output_data", "video"),
+VIDEO_CONF2: ConfigData = {
+    "ksl_source_format": "scriptlog_idfx",
+    "ksl_files": _VIDEO_IDFX_FILES,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -60,13 +59,10 @@ VIDEO_CONF2 = {
     "language": DEFAULT_LANGUAGE,
 }
 
-VIDEO_CONF3 = {
-    "xml": [
-        os.path.join(VIDEO_DATA_DIR, f)
-        for f in os.listdir(VIDEO_DATA_DIR)
-        if os.path.isfile(os.path.join(VIDEO_DATA_DIR, f)) and f.endswith("idfx") and f.startswith("R")
-    ],
-    "output": os.path.join("output_data", "video"),
+VIDEO_CONF3: ConfigData = {
+    "ksl_source_format": "scriptlog_idfx",
+    "ksl_files": tuple(f for f in _VIDEO_IDFX_FILES if f.name.startswith("R")),
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
@@ -75,4 +71,3 @@ VIDEO_CONF3 = {
     "punctuation": False,
     "language": DEFAULT_LANGUAGE,
 }
-

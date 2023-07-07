@@ -1,0 +1,6 @@
+class Match:
+    ruleId: str
+
+class LanguageTool:
+    def __init__(self, language: str = ...) -> None: ...
+    def check(self, text: str) -> list[Match]: ...

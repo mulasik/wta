@@ -1,5 +1,5 @@
 output_data
-example_data
+input_data
 
 *.idfx
 *.pyc
@@ -8,6 +8,14 @@ GREEK_PHASE1.log
 wta.tar
 /venv/
 /myconfig.py
-/xml_content_check.py
-/tests.py
-/wta/scripts/
+/wta/scripts/xml_content_check.py
+/wta/scripts/tests.py
+/wta/scripts
+.DS_Store
+.idea/
+docs/.DS_Store
+docs/charts/.DS_Store
+wta/.DS_Store
+pyvenv.cfg
+/myconfig.py
+/local_config.py

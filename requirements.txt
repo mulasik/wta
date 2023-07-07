@@ -1,6 +1,7 @@
-benepar[cpu]
+tqdm
 cython
 numpy
+benepar[cpu]
 bs4
 spacy==3.0.6
 lxml
@@ -8,6 +9,9 @@ nltk
 matplotlib
 language-tool-python==2.5.4
 supar
+syntok
+pandas
+openpyxl
 
 # Spacy's model for German
 https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.0.0/de_core_news_md-3.0.0.tar.gz#egg=de_core_news_md
