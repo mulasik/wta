@@ -704,14 +704,14 @@ data = ["language-data (>=1.1,<2.0)"]
 
 [[package]]
 name = "language-tool-python"
-version = "2.5.4"
+version = "2.7.1"
 description = "Checks grammar using LanguageTool."
 category = "main"
 optional = false
 python-versions = "*"
 files = [
-    {file = "language_tool_python-2.5.4-py3-none-any.whl", hash = "sha256:1098458c7654692c08e33e97f59f2ef3d76cdffdac11a05404ebd521f2d89182"},
-    {file = "language_tool_python-2.5.4.tar.gz", hash = "sha256:2e52386ee0708eaa242c58b706a9439dbe20882f90721fc364dac59344fa742f"},
+    {file = "language_tool_python-2.7.1-py3-none-any.whl", hash = "sha256:ea9e93c261fbc1ec8bd52353c1b22fadba597cd4d65153d7c8f86fe499c719e7"},
+    {file = "language_tool_python-2.7.1.tar.gz", hash = "sha256:753bb6d9a5a8c810bfa96b9029531cfc147fa84822b035e882ff4b3e7c686dae"},
 ]
 
 [package.dependencies]
@@ -2406,4 +2406,4 @@ test = ["pytest (>=3.0.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "ecbc228a4ad6d98c03d4aed09870d05cf42c37f12de19b2aac4d9758b28b2837"
+content-hash = "df7316eb66b6e041befb8e7d4592af0d2a10c3dcd121f44bad1e5fbc56054702"
