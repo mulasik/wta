@@ -1,7 +1,9 @@
 import argparse
+import shutil
 import sys
 import traceback
 from importlib import import_module
+from pathlib import Path
 from typing import cast
 
 from .config_data import ConfigData
@@ -18,6 +20,7 @@ from .output_handler.output_factory import (
     TpsfsPCMOutputFactory,
     TssOutputFactory,
 )
+from .pipeline.evaluation.texthis_correctness import check_texthis_correctness
 from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
 from .pipeline.statistics.statistics_factory import StatsFactory
 from .pipeline.text_history.action_factory import ActionAggregator, ActionFactory
@@ -40,16 +43,18 @@ def run() -> None:
     config = load_path(args.config)
     nlp_model = SpacyModel(config["language"])
 
-    for idfx in config["xml"]:
+    correctly_processed = []
+
+    for i, logfile in enumerate(config["ksl_files"]):
         try:
-            filename = idfx.with_suffix("").name
+            filename = logfile.with_suffix("").name
             settings = Settings(config, nlp_model, filename)
 
-            print(f"\nProcessing the input file {idfx}...")
+            print(f"\nProcessing the input file {logfile}... ({i} out of {len(config['ksl_files'])})")
 
             # GENERATE TEXTHIS
             print("\n== KEYSTROKE LOGS PROCESSING & TEXT HISTORY GENERATION ==")
-            events = EventFactory().run(idfx)
+            events = EventFactory().run(logfile, settings)
             EventsOutputFactory.run(events, settings)
             actions = ActionFactory().run(events)
             ActionsOutputFactory.run(actions, settings)
@@ -64,6 +69,15 @@ def run() -> None:
             TexthisOutputFactory.run(tpsfs, settings)  # + texthis_pcm
             tpsfs_fltr = filter_tpsfs(tpsfs)
             TexthisFltrOutputFactory.run(tpsfs_fltr, settings)
+            correct = check_texthis_correctness(tpsfs[-1], filename, settings)
+            if correct:
+                correctly_processed.append(logfile)
+                cp_dir = Path(settings.config["ksl_files"][0].parents[1], "correctly_processed")
+                cp_dir.mkdir(exist_ok=True)
+                cp_path = Path(cp_dir, logfile.name)
+                shutil.copy(logfile, cp_path)
+            print("\n== TEXT HISTORY EVALUATION ==")
+            print(f"{len(correctly_processed)} idfx files processed successfully so far: The final version of the text corresponds to the original text.")
 
             # GENERATE SENHIS
             print("\n== SENTENCE HISTORIES GENERATION ==")
@@ -90,12 +104,15 @@ def run() -> None:
             # GENERATE STATS
             print("\n== STATISTICS GENERATION ==")
             print("Generating statistics...")
-            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory().run(idfx, tpsfs, tpsfs_fltr, tpsfs_pcm, actions, senhis)
-            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, tpsfs, senhis, settings)
+            b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory().run(logfile, tpsfs, tpsfs_fltr, tpsfs_pcm, actions, senhis)
+            StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, logfile, tpsfs, senhis, settings)
 
         except:
             traceback.print_exc()
-            print(f"Failed for {idfx}", file=sys.stderr)
+            print(f"Failed for {logfile}", file=sys.stderr)
+
+    print("\n== FINAL TEXT HISTORY EVALUATION ==")
+    print(f"{len(correctly_processed)} idfx files processed successfully: The final version of the text corresponds to the original text.")
 
 
 if __name__ == "__main__":
