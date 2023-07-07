@@ -33,7 +33,7 @@ class ActionFactory:
                 actions.append(action)
             else:
                 print(
-                    f"INFO: No action found for event {type(evnt).__name__} *{evnt.content}* at pos {evnt.startpos}-{evnt.endpos}"
+                    f"INFO: Could not generate action for event {type(evnt).__name__} *{evnt.content}* at pos {evnt.startpos}-{evnt.endpos}"
                 )
         return actions
 
@@ -75,9 +75,11 @@ class ActionAggregator:
         prev_act_type = None
         for i, act in enumerate(acts):
             act_type = type(act).__name__
+            # print(prev_act_type)
+            # print(act_type, act.__dict__)
             non_consecutive_act = abs(act.startpos - acts[i - 1].startpos) > 1
             consecutive_del = (
-                abs(act.startpos - acts[i - 1].startpos) == 0
+                act.startpos - acts[i - 1].startpos == 0
                 and act.textlen < acts[i - 1].textlen
             )
             # if the action type has just changed
@@ -90,6 +92,7 @@ class ActionAggregator:
                 or act_type in ["Replacement", "Pasting", "Navigation"]
                 or (non_consecutive_act and not consecutive_del)
             ):
+                # print(act_type != prev_act_type, f"{act_type}_{counter}")
                 act_groups[f"{act_type}_{counter}"] = [act]
                 current_act_type = f"{act_type}_{counter}"
                 counter += 1
@@ -97,12 +100,16 @@ class ActionAggregator:
                 act_type == prev_act_type
                 and abs(act.startpos - acts[i - 1].startpos) == 1
             ):
+                # print(f"Appending consequtive actions to {current_act_type}: {act.__dict__}")
                 act_groups[current_act_type].append(act)
+                # print(f"Total actions in {current_act_type}: {len(act_groups[current_act_type])}")
             else:
                 print(
                     f"INFO: The action of type {act_type} does not meet pre-defined criteria for aggregation. "
                     f"It will be added to the action groups as a separate single-item group."
+                    f"\n{act.__dict__}"
                 )
+                current_act_type = f"{act_type}_{counter}"
                 act_groups[current_act_type] = [act]
             prev_act_type = act_type
         return act_groups
