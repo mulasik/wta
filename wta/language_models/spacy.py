@@ -47,6 +47,13 @@ class SpacyModel:
             print("Loading Spacy model for Greek...")
             self.nlp = spacy.load("el_core_news_md")
             self.tool = language_tool_python.LanguageTool("el-GR")
+        elif lang == Languages.FR:
+            from spacy.lang.fr import French
+
+            self.nlp = French()
+            print("Loading Spacy model for French...")
+            self.nlp = spacy.load("fr_core_news_md")
+            self.tool = language_tool_python.LanguageTool("fr-FR")
         else:
             print("FAILURE: Could not recognize the language.")
 
