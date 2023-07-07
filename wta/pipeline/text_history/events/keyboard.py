@@ -1,13 +1,29 @@
+from wta.settings import Settings
+
 from ...names import EventTypes
 from ..action import Action, Append, Deletion, Insertion, Midletion, Navigation, Pasting
 from .base import BaseEvent
 
-CHAR_NUMBER_DIFF_PRODUCTION = 1
-CHAR_NUMBER_DIFF_DDELETION = 1
-# Document length in the idfx file == position + 1.
-# In case of backspace deletion the startpos == startpos - 1 because this is where the char actually gets deleted.
-# So the total diff is 2 between the position of the deleted char and the document length provided in idfx.
-CHAR_NUMBER_DIFF_BDELETION = 2
+CHAR_NUMBER_DIFF_MAPPING = {
+    "scriptlog_idfx": {
+        "production": 1,
+        "ddeletion": 1,
+        "bdeletion": 2
+        # Document length in the idfx file == position + 1.
+        # In case of backspace deletion the startpos == startpos - 1 because this is where the char actually gets deleted. 
+        # So the total diff is 2 between the position of the deleted char and the document length provided in idfx.
+    },
+    "inputlog_idfx": {
+        "production": 1,
+        "ddeletion": 1,
+        "bdeletion": 2
+    },
+    "protext_csv": {
+        "production": 0,
+        "ddeletion": 0,
+        "bdeletion": 0
+    }
+}
 
 
 class KeyboardEvent(BaseEvent):
@@ -44,6 +60,7 @@ class KeyboardEvent(BaseEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings,
         char_number_diff: int,
     ) -> None:
         super().__init__(content, startpos, endpos)
@@ -52,6 +69,7 @@ class KeyboardEvent(BaseEvent):
         self.endtime = endtime
         self.textlen = textlen
         self.pause: int | None = None
+        self.settings = settings
         self.char_number_diff = char_number_diff
 
     def set_pause(self) -> None:
@@ -73,6 +91,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings
     ) -> None:
         super().__init__(
             content,
@@ -82,7 +101,9 @@ class ProductionKeyboardEvent(KeyboardEvent):
             starttime,
             endtime,
             textlen,
-            CHAR_NUMBER_DIFF_PRODUCTION,
+            settings,
+            # CHAR_NUMBER_DIFF_PRODUCTION,
+            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["production"]
         )
 
     def to_action(self) -> Action | None:
@@ -127,6 +148,7 @@ class DeletionKeyboardEvent(KeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings,
         char_number_diff: int,
     ) -> None:
         super().__init__(
@@ -137,6 +159,7 @@ class DeletionKeyboardEvent(KeyboardEvent):
             starttime,
             endtime,
             textlen,
+            settings,
             char_number_diff,
         )
 
@@ -177,6 +200,7 @@ class BDeletionKeyboardEvent(DeletionKeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings,
     ) -> None:
         super().__init__(
             content,
@@ -186,7 +210,8 @@ class BDeletionKeyboardEvent(DeletionKeyboardEvent):
             starttime,
             endtime,
             textlen,
-            CHAR_NUMBER_DIFF_BDELETION,
+            settings,
+            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["bdeletion"]
         )
 
 
@@ -200,6 +225,7 @@ class DDeletionKeyboardEvent(DeletionKeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings
     ) -> None:
         super().__init__(
             content,
@@ -209,7 +235,8 @@ class DDeletionKeyboardEvent(DeletionKeyboardEvent):
             starttime,
             endtime,
             textlen,
-            CHAR_NUMBER_DIFF_DDELETION,
+            settings,
+            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["ddeletion"],
         )
 
 
@@ -223,9 +250,10 @@ class NavigationKeyboardEvent(KeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
+        settings: Settings
     ) -> None:
         super().__init__(
-            content, startpos, endpos, keyname, starttime, endtime, textlen, -1
+            content, startpos, endpos, keyname, starttime, endtime, textlen, settings, -1
         )
 
     def set_endpos(self) -> None:
