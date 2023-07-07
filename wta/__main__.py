@@ -50,7 +50,7 @@ def run() -> None:
             filename = logfile.with_suffix("").name
             settings = Settings(config, nlp_model, filename)
 
-            print(f"\nProcessing the input file {logfile}... ({i} out of {len(config['ksl_files'])})")
+            print(f"\nProcessing the input file {logfile}... ({i+1} out of {len(config['ksl_files'])})")
 
             # GENERATE TEXTHIS
             print("\n== KEYSTROKE LOGS PROCESSING & TEXT HISTORY GENERATION ==")
