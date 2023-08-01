@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from ..pipeline.sentence_histories.text_unit import TextUnit
+from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
+
+from ..pipeline.sentence_histories.text_unit import SentenceVersion, TextUnit
 from ..pipeline.sentence_parsing.parsers import TokenProp
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
@@ -37,6 +39,7 @@ from .storage.txt import (
     DepParsesTxt,
     EventsTxt,
     SenhisTxt,
+    SenhoodhisTxt,
     StatsTxt,
     TexthisTxt,
     TpsfsPCMTxt,
@@ -105,8 +108,8 @@ class SenhisOutputFactory:
         cls,
         texthis: list[TpsfECM],
         texthis_fltr: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
-        senhis_fltr: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SentenceVersion]],
+        senhis_fltr: dict[int, list[SentenceVersion]],
         settings: Settings,
     ) -> None:
         SenhisJson(senhis, settings).to_file()
@@ -115,6 +118,16 @@ class SenhisOutputFactory:
         SenhisTxt(senhis_fltr, settings, filtered=True).to_file()
         SenhisSvg(texthis, senhis, settings).to_file()
         SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
+
+
+class SenhoodhisOutputFactory:
+    @classmethod
+    def run(
+        cls,
+        senhoodhis: dict[int, list[Sentencehood]],
+        settings: Settings,
+    ) -> None:
+        SenhoodhisTxt(senhoodhis, settings).to_file()
 
 
 class ParseOutputFactory:

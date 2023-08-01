@@ -1,6 +1,8 @@
 from pathlib import Path
 
-from ...pipeline.sentence_histories.text_unit import TextUnit
+from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
+
+from ...pipeline.sentence_histories.text_unit import SentenceVersion, TextUnit
 from ...pipeline.sentence_parsing.parsers import TokenProp
 from ...pipeline.statistics.statistics import (
     BasicStatistics,
@@ -162,7 +164,7 @@ class TexthisTxt(Txt):
 class SenhisTxt(Txt):
     def __init__(
         self,
-        data: dict[int, list[TextUnit]],
+        data: dict[int, list[SentenceVersion]],
         settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,
@@ -183,6 +185,31 @@ class SenhisTxt(Txt):
             output_str += f"\n******* {key} *******\n"
             for s in sens:
                 output_str += f"{s.to_text()}\n\n"
+        return output_str
+
+
+class SenhoodhisTxt(Txt):
+    def __init__(
+        self,
+        data: dict[int, list[Sentencehood]],
+        settings: Settings,
+    ) -> None:
+        txt_file = (
+            f"{settings.filename}_{names.SENHOOD}.txt"
+        )
+        super().__init__(
+            settings.paths.senhood_txt_dir / txt_file,
+            self.preprocess_data(data),
+        )
+
+    def preprocess_data(self, senhoodhis: dict[int, list[Sentencehood]]) -> str:
+        output_str = ""
+        for key, senhood_data in senhoodhis.items():
+            output_str += f"\n******* {key} *******\n"
+            for sh in senhood_data:
+                output_str += f"""Sentence: |{sh.text}|
+Completeness (mechanical-conceptual-syntactic): {sh.mech_completeness}-{sh.con_completeness}-{sh.syn_completeness}
+Correctness (mechanical-grammatical): {sh.mech_correctness}-{sh.gram_correctness}\n\n"""
         return output_str
 
 

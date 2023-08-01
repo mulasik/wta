@@ -6,6 +6,10 @@ from importlib import import_module
 from pathlib import Path
 from typing import cast
 
+from wta.pipeline.sentence_histories.sentencehood_evaluator import SentencehoodEvaluator
+from wta.pipeline.sentence_parsing.facade import ParsingFacade
+from wta.pipeline.sentence_parsing.models import Grammars, Parsers
+
 from .config_data import ConfigData
 from .language_models.spacy import SpacyModel
 from .output_handler.output_factory import (
@@ -13,6 +17,7 @@ from .output_handler.output_factory import (
     ActionsOutputFactory,
     EventsOutputFactory,
     SenhisOutputFactory,
+    SenhoodhisOutputFactory,
     StatsOutputFactory,
     TexthisFltrOutputFactory,
     TexthisOutputFactory,
@@ -43,7 +48,7 @@ def run() -> None:
     config = load_path(args.config)
     nlp_model = SpacyModel(config["language"])
 
-    correctly_processed = []
+    correctly_processed: list[str] = []
 
     for i, logfile in enumerate(config["ksl_files"]):
         try:
@@ -72,7 +77,7 @@ def run() -> None:
             print("\n== TEXT HISTORY EVALUATION ==")
             correct = check_texthis_correctness(tpsfs[-1], filename, settings)
             if correct:
-                correctly_processed.append(logfile)
+                correctly_processed.append(logfile.name)
                 cp_dir = Path(settings.config["ksl_files"][0].parents[1], "correctly_processed")
                 cp_dir.mkdir(exist_ok=True)
                 cp_path = Path(cp_dir, logfile.name)
@@ -85,8 +90,9 @@ def run() -> None:
             senhis = senhis_generator.run(tpsfs, settings)
             senhis_fltr = senhis_generator.filter_senhis(senhis)
             SenhisOutputFactory.run(tpsfs, tpsfs_fltr, senhis, senhis_fltr, settings)
+            senhoodhis = SentencehoodEvaluator().run(senhis, nlp_model)
+            SenhoodhisOutputFactory.run(senhoodhis, settings)
 
-            #
             # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
             # dep_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.DEP)
