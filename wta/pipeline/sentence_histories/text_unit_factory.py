@@ -127,6 +127,7 @@ class TextUnitFactory:
         # print(f'Detected doubles. Need to merge.')
         prev_merged_text = ""
         merged_textunits = []
+        merged = False
         for i, j in zip(textunit_list, textunit_list[1:]):
             if (
                 i.text_unit_type == j.text_unit_type != TextUnitType.SEN
@@ -149,9 +150,13 @@ class TextUnitFactory:
                         sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
                         merged_textunits.append(sin)
                 prev_merged_text = j.text
+                merged = True
             elif i.text != prev_merged_text:
                 merged_textunits.append(i)
                 prev_merged_text = ""
+                merged = False
+        if merged is False:
+            merged_textunits.append(j)
         return self._merge_double_textunits(merged_textunits)
 
     def _improve_segmentation_with_prev_tus(
