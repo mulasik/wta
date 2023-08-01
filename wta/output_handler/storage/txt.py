@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ...pipeline.sentence_histories.text_unit import SentenceVersion, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
 from ...pipeline.sentence_parsing.parsers import TokenProp
 from ...pipeline.statistics.statistics import (
     BasicStatistics,
@@ -164,7 +164,7 @@ class TexthisTxt(Txt):
 class SenhisTxt(Txt):
     def __init__(
         self,
-        data: dict[int, list[SentenceVersion]],
+        data: dict[int, list[SPSF]],
         settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,

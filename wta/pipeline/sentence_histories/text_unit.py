@@ -22,7 +22,7 @@ class TextUnitType(enum.IntEnum):
     SEN = enum.auto()
 
 
-class SentenceVersionDict(TypedDict):
+class SPSFDict(TypedDict):
     sen_id: int
     text_unit_type: "TextUnitType"
     text: str
@@ -122,7 +122,7 @@ class TextUnitBuilder:
             tpsf_id=self.tpsf_id
         )
 
-class SentenceVersionBuilder:
+class SPSFBuilder:
 
     def __init__(self, tu: TextUnit) -> None:
         self.sen_id: int | None = None
@@ -142,7 +142,7 @@ class SentenceVersionBuilder:
     def set_ts(self, ts: TransformingSequence) -> None:
         self.ts = ts
 
-    def to_sentence_version(self) -> "SentenceVersion":
+    def to_sentence_version(self) -> "SPSF":
         if (
             self.sen_id is None
             or self.pos_in_text is None
@@ -150,7 +150,7 @@ class SentenceVersionBuilder:
         ):
             msg = f"The sentence version builder is not yet complete {vars(self)}"
             raise RuntimeError(msg)
-        return SentenceVersion(
+        return SPSF(
             sen_id=self.sen_id,
             text_unit_type=self.text_unit_type,
             text=self.text,
@@ -162,7 +162,7 @@ class SentenceVersionBuilder:
 
 
 @dataclasses.dataclass(frozen=True)
-class SentenceVersion:
+class SPSF:
     sen_id: int
     text_unit_type: TextUnitType
     text: str
@@ -171,7 +171,7 @@ class SentenceVersion:
     pos_in_text: int
     ts: TransformingSequence
 
-    def to_dict(self) -> SentenceVersionDict:
+    def to_dict(self) -> SPSFDict:
         return {
             "sen_id": self.sen_id,
             "text_unit_type": self.text_unit_type,

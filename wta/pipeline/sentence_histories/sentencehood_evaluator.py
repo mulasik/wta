@@ -1,7 +1,7 @@
 import dataclasses
 from wta.language_models.spacy import SpacyModel
 
-from wta.pipeline.sentence_histories.text_unit import SentenceVersion, TextUnit, TextUnitType
+from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitType
 
 
 @dataclasses.dataclass(frozen=True)
@@ -24,7 +24,7 @@ class Sentencehood:
 
 
 class SentencehoodEvaluator:
-    def run(self, sentence_history: dict[int, list[SentenceVersion]], nlp_model: SpacyModel) -> dict[int, list[Sentencehood]]:
+    def run(self, sentence_history: dict[int, list[SPSF]], nlp_model: SpacyModel) -> dict[int, list[Sentencehood]]:
         sentencehood_history: dict[int, list[Sentencehood]] = {}
         for sen_id, spsf_list in sentence_history.items():
             spsf_sentencehood_list = []

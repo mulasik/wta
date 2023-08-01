@@ -8,22 +8,22 @@ from wta.settings import Settings
 
 from ..names import SenLabels
 from ..text_history.tpsf import TpsfECM
-from .text_unit import SentenceVersion, SentenceVersionBuilder, TextUnit, TextUnitType
+from .text_unit import SPSF, SPSFBuilder, TextUnit, TextUnitType
 
 
 class SentenceHistoryGenerator:
     def run(
         self, tpsfs: list[TpsfECM], settings: Settings
-    ) -> dict[int, list[SentenceVersion]]:
+    ) -> dict[int, list[SPSF]]:
         sentence_history_builder = {}
         sentence_history = {}
         global_new_sens = []
-        prev_senver_builders: list[SentenceVersionBuilder] = []
+        prev_senver_builders: list[SPSFBuilder] = []
         progress = tqdm(tpsfs, "Generating sentence histories")
         for i, tpsf in enumerate(progress):
             # print(f"****{tpsf.revision_id}****")
             current_senver_builders = [
-                SentenceVersionBuilder(tu)
+                SPSFBuilder(tu)
                 for tu in tpsf.textunits
                 if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
             ]
@@ -130,11 +130,11 @@ class SentenceHistoryGenerator:
         return sentence_history
 
     def eliminate_duplicates(
-        self, sentence_history: dict[int, list[SentenceVersionBuilder]]
-    ) -> dict[int, list[SentenceVersionBuilder]]:
+        self, sentence_history: dict[int, list[SPSFBuilder]]
+    ) -> dict[int, list[SPSFBuilder]]:
         sentence_history_duplicates_eliminated = {}
         for key, sens in sentence_history.items():
-            sens_duplicates_eliminated: list[SentenceVersionBuilder] = []
+            sens_duplicates_eliminated: list[SPSFBuilder] = []
             for s in sens:
                 if s.text not in [sde.text for sde in sens_duplicates_eliminated]:
                     sens_duplicates_eliminated.append(s)
@@ -144,8 +144,8 @@ class SentenceHistoryGenerator:
         return sentence_history_duplicates_eliminated
 
     def filter_senhis(
-        self, senhis: dict[int, list[TextUnit]]
-    ) -> dict[int, list[TextUnit]]:
+        self, senhis: dict[int, list[SPSF]]
+    ) -> dict[int, list[SPSF]]:
         filtered_senhis = {}
         for sen_id, sen_versions in senhis.items():
             filtered_sen_versions = [s for s in sen_versions if s.ts.relevance is True]

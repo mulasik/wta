@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
-from ...pipeline.sentence_histories.text_unit import TextUnit, TextUnitDict
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitDict
 from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
 from ...pipeline.transformation_histories.transformation import Transformation
 from ...settings import Settings
@@ -48,7 +48,7 @@ class TexthisJson(Json[list[TpsfECMDict]]):
 class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
     def __init__(
         self,
-        data: dict[int, list[TextUnit]],
+        data: dict[int, list[SPSF]],
         settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,

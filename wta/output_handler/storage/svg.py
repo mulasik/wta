@@ -2,7 +2,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.transformation_histories.transformation import Transformation
 from ...settings import Settings
@@ -62,7 +62,7 @@ class SenhisSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
         filtered: bool = False,
     ) -> None:

@@ -1,4 +1,4 @@
-from ..sentence_histories.text_unit import SentenceVersion, TextUnit
+from ..sentence_histories.text_unit import SPSF, TextUnit
 from .models import Parsers
 from .parsers import BaseParserAdapter, DiaParser, TokenProp
 
@@ -6,7 +6,7 @@ from .parsers import BaseParserAdapter, DiaParser, TokenProp
 class ParsingFacade:
     def __init__(
         self,
-        senhis: dict[int, list[SentenceVersion]],
+        senhis: dict[int, list[SPSF]],
         parser_name: str,
         lang: str,
         grammar: str,

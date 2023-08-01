@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ..pipeline.sentence_histories.text_unit import SentenceVersion, TextUnit
+from ..pipeline.sentence_histories.text_unit import SPSF, TextUnit
 from ..pipeline.sentence_parsing.parsers import TokenProp
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
@@ -108,8 +108,8 @@ class SenhisOutputFactory:
         cls,
         texthis: list[TpsfECM],
         texthis_fltr: list[TpsfECM],
-        senhis: dict[int, list[SentenceVersion]],
-        senhis_fltr: dict[int, list[SentenceVersion]],
+        senhis: dict[int, list[SPSF]],
+        senhis_fltr: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         SenhisJson(senhis, settings).to_file()
