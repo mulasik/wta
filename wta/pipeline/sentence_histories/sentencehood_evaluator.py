@@ -1,7 +1,15 @@
 import dataclasses
-from wta.language_models.spacy import SpacyModel
 
-from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitType
+from wta.language_models.spacy import SpacyModel
+from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnitType
+from wta.settings import Settings
+
+
+class ErrorTypes:
+    GRAMMAR = {
+        "de": "GRAMMAR",
+        "fr": "CAT_GRAMMAIRE"
+    }
 
 
 @dataclasses.dataclass(frozen=True)
@@ -24,8 +32,9 @@ class Sentencehood:
 
 
 class SentencehoodEvaluator:
-    def run(self, sentence_history: dict[int, list[SPSF]], nlp_model: SpacyModel) -> dict[int, list[Sentencehood]]:
+    def run(self, sentence_history: dict[int, list[SPSF]], nlp_model: SpacyModel, settings: Settings) -> tuple[dict[int, list[Sentencehood]], dict[str, set[str]]]:
         sentencehood_history: dict[int, list[Sentencehood]] = {}
+        error_details: dict[str, set[str]] = {}
         for sen_id, spsf_list in sentence_history.items():
             spsf_sentencehood_list = []
             for i, spsf in enumerate(spsf_list):
@@ -39,7 +48,12 @@ class SentencehoodEvaluator:
                     and (("NOUN", "sb") in syn_data or ("PRON", "sb") in syn_data))
                 errors = nlp_model.tool.check(spsf.text)
                 error_types = {e.category for e in errors}
-                gramm_correctness = bool("GRAMMAR" not in error_types)
+                for e in errors:
+                    if e.category not in error_details.keys():
+                        error_details[e.category] = set(spsf.text[e.offset:e.offset+e.errorLength])
+                    else:
+                        error_details[e.category].add(spsf.text[e.offset:e.offset+e.errorLength])
+                gramm_correctness = bool(ErrorTypes.GRAMMAR[settings.config["language"]] not in error_types)
                 mech_correctness = bool(
                     mech_completeness
                     and "TYPOS" not in error_types
@@ -55,5 +69,5 @@ class SentencehoodEvaluator:
                     )
                 spsf_sentencehood_list.append(sentencehood)
             sentencehood_history[sen_id] = spsf_sentencehood_list
-        return sentencehood_history
+        return sentencehood_history, error_details
 
