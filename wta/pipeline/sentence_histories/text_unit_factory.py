@@ -1,6 +1,4 @@
 import re
-from collections.abc import Mapping
-from itertools import zip_longest
 from typing import TYPE_CHECKING
 
 from ...pipeline.names import SenLabels, TSLabels
