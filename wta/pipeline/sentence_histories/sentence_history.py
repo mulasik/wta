@@ -8,7 +8,7 @@ from wta.settings import Settings
 
 from ..names import SenLabels
 from ..text_history.tpsf import TpsfECM
-from .text_unit import SPSF, SPSFBuilder, TextUnit, TextUnitType
+from .text_unit import SPSF, SPSFBuilder, TextUnitType
 
 
 class SentenceHistoryGenerator:
@@ -18,55 +18,55 @@ class SentenceHistoryGenerator:
         sentence_history_builder = {}
         sentence_history = {}
         global_new_sens = []
-        prev_senver_builders: list[SPSFBuilder] = []
+        prev_spsf_builders: list[SPSFBuilder] = []
         progress = tqdm(tpsfs, "Generating sentence histories")
         for i, tpsf in enumerate(progress):
             # print(f"****{tpsf.revision_id}****")
-            current_senver_builders = [
+            current_spsf_builders = [
                 SPSFBuilder(tu)
                 for tu in tpsf.textunits
                 if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
             ]
-            for index, csb in enumerate(current_senver_builders):
+            for index, csb in enumerate(current_spsf_builders):
                 csb.set_pos_in_text(index+1)
 
             number_new = 0
             if i == 0:
-                for csv in current_senver_builders:
+                for csv in current_spsf_builders:
                     uid = uuid.uuid1().int
                     sentence_history_builder[uid] = [csv]
                     csv.set_id(uid)
                     global_new_sens.append(csv.text)
-            elif i > 0 and len(current_senver_builders) == len(prev_senver_builders):
+            elif i > 0 and len(current_spsf_builders) == len(prev_spsf_builders):
                 # print(f"Number of sentences ({len(current_senver_builders)}) has not changed.")
-                for csv, psv in zip(current_senver_builders, prev_senver_builders):
+                for csv, psv in zip(current_spsf_builders, prev_spsf_builders):
                     if psv.sen_id is not None:
                         csv.set_id(psv.sen_id)
                         sentence_history_builder[psv.sen_id].append(csv)
-            elif i > 0 and len(current_senver_builders) < len(prev_senver_builders):
+            elif i > 0 and len(current_spsf_builders) < len(prev_spsf_builders):
                 # print(
                 #     f"Sentence deletion detected: from {len(prev_senver_builders)} to {len(current_senver_builders)}"
                 # )
-                number_deleted = abs(len(current_senver_builders) - len(prev_senver_builders))
-                for i, csv in enumerate(current_senver_builders):
+                number_deleted = abs(len(current_spsf_builders) - len(prev_spsf_builders))
+                for i, csv in enumerate(current_spsf_builders):
                     if csv.state == SenLabels.UNC_PRE:
-                        prev_sen_id = prev_senver_builders[i].sen_id
+                        prev_sen_id = prev_spsf_builders[i].sen_id
                         if prev_sen_id is not None:
                             csv.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(csv)
                     elif csv.state in [SenLabels.MOD, SenLabels.UNC_POST]:
-                        prev_sen_id = prev_senver_builders[i + number_deleted].sen_id 
+                        prev_sen_id = prev_spsf_builders[i + number_deleted].sen_id 
                         # TODO check if the code csv.set_id(prev_senver_builders[i - number_new].sen_id) made sense
                         if prev_sen_id is not None:
                             csv.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(csv)
-            elif i > 0 and len(current_senver_builders) > len(prev_senver_builders):
+            elif i > 0 and len(current_spsf_builders) > len(prev_spsf_builders):
                 # print(
-                #     f"Sentence creation detected: from {len(prev_senver_builders)} to {len(current_senver_builders)}"
+                #     f"Sentence creation detected: from {len(prev_spsf_builders)} to {len(current_senver_builders)}"
                 # )
-                for i, ctu in enumerate(current_senver_builders):
+                for i, ctu in enumerate(current_spsf_builders):
                     if ctu.state == SenLabels.UNC_PRE:
-                        prev_sen_id = prev_senver_builders[i].sen_id
+                        prev_sen_id = prev_spsf_builders[i].sen_id
                         if prev_sen_id is not None:
                             ctu.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(ctu)
@@ -85,7 +85,7 @@ class SentenceHistoryGenerator:
                         global_new_sens.append(ctu.text)
                     elif ctu.state in [SenLabels.MOD, SenLabels.UNC_POST]:
                         try:
-                            prev_sen_id = prev_senver_builders[i - number_new].sen_id
+                            prev_sen_id = prev_spsf_builders[i - number_new].sen_id
                             if prev_sen_id is not None:
                                 ctu.set_id(prev_sen_id)
                                 sentence_history_builder[prev_sen_id].append(ctu)
@@ -99,7 +99,7 @@ class SentenceHistoryGenerator:
                             uid = uuid.uuid1().int
                             sentence_history_builder[uid] = [ctu]
                             ctu.set_id(uid)
-            prev_senver_builders = current_senver_builders
+            prev_spsf_builders = current_spsf_builders
         sentence_history_builder = self.eliminate_duplicates(sentence_history_builder)
         for sen_id, senver_builders in sentence_history_builder.items():
             sentence_versions = []
