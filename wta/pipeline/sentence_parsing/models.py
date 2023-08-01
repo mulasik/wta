@@ -14,6 +14,7 @@ class Grammars:
 
 class Parsers:
     SUPAR = "supar"
+    DIAPARSER = "diaparser"
 
 
 class Models:
@@ -24,6 +25,9 @@ class Models:
     # Selected languages: de, en, nl, no, fr
     # https://pypi.org/project/supar/
     SUPAR_MULTILINGUAL_DEP_MODEL = "biaffine-dep-xlmr"
+    DIAPARSER_DE_DEP_MODEL = "de_htd.dbmdz-bert-base"
+    DIAPARSER_FR_DEP_MODEL = "fr_sequoia.camembert"
+    DIAPARSER_EN_DEP_MODEL = "en_ptb.electra"
 
     # CONSTITUENCY
 
@@ -43,6 +47,11 @@ class ModelMapping:
                 Languages.NL: Models.SUPAR_MULTILINGUAL_DEP_MODEL,
                 Languages.NO: Models.SUPAR_MULTILINGUAL_DEP_MODEL,
                 Languages.FR: Models.SUPAR_MULTILINGUAL_DEP_MODEL,
+            },
+            Parsers.DIAPARSER: {
+                Languages.EN: Models.DIAPARSER_EN_DEP_MODEL,
+                Languages.DE: Models.DIAPARSER_DE_DEP_MODEL,
+                Languages.FR: Models.DIAPARSER_FR_DEP_MODEL,
             }
         },
         Grammars.CONST: {

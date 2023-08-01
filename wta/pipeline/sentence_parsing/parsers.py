@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict, cast
 
-from supar import Parser
-from supar.utils import Dataset
+import diaparser
+from diaparser.parsers import Parser
 
 from .models import Grammars, ModelMapping, Parsers
 
@@ -26,11 +26,32 @@ class BaseParserAdapter(ABC):
     ) -> dict[int, list[list[TokenProp] | None]]:
         raise NotImplementedError
 
-
 class Supar(BaseParserAdapter):
     """
     SuPar predict function returns supar.utils.data.Dataset
     Iterating over the dataset returns supar.utils.transform.CoNLLSentence
+    CoNLLSentence has the CoNLL-X format. It is a string with tokens separated by newline:
+        - ID (index in sentence, starting at 1)
+        - FORM (word form itself)
+        - LEMMA (word's lemma or stem)
+        - CPOSTAG
+        - POSTAG
+        - FEAT (list of morphological features separated by |)
+        - HEAD (index of syntactic parent, 0 for ROOT)
+        - DEPREL (syntactic relationship between HEAD and this word)
+        - PHEAD
+        - PDEPREL
+    E.g.
+    1   The	_	_	_	_	2	det	_	_
+    2	tortoise	_	_	_	_	3	nsubj	_	_
+    """
+    ...
+
+class DiaParser(BaseParserAdapter):
+    """
+    https://github.com/Unipisa/diaparser
+    DiaParser predict function returns diaparser.utils.data.Dataset
+    Iterating over the dataset returns diaparser.utils.transform.CoNLLSentence
     CoNLLSentence has the CoNLL-X format. It is a string with tokens separated by newline:
         - ID (index in sentence, starting at 1)
         - FORM (word form itself)
@@ -52,7 +73,7 @@ class Supar(BaseParserAdapter):
         self.grammar = grammar
 
     def load_pipeline(self) -> Parser:
-        model = ModelMapping.mapping[self.grammar][Parsers.SUPAR][self.lang]
+        model = ModelMapping.mapping[self.grammar][Parsers.DIAPARSER][self.lang]
         return Parser.load(model)
 
     def predict(
@@ -65,7 +86,7 @@ class Supar(BaseParserAdapter):
             senhis_parses[sen_id] = []
             for sentext in sgl_senhis_sentexts:
                 result = pipeline.predict(
-                    sentext, lang=self.lang, prob=True, verbose=False
+                    sentext, text=self.lang
                 )
                 senhis_parses[sen_id].append(self.postprocess(result))
                 # TODO: visualise constituency trees:
@@ -76,7 +97,7 @@ class Supar(BaseParserAdapter):
                 # TreeView(t)._cframe.print_to_file(output_file)
         return senhis_parses
 
-    def postprocess(self, parsed_sen: Dataset) -> list[TokenProp] | None:
+    def postprocess(self, parsed_sen: diaparser.utils.transform.CoNLLSentence) -> list[TokenProp] | None:
         if self.grammar == Grammars.DEP:
             tok_lst: list[TokenProp] = []
             _tok_lst = [str(tok).split("\n") for tok in parsed_sen][0]
@@ -96,3 +117,4 @@ class Supar(BaseParserAdapter):
         if self.grammar == Grammars.CONST:
             return cast(list[TokenProp], list(parsed_sen)[0])
         return None
+

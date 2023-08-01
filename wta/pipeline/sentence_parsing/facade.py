@@ -1,18 +1,18 @@
-from ..sentence_histories.text_unit import TextUnit
+from ..sentence_histories.text_unit import SentenceVersion, TextUnit
 from .models import Parsers
-from .parsers import BaseParserAdapter, Supar, TokenProp
+from .parsers import BaseParserAdapter, DiaParser, TokenProp
 
 
 class ParsingFacade:
     def __init__(
         self,
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SentenceVersion]],
         parser_name: str,
         lang: str,
         grammar: str,
     ) -> None:
         self.parser_lst = {
-            Parsers.SUPAR: Supar,
+            Parsers.DIAPARSER: DiaParser,
         }
         self.senhis = senhis
         self.grammar = grammar
@@ -31,6 +31,6 @@ class ParsingFacade:
         senhist_sentexts = {}
         for sen_id, single_senhis in self.senhis.items():
             senhist_sentexts[sen_id] = [
-                sen.content for sen in single_senhis if sen.content
+                sen.text for sen in single_senhis if sen.text
             ]
         return senhist_sentexts
