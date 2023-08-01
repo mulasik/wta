@@ -1,6 +1,6 @@
 from matplotlib import colors as pltc
 
-from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
 
 
 class Colors:
@@ -73,7 +73,7 @@ class Colors:
     BOOL_COLORS = {True: "indianred", False: "teal"}
 
     @classmethod
-    def assign_colors_to_sens(cls, senhis: dict[int, list[TextUnit]]) -> dict[int, str]:
+    def assign_colors_to_sens(cls, senhis: dict[int, list[SPSF]]) -> dict[int, str]:
         """
         Assigns colors to sentences in sentence history.
         Each sentence has a unique color.

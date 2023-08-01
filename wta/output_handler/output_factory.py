@@ -169,7 +169,7 @@ class StatsOutputFactory:
         sen_stats: SentenceStatistics,
         idfx: Path,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings).to_file()

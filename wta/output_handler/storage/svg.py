@@ -74,7 +74,7 @@ class SenhisSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
     ) -> None:
         SenhisPlot(texthis, senhis).run()
 
@@ -155,7 +155,7 @@ class SenEditSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -164,7 +164,7 @@ class SenEditSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         SenEditPlot(texthis, senhis, settings).run()
 
@@ -173,7 +173,7 @@ class TsLabelsSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -184,7 +184,7 @@ class TsLabelsSvg(Svg):
     def preprocess_data(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings
     ) -> None:
         TsLabelsPlot(texthis, senhis, settings).run()
@@ -194,7 +194,7 @@ class TsTokensSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -203,7 +203,7 @@ class TsTokensSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         TsTokensPlot(texthis, senhis, settings).run()
 
@@ -212,7 +212,7 @@ class DeletionsSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -221,7 +221,7 @@ class DeletionsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         DeletionsPlot(texthis, senhis, settings).run()
 
@@ -230,7 +230,7 @@ class InsertionsSvg(Svg):
     def __init__(
         self,
         texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -239,6 +239,6 @@ class InsertionsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         InsertionsPlot(texthis, senhis, settings).run()

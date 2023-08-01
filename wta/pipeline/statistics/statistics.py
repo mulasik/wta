@@ -5,7 +5,7 @@ from typing import cast
 import numpy as np
 from bs4 import BeautifulSoup
 
-from ..sentence_histories.text_unit import TextUnit, TextUnitType
+from ..sentence_histories.text_unit import SPSF, TextUnitType
 from ..text_history.action import Action
 from ..text_history.tpsf import TpsfECM, TpsfPCM
 
@@ -154,7 +154,7 @@ class TSStatistics(Statistics):
 
 class SentenceStatistics(Statistics):
     def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
     ) -> None:
         self.texthis = texthis
         self.senhis = senhis

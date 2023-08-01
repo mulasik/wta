@@ -3,7 +3,7 @@ from matplotlib.axes import Axes
 
 from wta.pipeline.names import SenLabels
 
-from ...pipeline.sentence_histories.text_unit import TextUnit, TextUnitType
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnitType
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
@@ -11,7 +11,7 @@ from .colors import Colors
 
 class SenhisPlot(BasePlot):
     def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
     ) -> None:
         texthis = [
             tpsf
@@ -31,7 +31,7 @@ class SenhisPlot(BasePlot):
         self.data = self.preprocess_data(texthis, senhis)
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]]
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
     ) -> dict[int, list[tuple[int, str, str]]]:
         """
         Collects sentence versions for each tpsf (its text and length)

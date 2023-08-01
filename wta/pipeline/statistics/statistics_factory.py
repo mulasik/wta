@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..sentence_histories.text_unit import TextUnit
+from ..sentence_histories.text_unit import SPSF
 from ..text_history.action import Action
 from ..text_history.tpsf import TpsfECM, TpsfPCM
 from .statistics import (
@@ -20,7 +20,7 @@ class StatsFactory:
         texthis_filtered: list[TpsfECM],
         texthis_pcm: list[TpsfPCM],
         actions: list[Action],
-        senhis: dict[int, list[TextUnit]],
+        senhis: dict[int, list[SPSF]],
     ) -> tuple[
         BasicStatistics,
         EventStatistics,

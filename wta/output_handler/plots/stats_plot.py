@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from wta.settings import Settings
 
-from ...pipeline.sentence_histories.text_unit import TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
@@ -15,7 +15,7 @@ _T = TypeVar("_T")
 
 class StatsPlot(BasePlot, Generic[_T]):
     def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[TextUnit]], settings: Settings
+        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         self.texthis = texthis
         self.senhis = senhis
