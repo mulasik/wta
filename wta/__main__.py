@@ -1,4 +1,5 @@
 import argparse
+import json
 import shutil
 import sys
 import traceback
@@ -7,9 +8,9 @@ from pathlib import Path
 from typing import cast
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import SentencehoodEvaluator
-from wta.pipeline.sentence_parsing.facade import ParsingFacade
-from wta.pipeline.sentence_parsing.models import Grammars, Parsers
 
+# from wta.pipeline.sentence_parsing.facade import ParsingFacade
+# from wta.pipeline.sentence_parsing.models import Grammars, Parsers
 from .config_data import ConfigData
 from .language_models.spacy import SpacyModel
 from .output_handler.output_factory import (
@@ -49,6 +50,8 @@ def run() -> None:
     nlp_model = SpacyModel(config["language"])
 
     correctly_processed: list[str] = []
+
+    all_errors = {}
 
     for i, logfile in enumerate(config["ksl_files"]):
         try:
@@ -90,10 +93,16 @@ def run() -> None:
             senhis = senhis_generator.run(tpsfs, settings)
             senhis_fltr = senhis_generator.filter_senhis(senhis)
             SenhisOutputFactory.run(tpsfs, tpsfs_fltr, senhis, senhis_fltr, settings)
-            senhoodhis = SentencehoodEvaluator().run(senhis, nlp_model)
+            senhoodhis, error_details = SentencehoodEvaluator().run(senhis, nlp_model, settings)
+            for e_cat, e_list in error_details.items():
+                if e_cat not in all_errors:
+                    all_errors[e_cat] = e_list
+                else:
+                    for e in e_list:
+                        all_errors[e_cat].add(e)
             SenhoodhisOutputFactory.run(senhoodhis, settings)
 
-            # TODO: PARSE SENHIS
+            # TODO: PARSE SENHIS  # noqa: TD003, FIX002, TD002
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
             # dep_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.DEP)
             # dep_parser.run()
@@ -101,7 +110,7 @@ def run() -> None:
             # const_parser.run()
             # ParseOutputFactory.run(dep_parser.senhis_parses, const_parser.senhis_parses, settings)
             #
-            # TODO: GENERATE TRANSHIS
+            # TODO: GENERATE TRANSHIS  # noqa: TD003, FIX002, TD002
             # print('\n== TRANSFORMATION HISTORIES GENERATION ==')
             # dep_transhis_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
             # const_transhis_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
@@ -113,9 +122,11 @@ def run() -> None:
             b_stats, e_stats, p_stats, ts_stats, sen_stats = StatsFactory().run(logfile, tpsfs, tpsfs_fltr, tpsfs_pcm, actions, senhis)
             StatsOutputFactory.run(b_stats, e_stats, p_stats, ts_stats, sen_stats, logfile, tpsfs, senhis, settings)
 
-        except:
+        except:  # noqa: PERF203
             traceback.print_exc()
             print(f"Failed for {logfile}", file=sys.stderr)
+
+    # print(all_errors)
 
     print("\n== FINAL TEXT HISTORY EVALUATION ==")
     print(f"{len(correctly_processed)} idfx files processed successfully: The final version of the text corresponds to the original text.")
