@@ -1,4 +1,5 @@
 import dataclasses
+from typing import TypedDict
 
 from wta.language_models.spacy import SpacyModel
 from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnitType
@@ -10,6 +11,15 @@ class ErrorTypes:
         "de": "GRAMMAR",
         "fr": "CAT_GRAMMAIRE"
     }
+
+
+class SenhoodDict(TypedDict):
+    text: str
+    mech_completeness: bool
+    con_completeness: bool
+    syn_completeness: bool
+    mech_correctness: bool
+    gram_correctness: bool
 
 
 @dataclasses.dataclass(frozen=True)
@@ -29,6 +39,15 @@ class Sentencehood:
     mech_correctness: bool
     gram_correctness: bool
 
+    def to_dict(self) -> SenhoodDict:
+        return {
+            "text": self.text,
+            "mech_completeness": self.mech_completeness,
+            "con_completeness": self.con_completeness,
+            "syn_completeness": self.syn_completeness,
+            "mech_correctness": self.mech_correctness,
+            "gram_correctness": self.gram_correctness
+        }
 
 
 class SentencehoodEvaluator:

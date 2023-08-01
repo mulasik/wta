@@ -2,6 +2,8 @@ import json
 from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
+from wta.pipeline.sentence_histories.sentencehood_evaluator import SenhoodDict, Sentencehood
+
 from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitDict
 from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
 from ...pipeline.transformation_histories.transformation import Transformation
@@ -68,6 +70,27 @@ class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
         for key, sens in senhis.items():
             _senhis[key] = [s.to_dict() for s in sens]
         return _senhis
+
+
+class SenhoodJson(Json[dict[int, list[SenhoodDict]]]):
+    def __init__(
+        self,
+        data: dict[int, list[Sentencehood]],
+        settings: Settings,
+    ) -> None:
+        self.data = self.preprocess_data(data)
+        json_file = (
+            f"{settings.filename}_{names.SENHOOD}.json"
+        )
+        self.filepath = settings.paths.senhood_json_dir / json_file
+
+    def preprocess_data(
+        self, senhoodhis: dict[int, list[Sentencehood]]
+    ) -> dict[int, list[SenhoodDict]]:
+        _senhoodhis = {}
+        for key, senhood in senhoodhis.items():
+            _senhoodhis[key] = [sh.to_dict() for sh in senhood]
+        return _senhoodhis
 
 
 class TranshisJson(Json[dict[int, list[_AnyDict]]]):

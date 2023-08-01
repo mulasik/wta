@@ -17,7 +17,7 @@ from ..pipeline.text_history.tpsf import TpsfECM, TpsfPCM
 from ..pipeline.text_history.ts import TransformingSequence
 from ..pipeline.transformation_histories.transformation import Transformation
 from ..settings import Settings
-from .storage.json import SenhisJson, TexthisJson, TranshisJson
+from .storage.json import SenhisJson, SenhoodJson, TexthisJson, TranshisJson
 from .storage.svg import (
     ConstTranshisSvg,
     DeletionsSvg,
@@ -128,6 +128,7 @@ class SenhoodhisOutputFactory:
         settings: Settings,
     ) -> None:
         SenhoodhisTxt(senhoodhis, settings).to_file()
+        SenhoodJson(senhoodhis, settings).to_file()
 
 
 class ParseOutputFactory:

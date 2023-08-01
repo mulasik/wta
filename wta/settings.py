@@ -19,6 +19,7 @@ class Paths:
     stats_dir: Path
     senhis_json_dir: Path
     senhis_txt_dir: Path
+    senhood_json_dir: Path
     senhood_txt_dir: Path
     senhis_visual_dir: Path
     dependency_senhis_parses_dir: Path
@@ -63,6 +64,7 @@ def _create_paths(output_dir: Path) -> Paths:
         stats_dir=output_dir / names.STATS,
         senhis_json_dir=senhis_dir / names.JSON,
         senhis_txt_dir=senhis_dir / names.TXT,
+        senhood_json_dir=senhood_dir / names.JSON,
         senhood_txt_dir=senhood_dir / names.TXT,
         senhis_visual_dir=senhis_dir / names.VISUAL,
         dependency_senhis_parses_dir=senhis_parses_dir / names.DEP,
