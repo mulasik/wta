@@ -316,7 +316,7 @@ class TextUnitFactory:
         tu_starts_within_ts = startpos in range(ts.startpos, ts.endpos + 1)
         # two options in case the textunit ends with space
         # if it ends with space this space might have previously build a SIN, but as a SEC has been inserted
-        # the SIN became part of the SEC as per definition (see paper)
+        # the SIN became part of the SEC as per definition (see Languages paper)
         trailing_ws_match = re.search(r"\s+$", tu.text)
         no_trailing_ws = (
             0 if trailing_ws_match is None else len(trailing_ws_match.group(0))
