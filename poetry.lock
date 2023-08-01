@@ -416,6 +416,25 @@ type = "url"
 url = "https://github.com/explosion/spacy-models/releases/download/de_core_news_md-3.5.0/de_core_news_md-3.5.0.tar.gz#egg=de_core_news_md"
 
 [[package]]
+name = "diaparser"
+version = "1.1.3"
+description = "Direct Attentive Dependency Parser"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "diaparser-1.1.3-py3-none-any.whl", hash = "sha256:554b11adc9cb4d911b6923e40296621b4f529585e4a000efde4e2a6d5f75fed6"},
+    {file = "diaparser-1.1.3.tar.gz", hash = "sha256:a8ca0262110c9079d0fbf9cdb254cf90910685c4798529faf4bc4f3033bc54e3"},
+]
+
+[package.dependencies]
+nltk = "*"
+numpy = "*"
+stanza = "1.2.3"
+torch = ">=1.6"
+transformers = "*"
+
+[[package]]
 name = "dill"
 version = "0.3.6"
 description = "serialize all of python"
@@ -445,20 +464,6 @@ spacy = ">=3.5.0,<3.6.0"
 [package.source]
 type = "url"
 url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.5.0/el_core_news_md-3.5.0.tar.gz#egg=el_core_news_md"
-
-[[package]]
-name = "emoji"
-version = "2.2.0"
-description = "Emoji for Python"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-files = [
-    {file = "emoji-2.2.0.tar.gz", hash = "sha256:a2986c21e4aba6b9870df40ef487a17be863cb7778dcf1c01e25917b7cd210bb"},
-]
-
-[package.extras]
-dev = ["coverage", "coveralls", "pytest"]
 
 [[package]]
 name = "en-core-web-md"
@@ -1954,29 +1959,26 @@ catalogue = ">=2.0.3,<2.1.0"
 
 [[package]]
 name = "stanza"
-version = "1.4.2"
+version = "1.2.3"
 description = "A Python NLP Library for Many Human Languages, by the Stanford NLP Group"
 category = "main"
 optional = false
 python-versions = ">=3.6"
 files = [
-    {file = "stanza-1.4.2-py3-none-any.whl", hash = "sha256:0f2c9d9f6f37cfe96dd77e441f7f9e62fa2484850a748e72c494163eb23827b2"},
-    {file = "stanza-1.4.2.tar.gz", hash = "sha256:2f4780ee05e4920392eebef05e1632838e68c98eccc9cc9259f37ab7a00ba700"},
+    {file = "stanza-1.2.3-py3-none-any.whl", hash = "sha256:b11a96791f34046b71d1760ad5ab7afdd536c18592909318a69876b308183904"},
+    {file = "stanza-1.2.3.tar.gz", hash = "sha256:6a27f1990f4981d982939198d5c872b93fd6e1858345a915e33f42fc50b3cf22"},
 ]
 
 [package.dependencies]
-emoji = "*"
 numpy = "*"
 protobuf = "*"
 requests = "*"
-six = "*"
 torch = ">=1.3.0"
 tqdm = "*"
 
 [package.extras]
 dev = ["check-manifest"]
-test = ["coverage", "pytest"]
-transformers = ["transformers (>=3.0.0)"]
+test = ["coverage"]
 
 [[package]]
 name = "supar"
@@ -2406,4 +2408,4 @@ test = ["pytest (>=3.0.0)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "df7316eb66b6e041befb8e7d4592af0d2a10c3dcd121f44bad1e5fbc56054702"
+content-hash = "b162b7492312959105a09eb6f8c72bb3f6920d24441faadf25805e465da15288"
