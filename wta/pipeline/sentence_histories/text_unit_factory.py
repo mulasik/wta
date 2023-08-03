@@ -42,6 +42,7 @@ class TextUnitFactory:
         #     f"\nINITIAL TEXTUNITS: {[(tu.text, tu.text_unit_type) for tu in textunit_list]}"
         # )
         # print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}")
+
         corrected_tus = self._improve_segmentation_with_prev_tus(
             merged_textunit_list, prev_tpsf
         )
@@ -111,6 +112,13 @@ class TextUnitFactory:
                         )
                         textunit_list.append(sin)
 
+        return textunit_list
+
+    def split_fused_sentences(
+        self, textunit_list: list[TextUnitBuilder]
+    ) -> list[TextUnitBuilder]:
+        # TODO Split sentences which spaCy classified as one sentence.
+        # Especially if they are separated by „\n\t“ without a space
         return textunit_list
 
     def _merge_double_textunits(
