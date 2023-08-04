@@ -5,13 +5,31 @@ from wta.language_models.spacy import SpacyModel
 from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnitType
 from wta.settings import Settings
 
-
-class ErrorTypes:
-    GRAMMAR = {
-        "de": "GRAMMAR",
-        "fr": "CAT_GRAMMAIRE"
+_GRAMMAR = {
+        "de": [
+            "GRAMMAR"
+        ],
+        "fr": [
+            "CAT_GRAMMAIRE",
+            "AGREEMENT",
+            "CAT_HOMONYMES_PARONYMES"
+        ]
     }
-
+_MECHANICS = {
+        "de": [
+            "TYPOS",
+            "CASING",
+            "HILFESTELLUNG_KOMMASETZUNG"
+        ],
+        "fr": [
+            "TYPOS",
+            "CAT_TYPOGRAPHIE",
+            "CAT_ELISION",
+            "CASING",
+            "CAT_MAJUSCULES",
+            "PUNCTUATION"
+        ]
+    }
 
 class SenhoodDict(TypedDict):
     text: str
@@ -72,12 +90,10 @@ class SentencehoodEvaluator:
                         error_details[e.category] = set(spsf.text[e.offset:e.offset+e.errorLength])
                     else:
                         error_details[e.category].add(spsf.text[e.offset:e.offset+e.errorLength])
-                gramm_correctness = bool(ErrorTypes.GRAMMAR[settings.config["language"]] not in error_types)
-                mech_correctness = bool(
-                    mech_completeness
-                    and "TYPOS" not in error_types
-                    and "CASING" not in error_types
-                    and "HILFESTELLUNG_KOMMASETZUNG" not in error_types)
+                grammatical_errors = [err for err in _GRAMMAR[settings.config["language"]] if err in error_types]
+                gramm_correctness = bool(grammatical_errors == [])
+                mechanical_errors = [err for err in _MECHANICS[settings.config["language"]] if err in error_types]
+                mech_correctness = bool(mech_completeness and mechanical_errors == [])
                 sentencehood = Sentencehood(
                     text=spsf.text,
                     mech_completeness=mech_completeness,
