@@ -135,11 +135,11 @@ class SentenceHistoryGenerator:
         sentence_history_duplicates_eliminated = {}
         for key, sens in sentence_history.items():
             sens_duplicates_eliminated: list[SPSFBuilder] = []
+            prev_sen: str = ""
             for s in sens:
-                if s.text not in [sde.text for sde in sens_duplicates_eliminated]:
+                if s.text != prev_sen:
                     sens_duplicates_eliminated.append(s)
-                else:
-                    continue
+                prev_sen = s.text
             sentence_history_duplicates_eliminated[key] = sens_duplicates_eliminated
         return sentence_history_duplicates_eliminated
 
