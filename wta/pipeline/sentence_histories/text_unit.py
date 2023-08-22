@@ -20,6 +20,7 @@ class TextUnitType(enum.IntEnum):
     SIN = enum.auto()
     SEC = enum.auto()
     SEN = enum.auto()
+    PIN = enum.auto()
 
 
 class SPSFDict(TypedDict):
@@ -37,10 +38,11 @@ class SPSFDict(TypedDict):
 class TextUnit:
     """
     TextUnits are elements that the text is composed of.
-    There are two types of TextUnits:
+    There are three types of TextUnits:
     - Sentence (SEN)
     - Sentence Interspace (SIN) (the space between the sentences such as a whitespace or a newline)
     - Sentence Candidate (SEC) (an incomplete sentence)
+    - Paragraph Interspace (PIN) (one or multiple whitespace characters occurring at any position in text: tab, newline, return, vertical tab)
     """
 
     text_unit_type: TextUnitType
@@ -78,10 +80,11 @@ TPSF {s["tpsf_id"]}, type {s["text_unit_type"].name}, state {s["state"]}:
 class TextUnitBuilder:
     """
     TextUnits are elements that the text is composed of.
-    There are two types of TextUnits:
+    There are three types of TextUnits:
     - Sentence (SEN)
     - Sentence Interspace (SIN) (the space between the sentences such as a whitespace or a newline)
     - Sentence Candidate (SEC) (an incomplete sentence)
+    - Paragraph Interspace (PIN) (one or multiple whitespace characters occurring at any position in text: tab, newline, return, vertical tab)
     """
 
     def __init__(self, text_unit_type: TextUnitType, text: str) -> None:
