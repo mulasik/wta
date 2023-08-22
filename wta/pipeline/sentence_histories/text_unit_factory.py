@@ -98,31 +98,54 @@ class TextUnitFactory:
                 textunit_list.append(sin)
                 s = s.replace(found_initial_sin.group(0), "")
 
-            found_middle_sin = regular_expressions.MIDDLE_WS_RE.search(s)
-            if found_middle_sin is not None:
-                middle_sin = found_middle_sin.group(0)
-                split_sens = s.split(middle_sin)
-                first_sen = split_sens[0]
-                first_sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", first_sen)
-                if first_sen_with_ws_trimmed != "":
-                    uppercase_letter = starts_with_uppercase_letter(first_sen_with_ws_trimmed)
-                    end_punctuation = ends_with_end_punctuation(first_sen_with_ws_trimmed)
-                    if not uppercase_letter or not end_punctuation:
-                        first_sec = first_sen + middle_sin
-                        sec = TextUnitBuilder(TextUnitType.SEC, first_sec)
-                        textunit_list.append(sec)
+            middle_sins = regular_expressions.MIDDLE_WS_RE.findall(s)
+            print(middle_sins)
+            middle_sin_matches = []
+            for middle_sin_tup in middle_sins:
+                match = [t for t in middle_sin_tup if t != ""][0]
+                middle_sin_matches.append(match)
+            if middle_sin_matches != []:
+                print(middle_sin_matches)
+                for middle_sin in middle_sin_matches:
+                    print(f"Found middle sin: |{middle_sin}|")
+                    split_sens = s.split(middle_sin, 1)
+                    print(f"There are {len(split_sens)} SPSFs in this sequence split by middle SIN:")
+                    first_sen = split_sens[0]
+                    second_sen = "" if len(split_sens) == 1 else split_sens[1]
+                    print(f"first_sen: {first_sen}")
+                    print(f"second_sen: {second_sen}")
+                    first_sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", first_sen)
+                    if first_sen_with_ws_trimmed != "":
+                        uppercase_letter = starts_with_uppercase_letter(first_sen_with_ws_trimmed)
+                        end_punctuation = ends_with_end_punctuation(first_sen_with_ws_trimmed)
+                        if not uppercase_letter or not end_punctuation:
+                            print(f"First SPSF before SIN is a SEC: |{first_sen_with_ws_trimmed}|")
+                            second_sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", second_sen)
+                            uppercase_letter_sec = starts_with_uppercase_letter(second_sen_with_ws_trimmed)
+                            end_punctuation_sec = ends_with_end_punctuation(second_sen_with_ws_trimmed)
+                            sec_content = s if not uppercase_letter_sec or not end_punctuation_sec else first_sen + middle_sin
+                            print(f"This is the content of the SEC: |{sec_content}|")
+                            sec = TextUnitBuilder(TextUnitType.SEC, sec_content)
+                            textunit_list.append(sec)
+                            s = "" if sec_content == s else second_sen
+                            if s == "":
+                                break
+                        else:
+                            print(f"First SPSF before SIN is a SEN: |{first_sen_with_ws_trimmed}|")
+                            sen = TextUnitBuilder(TextUnitType.SEN, first_sen_with_ws_trimmed)
+                            textunit_list.append(sen)
+                            found_trailing_ws = regular_expressions.TRAILING_WS_RE.search(first_sen)
+                            trailing_ws = "" if found_trailing_ws is None else found_trailing_ws.group(0)
+                            sin_content = f"{trailing_ws}{middle_sin}"
+                            print(f"Added a SIN after the SEN: |{sin_content}|")
+                            sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
+                            textunit_list.append(sin)
+                            s = second_sen
                     else:
-                        sen = TextUnitBuilder(TextUnitType.SEN, first_sen_with_ws_trimmed)
-                        textunit_list.append(sen)
-                        found_trailing_ws = regular_expressions.TRAILING_WS_RE.search(first_sen)
-                        trailing_ws = "" if found_trailing_ws is None else found_trailing_ws.group(0)
-                        sin_content = f"{trailing_ws}{middle_sin}"
-                        sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
+                        sin = TextUnitBuilder(TextUnitType.SIN, middle_sin)
                         textunit_list.append(sin)
-                else:
-                    sin = TextUnitBuilder(TextUnitType.SIN, middle_sin)
-                    textunit_list.append(sin)
-                s = split_sens[1]
+                        s = second_sen
+            print(f"After checking middle SIN, I ended up with the following SPSF: |{s}|")
 
             sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", s)
             if sen_with_ws_trimmed != "":
