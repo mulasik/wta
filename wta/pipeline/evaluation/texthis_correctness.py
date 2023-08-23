@@ -1,5 +1,5 @@
-from pathlib import Path
 import re
+from pathlib import Path
 
 from wta.pipeline.text_history.tpsf import TpsfECM
 from wta.settings import Settings

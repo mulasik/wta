@@ -27,21 +27,22 @@ class TextUnitFactory:
 
         sentence_list = settings.nlp_model.segment_text(text)
 
+        print(
+            f"\n\n=============================={revision_id}==============================\n"
+        )
+        print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|\n")
+        print(f"Text segment impacted by the TS: |{text[ts.startpos:ts.endpos+1]}|")
+        print(f"TEXT: {text}")
+        print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
+
         textunit_list = self._split_in_textunits(sentence_list)
 
         merged_textunit_list = self._merge_double_textunits(textunit_list)
 
-        # print(
-        #     f"\n\n=============================={revision_id}==============================\n"
-        # )
-        # print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|\n")
-        # print(f"Text segment impacted by the TS: |{text[ts.startpos:ts.endpos+1]}|")
-        # print(f"TEXT: {text}")
-        # print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
-        # print(
-        #     f"\nINITIAL TEXTUNITS: {[(tu.text, tu.text_unit_type) for tu in textunit_list]}\n"
-        # )
-        # print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}\n")
+        print(
+            f"\nINITIAL TEXTUNITS: {[(tu.text, tu.text_unit_type) for tu in textunit_list]}\n"
+        )
+        print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}\n")
 
         corrected_tus = self._improve_segmentation_with_prev_tus(
             merged_textunit_list, prev_tpsf
@@ -75,14 +76,114 @@ class TextUnitFactory:
 
         return tuple(tu.to_text_unit() for tu in tus)
 
+    def collect_preceding_sins_and_pins(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+        starts_with_s = regular_expressions.PRECEDING_S_RE.search(seq)
+        starts_with_pws = regular_expressions.PRECEDING_PWS_RE.search(seq)
+        if starts_with_s is not None:
+            sin_content = starts_with_s.group(0)
+            sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
+            textunit_list.append(sin)
+            seq = re.sub(sin_content, "", seq)
+        elif starts_with_pws is not None:
+            pin_content = starts_with_pws.group(0)
+            pin = TextUnitBuilder(TextUnitType.PIN, pin_content)
+            textunit_list.append(pin)
+            seq = re.sub(pin_content, "", seq)
+        else:
+            return seq, textunit_list
+        return self.collect_preceding_sins_and_pins(seq, textunit_list)
+
+    def find_middle_pins(self, seq: str) -> list[str]:
+        middle_pins = regular_expressions.MIDDLE_PWS_RE.findall(seq)
+        middle_pin_matches = []
+        for middle_pin_tup in middle_pins:
+            match = [t for t in middle_pin_tup if t != ""][0]
+            middle_pin_matches.append(match)
+        return middle_pin_matches
+
+    def split_tu_by_pins(self, seq: str, textunit_list: list[TextUnitBuilder], middle_pins: list[str]) -> tuple[str, list[TextUnitBuilder]]:
+        if middle_pins == []:
+            return seq, textunit_list
+        middle_pin = middle_pins.pop(0)
+        print(f"Splitting by the PIN: |{middle_pin}|")
+        split_tus = seq.split(middle_pin, 1)
+        print(f"There are {len(split_tus)} TUs in this sequence split by middle PIN:")
+        first_tu = split_tus[0]
+        second_tu = "" if len(split_tus) == 1 else split_tus[1]
+        print(f"First TU: |{first_tu}|")
+        print(f"Second TU: |{second_tu}|")
+        _, textunit_list = self.retrieve_sen_or_sec(first_tu, textunit_list)
+        pin = TextUnitBuilder(TextUnitType.PIN, middle_pin)
+        textunit_list.append(pin)
+        return self.split_tu_by_pins(second_tu, textunit_list, middle_pins)
+
+    def trim_trailing_sins_and_pins(self, seq: str) -> str:
+        ends_with_s = regular_expressions.TRAILING_S_RE.search(seq)
+        ends_with_pws = regular_expressions.TRAILING_PWS_RE.search(seq)
+        if ends_with_s is not None:
+            seq = re.sub(regular_expressions.TRAILING_S_RE, "", seq)
+        elif ends_with_pws is not None:
+            seq = re.sub(regular_expressions.TRAILING_PWS_RE, "", seq)
+        else:
+            return seq
+        return self.trim_trailing_sins_and_pins(seq)
+
+    def collect_trailing_sins_and_pins(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+        ends_with_s = regular_expressions.TRAILING_S_RE.search(seq)
+        ends_with_pws = regular_expressions.TRAILING_PWS_RE.search(seq)
+        if ends_with_s is not None:
+            sin_content = ends_with_s.group(0)
+            sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
+            textunit_list.append(sin)
+            seq = re.sub(sin_content, "", seq)
+        elif ends_with_pws is not None:
+            pin_content = ends_with_pws.group(0)
+            pin = TextUnitBuilder(TextUnitType.PIN, pin_content)
+            textunit_list.append(pin)
+            seq = re.sub(pin_content, "", seq)
+        else:
+            # seq should be empty after the function is executed
+            return seq, textunit_list
+        return self.collect_trailing_sins_and_pins(seq, textunit_list)
+
+    def retrieve_sen_or_sec(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+        # if the seq contains only space characters, no SEN or SEC can be retrieved
+        if re.search(regular_expressions.ONLY_S_RE, seq) is not None:
+            return seq, textunit_list
+        seq_with_whitespaces_trimmed = self.trim_trailing_sins_and_pins(seq)
+        uppercase_letter = starts_with_uppercase_letter(seq_with_whitespaces_trimmed)
+        end_punctuation = ends_with_end_punctuation(seq_with_whitespaces_trimmed)
+        if not uppercase_letter or not end_punctuation and re.search(regular_expressions.ONLY_S_RE, seq) is None:
+            sec = TextUnitBuilder(TextUnitType.SEC, seq)
+            textunit_list.append(sec)
+            seq = ""
+        else:
+            sen = TextUnitBuilder(TextUnitType.SEN, seq_with_whitespaces_trimmed)
+            textunit_list.append(sen)
+            seq = re.sub(seq_with_whitespaces_trimmed, "", seq)
+            seq, textunit_list = self.collect_trailing_sins_and_pins(seq, textunit_list)
+        # seq should be empty after the function is executed
+        return seq, textunit_list
+
     def _split_in_textunits(self, sentence_list: list[str]) -> list[TextUnitBuilder]:
         textunit_list: list[TextUnitBuilder] = []
 
         for s in sentence_list:
-            contains_only_ws = regular_expressions.ONLY_WS_RE.search(s) is not None
-            if contains_only_ws is True:
+
+            # print(f"\n\n\n\n****** Analysing sentence:\n|{s}|\n******")
+
+            # check if s contains only space chars > SIN
+            contains_only_s = regular_expressions.ONLY_S_RE.search(s)
+            if contains_only_s is not None:
                 sin = TextUnitBuilder(TextUnitType.SIN, s)
                 textunit_list.append(sin)
+                continue
+
+            # check if s contains only paragraph whitespace chars > PIN
+            contains_only_pws = regular_expressions.ONLY_PWS_RE.search(s)
+            if contains_only_pws is not None:
+                pin = TextUnitBuilder(TextUnitType.PIN, s)
+                textunit_list.append(pin)
                 continue
 
             # Handling special cases: incorrect SpaCy segmentation in case of citations with «»
@@ -90,86 +191,25 @@ class TextUnitFactory:
             found_end_citation_at_beginning = re.search(r"\A»", s)
             if found_end_citation_at_beginning is not None:
                 textunit_list[-1] = textunit_list[-1].copy_with_appended_text("»")
-                s = re.sub(r"\A»", "", s)
+                s = re.sub(regular_expressions.PRECEDING_END_CITATION, "", s)
 
-            found_initial_sin = regular_expressions.INITIAL_WS_RE.search(s)
-            if found_initial_sin is not None:
-                sin = TextUnitBuilder(TextUnitType.SIN, found_initial_sin.group(0))
-                textunit_list.append(sin)
-                s = s.replace(found_initial_sin.group(0), "")
-
-            middle_sins = regular_expressions.MIDDLE_WS_RE.findall(s)
-            print(middle_sins)
-            middle_sin_matches = []
-            for middle_sin_tup in middle_sins:
-                match = [t for t in middle_sin_tup if t != ""][0]
-                middle_sin_matches.append(match)
-            if middle_sin_matches != []:
-                print(middle_sin_matches)
-                for middle_sin in middle_sin_matches:
-                    print(f"Found middle sin: |{middle_sin}|")
-                    split_sens = s.split(middle_sin, 1)
-                    print(f"There are {len(split_sens)} SPSFs in this sequence split by middle SIN:")
-                    first_sen = split_sens[0]
-                    second_sen = "" if len(split_sens) == 1 else split_sens[1]
-                    print(f"first_sen: {first_sen}")
-                    print(f"second_sen: {second_sen}")
-                    first_sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", first_sen)
-                    if first_sen_with_ws_trimmed != "":
-                        uppercase_letter = starts_with_uppercase_letter(first_sen_with_ws_trimmed)
-                        end_punctuation = ends_with_end_punctuation(first_sen_with_ws_trimmed)
-                        if not uppercase_letter or not end_punctuation:
-                            print(f"First SPSF before SIN is a SEC: |{first_sen_with_ws_trimmed}|")
-                            second_sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", second_sen)
-                            uppercase_letter_sec = starts_with_uppercase_letter(second_sen_with_ws_trimmed)
-                            end_punctuation_sec = ends_with_end_punctuation(second_sen_with_ws_trimmed)
-                            sec_content = s if not uppercase_letter_sec or not end_punctuation_sec else first_sen + middle_sin
-                            print(f"This is the content of the SEC: |{sec_content}|")
-                            sec = TextUnitBuilder(TextUnitType.SEC, sec_content)
-                            textunit_list.append(sec)
-                            s = "" if sec_content == s else second_sen
-                            if s == "":
-                                break
-                        else:
-                            print(f"First SPSF before SIN is a SEN: |{first_sen_with_ws_trimmed}|")
-                            sen = TextUnitBuilder(TextUnitType.SEN, first_sen_with_ws_trimmed)
-                            textunit_list.append(sen)
-                            found_trailing_ws = regular_expressions.TRAILING_WS_RE.search(first_sen)
-                            trailing_ws = "" if found_trailing_ws is None else found_trailing_ws.group(0)
-                            sin_content = f"{trailing_ws}{middle_sin}"
-                            print(f"Added a SIN after the SEN: |{sin_content}|")
-                            sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
-                            textunit_list.append(sin)
-                            s = second_sen
-                    else:
-                        sin = TextUnitBuilder(TextUnitType.SIN, middle_sin)
-                        textunit_list.append(sin)
-                        s = second_sen
-            print(f"After checking middle SIN, I ended up with the following SPSF: |{s}|")
-
-            sen_with_ws_trimmed = regular_expressions.TRAILING_WS_RE.sub("", s)
-            if sen_with_ws_trimmed != "":
-                uppercase_letter = starts_with_uppercase_letter(sen_with_ws_trimmed)
-                end_punctuation = ends_with_end_punctuation(sen_with_ws_trimmed)
-                if not uppercase_letter or not end_punctuation:
-                    sec = TextUnitBuilder(TextUnitType.SEC, s)
-                    textunit_list.append(sec)
-                else:
-                    sen = TextUnitBuilder(TextUnitType.SEN, sen_with_ws_trimmed)
-                    textunit_list.append(sen)
-                    found_initial_sin = regular_expressions.TRAILING_WS_RE.search(s)
-                    if found_initial_sin is not None:
-                        sin = TextUnitBuilder(
-                            TextUnitType.SIN, found_initial_sin.group(0)
-                        )
-                        textunit_list.append(sin)
+            s, textunit_list = self.collect_preceding_sins_and_pins(s, textunit_list)
+            middle_pins = self.find_middle_pins(s)
+            print(f"Found middle pins: {middle_pins} in |{s}|")
+            s, textunit_list = self.split_tu_by_pins(s, textunit_list, middle_pins)
+            print(f"I am now left with |{s}|")
+            if s != "":
+                s, textunit_list = self.retrieve_sen_or_sec(s, textunit_list)
+                print(f"After retrieving SEN or SEC I got: |{s}|")
+            if s != "":
+                s, textunit_list = self.collect_trailing_sins_and_pins(s, textunit_list)
+                print(f"After trailing SINs and PINs I got: |{s}|")
 
         return textunit_list
 
     def _merge_double_textunits(
         self, textunit_list: list[TextUnitBuilder]
     ) -> list[TextUnitBuilder]:
-        # TODO: Issue with merging: 'So hat sie eine Qualt\n\nDie Qualitätsstrategie ', 'Die Qualitätsstrategie
         if not any(
             i.text_unit_type == j.text_unit_type != TextUnitType.SEN
             for (i, j) in zip(textunit_list, textunit_list[1:])
@@ -182,14 +222,16 @@ class TextUnitFactory:
         merged_textunits = []
         merged = False
         for i, j in zip(textunit_list, textunit_list[1:]):
+            print("\n\nComparing")
+            print(f"|{i.text}|")
+            print("with")
+            print(f"|{j.text}|")
             if (
                 i.text_unit_type == j.text_unit_type != TextUnitType.SEN
                 and i.text != prev_merged_text
             ):
                 merged_tu_text = i.text + j.text
-                text_wo_trailing_ws = regular_expressions.TRAILING_WS_RE.sub(
-                    "", merged_tu_text
-                )
+                text_wo_trailing_ws = self.trim_trailing_sins_and_pins(merged_tu_text)
                 uppercase_letter = starts_with_uppercase_letter(text_wo_trailing_ws)
                 end_punctuation = ends_with_end_punctuation(text_wo_trailing_ws)
                 if not uppercase_letter or not end_punctuation:
@@ -198,17 +240,22 @@ class TextUnitFactory:
                 else:
                     sen = TextUnitBuilder(TextUnitType.SEN, text_wo_trailing_ws)
                     merged_textunits.append(sen)
-                    sin_content = merged_tu_text.replace(text_wo_trailing_ws, "")
-                    if len(sin_content) > 0:
-                        sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
-                        merged_textunits.append(sin)
+                    remaining_content = merged_tu_text.replace(text_wo_trailing_ws, "")
+                    _, merged_textunits = self.collect_trailing_sins_and_pins(remaining_content, merged_textunits)
                 prev_merged_text = j.text
                 merged = True
+                print(f"I have merged: |{merged_tu_text}|")
+                print(f"Merge flag: {merged}")
+                print(f"Prev merged text is: |{prev_merged_text}|")
             elif i.text != prev_merged_text:
                 merged_textunits.append(i)
                 prev_merged_text = ""
                 merged = False
-        if merged is False:
+                print(f"I have NOT merged: |{i.text}|")
+                print(f"Merge flag: {merged}")
+                print(f"Prev merged text is: |{prev_merged_text}|")
+        if j.text != prev_merged_text:
+            print(f"I have added |{j.text}| to text units list")
             merged_textunits.append(j)
         return self._merge_double_textunits(merged_textunits)
 
@@ -237,12 +284,6 @@ class TextUnitFactory:
                     corrected_tus.append(matching_sen)
                 new_ctu_text = tu.text.replace(matching_sen.text, "")
                 if new_ctu_text != "":
-                    preceding_whitespace = regular_expressions.INITIAL_WS_RE.search(new_ctu_text)
-                    if preceding_whitespace is not None:
-                        preceding_sin_content = preceding_whitespace.group(0)
-                        sin = TextUnitBuilder(TextUnitType.SIN, preceding_sin_content)
-                        corrected_tus.append(sin)
-                        new_ctu_text = new_ctu_text.replace(preceding_sin_content, "")
                     uppercase_letter = starts_with_uppercase_letter(new_ctu_text)
                     end_punctuation = ends_with_end_punctuation(new_ctu_text)
                     if not uppercase_letter or not end_punctuation:
@@ -251,16 +292,10 @@ class TextUnitFactory:
                     else:
                         sen = TextUnitBuilder(
                             TextUnitType.SEN,
-                            regular_expressions.TRAILING_WS_RE.sub("", new_ctu_text),
+                            regular_expressions.TRAILING_S_RE.sub("", new_ctu_text),
                         )
                         corrected_tus.append(sen)
-                        match = regular_expressions.TRAILING_WS_RE.search(new_ctu_text)
-                        sin_content = None if match is None else match.group(0)
-                        if sin_content is not None:
-                            sin = TextUnitBuilder(TextUnitType.SIN, sin_content)
-                            corrected_tus.append(sin)
                 if matching_sen_index > 0:
-
                     corrected_tus.append(matching_sen)
             elif len(matching_prev_sens) == 0:
                 corrected_tus.append(tu)
@@ -288,17 +323,11 @@ class TextUnitFactory:
             # if the edit consists in deleting or reducing sentence interspace
             if (
                 len(impacted_tus) == 1
-                and impacted_tus[0].text_unit_type == TextUnitType.SIN
+                and impacted_tus[0].text_unit_type in[TextUnitType.SIN, TextUnitType.PIN]
                 and ts.label in (TSLabels.MID, TSLabels.DEL)
             ):
-                reduced_sin_content = impacted_tus[0].text.replace(ts.text, "", 1)
-                if reduced_sin_content == "":
-                    impacted_tus = []
-                else:
-                    match = regular_expressions.ONLY_WS_RE.search(reduced_sin_content)
-                    if match is not None:
-                        sin_content = match.group(0)
-                        impacted_tus = [TextUnitBuilder(TextUnitType.SIN, sin_content)]
+                reduced_in_content = impacted_tus[0].text.replace(ts.text, "", 1)
+                impacted_tus = [] if reduced_in_content == "" else [impacted_tus[0].copy_with_text(reduced_in_content)]
             else:
                 impacted_tus = [
                     tu
@@ -396,8 +425,9 @@ class TextUnitFactory:
         if tu in post_tus and tu.text in [t.text for t in prev_tus]:
             return SenLabels.UNC_POST
 
-        if tu in post_tus and tu.text not in [t.text for t in prev_tus]:
-            return SenLabels.SPLIT
+        # TODO: find a method from detecting sentence splits
+        # if tu in post_tus and tu.text not in [t.text for t in prev_tus]:
+        #     return SenLabels.SPLIT
 
         if (
             ts.label in [TSLabels.INS, TSLabels.APP, TSLabels.PAST]
@@ -406,20 +436,21 @@ class TextUnitFactory:
         ):
             return SenLabels.NEW
 
-        if no_tus_increased is True:
-            # check if tu without the ts was is prev tus list
-            # then the status is "split"
-            ts_split_by_tu = re.split(r"(\.|\?|!)", ts.text)
-            ts_first_tu = "".join(ts_split_by_tu[:2])
-            tu_wo_ts = tu.text.replace(ts_first_tu, "")
-            tu_wo_ts_found_in_prev = False
-            for i, ptu in enumerate(prev_tus):
-                if tu_wo_ts in ptu.text:
-                    tu_wo_ts_found_in_prev = True
-                    last_prev_tu = i == len(prev_tus) - 1
-                    break
-            if tu_wo_ts_found_in_prev and not last_prev_tu:
-                return SenLabels.SPLIT
+    # TODO: find a method from detecting sentence splits
+        # if no_tus_increased is True:
+        #     # check if tu without the ts was is prev tus list
+        #     # then the status is "split"
+        #     ts_split_by_tu = re.split(r"(\.|\?|!)", ts.text)
+        #     ts_first_tu = "".join(ts_split_by_tu[:2])
+        #     tu_wo_ts = tu.text.replace(ts_first_tu, "")
+        #     tu_wo_ts_found_in_prev = False
+        #     for i, ptu in enumerate(prev_tus):
+        #         if tu_wo_ts in ptu.text:
+        #             tu_wo_ts_found_in_prev = True
+        #             last_prev_tu = i == len(prev_tus) - 1
+        #             break
+        #     if tu_wo_ts_found_in_prev and not last_prev_tu:
+        #         return SenLabels.SPLIT
 
         return SenLabels.MOD
 
