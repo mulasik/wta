@@ -19,8 +19,8 @@ def check_texthis_correctness(last_tpsf: TpsfECM, filename: str, settings: Setti
         return True
     diffs = retrieve_mismatch_ranges(text.strip(), last_tpsf.text.strip())
     print("INFO: Failure when generating text history. Last text version is not the same as the text produced.")
-    # print(f"\nThe final text in text history:\n{last_tpsf.text.strip()}")
-    # print(f"\nThe original text:\n{text.strip()}")
+    print(f"\nThe final text in text history:\n{last_tpsf.text.strip()}")
+    print(f"\nThe original text:\n{text.strip()}")
     print("\nATTENTION: The differences between the original and the retrieved text:\n")
     empty_diffs = []
     for diff in diffs:
