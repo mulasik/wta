@@ -1,3 +1,4 @@
+import re
 import uuid
 
 from tqdm import tqdm
@@ -15,7 +16,7 @@ class SentenceHistoryGenerator:
     def run(
         self, tpsfs: list[TpsfECM], settings: Settings
     ) -> dict[int, list[SPSF]]:
-        sentence_history_builder = {}
+        sentence_history_builder: dict[int, list[SPSFBuilder]] = {}
         sentence_history = {}
         global_new_sens = []
         prev_spsf_builders: list[SPSFBuilder] = []
@@ -45,9 +46,8 @@ class SentenceHistoryGenerator:
                         sentence_history_builder[psv.sen_id].append(csv)
             elif i > 0 and len(current_spsf_builders) < len(prev_spsf_builders):
                 # print(
-                #     f"Sentence deletion detected: from {len(prev_senver_builders)} to {len(current_senver_builders)}"
+                #     f"Sentence deletion detected: from {len(prev_spsf_builders)} to {len(current_spsf_builders)}"
                 # )
-                number_deleted = abs(len(current_spsf_builders) - len(prev_spsf_builders))
                 for i, csv in enumerate(current_spsf_builders):
                     if csv.state == SenLabels.UNC_PRE:
                         prev_sen_id = prev_spsf_builders[i].sen_id
@@ -55,11 +55,11 @@ class SentenceHistoryGenerator:
                             csv.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(csv)
                     elif csv.state in [SenLabels.MOD, SenLabels.UNC_POST]:
-                        prev_sen_id = prev_spsf_builders[i + number_deleted].sen_id 
-                        # TODO check if the code csv.set_id(prev_senver_builders[i - number_new].sen_id) made sense
-                        if prev_sen_id is not None:
-                            csv.set_id(prev_sen_id)
-                            sentence_history_builder[prev_sen_id].append(csv)
+                        prev_spsf_ids = [spsf.sen_id for spsf in prev_spsf_builders if re.search(csv.text, spsf.text) is not None]
+                        prev_spsf_id = None if len(prev_spsf_ids) == 0 else prev_spsf_ids[0]
+                        if prev_spsf_id is not None:
+                            csv.set_id(prev_spsf_id)
+                            sentence_history_builder[prev_spsf_id].append(csv)
             elif i > 0 and len(current_spsf_builders) > len(prev_spsf_builders):
                 # print(
                 #     f"Sentence creation detected: from {len(prev_spsf_builders)} to {len(current_senver_builders)}"
@@ -72,16 +72,17 @@ class SentenceHistoryGenerator:
                             sentence_history_builder[prev_sen_id].append(ctu)
                     elif ctu.state in [SenLabels.NEW, SenLabels.SPLIT]:
                         number_new += 1
-                        if ctu.text in global_new_sens:
-                            for key, sens in sentence_history_builder.items():
-                                texts = [s.text for s in sens]
-                                if ctu.text in texts:
-                                    sentence_history_builder[key].append(ctu)
-                                    ctu.set_id(key)
-                        else:
-                            uid = uuid.uuid1().int
-                            sentence_history_builder[uid] = [ctu]
-                            ctu.set_id(uid)
+                        # TODO: consider a better method for tracking re-inserted sentences
+                        # if ctu.text in global_new_sens:
+                        #     for key, sens in sentence_history_builder.items():
+                        #         texts = [s.text for s in sens]
+                        #         if ctu.text in texts:
+                        #             sentence_history_builder[key].append(ctu)
+                        #             ctu.set_id(key)
+                        # else:
+                        uid = uuid.uuid1().int
+                        sentence_history_builder[uid] = [ctu]
+                        ctu.set_id(uid)
                         global_new_sens.append(ctu.text)
                     elif ctu.state in [SenLabels.MOD, SenLabels.UNC_POST]:
                         try:
@@ -91,10 +92,10 @@ class SentenceHistoryGenerator:
                                 sentence_history_builder[prev_sen_id].append(ctu)
                         except IndexError:
                             print(
-                                "ATTENTION: Detected error when counting textunits. "
-                                "Probably a textunit segementation error. "
-                                "Cannot assign the textunit to any sentence history. "
-                                "Creating a new sentence history"
+                                "ATTENTION: Detected error when counting textunits."
+                                "Probably a textunit segementation error."
+                                "Cannot assign the textunit to any sentence history."
+                                "Creating a new sentence history."
                             )
                             uid = uuid.uuid1().int
                             sentence_history_builder[uid] = [ctu]
