@@ -358,41 +358,40 @@ class IdfxParser:
                     delete_count = 0
 
                 # CHAR DELETION: removing chars with backspace
-                if key_name == self.BACKSPACE:
-                    if pos > 0:
-                        # if this is the first edit action on the current text,
-                        # capture the current TPSF, before any edits are made
-                        if backspace_count == 0:
-                            event_desc = self.PRE_DEL
-                            edit = (prev_pos, removed_sequence, inserted_sequence)
-                            prev_tpsf = (
-                                None
-                                if len(self.all_tpsfs_ecm) == 0
-                                else self.all_tpsfs_ecm[-1]
-                            )
-                            tpsf = TpsfEcm(
-                                len(self.all_tpsfs_ecm),
-                                output_chars,
-                                edit,
-                                pause,
-                                event_desc,
-                                prev_tpsf,
-                                self.config,
-                                self.nlp_model,
-                            )
+                if key_name == self.BACKSPACE and pos > 0:
+                    # if this is the first edit action on the current text,
+                    # capture the current TPSF, before any edits are made
+                    if backspace_count == 0:
+                        event_desc = self.PRE_DEL
+                        edit = (prev_pos, removed_sequence, inserted_sequence)
+                        prev_tpsf = (
+                            None
+                            if len(self.all_tpsfs_ecm) == 0
+                            else self.all_tpsfs_ecm[-1]
+                        )
+                        tpsf = TpsfEcm(
+                            len(self.all_tpsfs_ecm),
+                            output_chars,
+                            edit,
+                            pause,
+                            event_desc,
+                            prev_tpsf,
+                            self.config,
+                            self.nlp_model,
+                        )
 
-                            self.all_tpsfs_ecm.append(tpsf)
-                            inserted_sequence = ""
-                        if prev_key != self.BACKSPACE or pos != prev_pos - 1:
-                            removed_sequence = ""
-                        try:
-                            removed_sequence += output_chars[pos - 1]
-                            del output_chars[pos - 1]
-                        except IndexError:
-                            print(
-                                "Apparently the number of output characters detected so far does not correspond to the position of the cursor."
-                            )
-                        backspace_count += 1
+                        self.all_tpsfs_ecm.append(tpsf)
+                        inserted_sequence = ""
+                    if prev_key != self.BACKSPACE or pos != prev_pos - 1:
+                        removed_sequence = ""
+                    try:
+                        removed_sequence += output_chars[pos - 1]
+                        del output_chars[pos - 1]
+                    except IndexError:
+                        print(
+                            "Apparently the number of output characters detected so far does not correspond to the position of the cursor."
+                        )
+                    backspace_count += 1
 
                 # CHAR DELETION: removing chars with delete
                 if key_name == self.DELETE:
