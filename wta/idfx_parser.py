@@ -9,8 +9,8 @@ class IdfxParser:
     ARROW_KEYS = ["VK_LEFT", "VK_RIGHT", "VK_UP", "VK_DOWN"]
     BACKSPACE = "VK_BACK"
     DELETE = "VK_DELETE"
-    END = "VK_END"
-    NON_PRODUCTION_KEYS = [BACKSPACE, DELETE, END, *ARROW_KEYS]
+    END_KEY = "VK_END"
+    NON_PRODUCTION_KEYS = [BACKSPACE, DELETE, END_KEY, *ARROW_KEYS]
 
     # Event types which trigger TPSF creation:
     PRE_DEL = "before deletion"
