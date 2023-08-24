@@ -37,10 +37,10 @@ class IdfxParser:
         self.filtered_tpsfs_ecm = []
         self.number_events = 0
 
-    def set_number_events(self, events):
+    def set_number_events(self, events) -> None:
         self.number_events = len(events)
 
-    def run(self):
+    def run(self) -> None:
         soup = BeautifulSoup(open(self.idfx), features="lxml")
         events = soup.find_all("event")
         self.set_number_events(events)
@@ -579,7 +579,7 @@ class IdfxParser:
         tpsf_paused = TpsfPcm(output_chars, pause, True)
         self.all_tpsfs_pcm.append(tpsf_paused)
 
-    def filter_tpsfs_ecm(self):
+    def filter_tpsfs_ecm(self) -> None:
         progress = tqdm(self.all_tpsfs_ecm, "Filtering text history")
         irrelevant_ts_aggregated = []
         for tpsf in progress:
