@@ -67,7 +67,7 @@ class IdfxParser:
         # there are three types of events 'keyboard', 'insert' and 'replacement', they have different structure
 
         progress = tqdm(events, "Processing keylogs")
-        for i, event in enumerate(progress):
+        for event in progress:
             parts = event.find_all("part")
 
             # for 'keyboard' event type, each keystroke is tracked to derive the TPSF
@@ -344,6 +344,7 @@ class IdfxParser:
                         # if a char insertion is directly followed by a replacement,
                         # the same char occurs in two subsequent events: keyboard and replacement
                         # one of the double chars needs to be removed from output chars and from inserted sequence
+                        # Note: i was the index of `progress`
                         # try:
                         #     next_event = events[i + 1]["type"]
                         # except IndexError:
