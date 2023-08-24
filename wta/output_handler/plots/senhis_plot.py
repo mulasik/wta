@@ -10,9 +10,7 @@ from .colors import Colors
 
 
 class SenhisPlot(BasePlot):
-    def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
-    ) -> None:
+    def __init__(self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]) -> None:
         texthis = [
             tpsf
             for tpsf in texthis

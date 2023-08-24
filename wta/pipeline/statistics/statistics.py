@@ -153,9 +153,7 @@ class TSStatistics(Statistics):
 
 
 class SentenceStatistics(Statistics):
-    def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
-    ) -> None:
+    def __init__(self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]) -> None:
         self.texthis = texthis
         self.senhis = senhis
         self.data = self.retrieve_stats()

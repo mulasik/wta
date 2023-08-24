@@ -12,7 +12,9 @@ class Action:
     - Pasting: pasting a text segment
     """
 
-    def __init__(self, content: str, startpos: int, endpos: int | None, textlen: int) -> None:
+    def __init__(
+        self, content: str, startpos: int, endpos: int | None, textlen: int
+    ) -> None:
         self.content = content
         self.startpos = startpos
         self.endpos = endpos

@@ -76,7 +76,9 @@ class TextUnitFactory:
 
         return tuple(tu.to_text_unit() for tu in tus)
 
-    def collect_preceding_sins_and_pins(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+    def collect_preceding_sins_and_pins(
+        self, seq: str, textunit_list: list[TextUnitBuilder]
+    ) -> tuple[str, list[TextUnitBuilder]]:
         starts_with_s = regular_expressions.PRECEDING_S_RE.search(seq)
         starts_with_pws = regular_expressions.PRECEDING_PWS_RE.search(seq)
         if starts_with_s is not None:
@@ -101,7 +103,9 @@ class TextUnitFactory:
             middle_pin_matches.append(match)
         return middle_pin_matches
 
-    def split_tu_by_pins(self, seq: str, textunit_list: list[TextUnitBuilder], middle_pins: list[str]) -> tuple[str, list[TextUnitBuilder]]:
+    def split_tu_by_pins(
+        self, seq: str, textunit_list: list[TextUnitBuilder], middle_pins: list[str]
+    ) -> tuple[str, list[TextUnitBuilder]]:
         if middle_pins == []:
             return seq, textunit_list
         middle_pin = middle_pins.pop(0)
@@ -128,7 +132,9 @@ class TextUnitFactory:
             return seq
         return self.trim_trailing_sins_and_pins(seq)
 
-    def collect_trailing_sins_and_pins(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+    def collect_trailing_sins_and_pins(
+        self, seq: str, textunit_list: list[TextUnitBuilder]
+    ) -> tuple[str, list[TextUnitBuilder]]:
         ends_with_s = regular_expressions.TRAILING_S_RE.search(seq)
         ends_with_pws = regular_expressions.TRAILING_PWS_RE.search(seq)
         if ends_with_s is not None:
@@ -146,14 +152,20 @@ class TextUnitFactory:
             return seq, textunit_list
         return self.collect_trailing_sins_and_pins(seq, textunit_list)
 
-    def retrieve_sen_or_sec(self, seq: str, textunit_list: list[TextUnitBuilder]) -> tuple[str, list[TextUnitBuilder]]:
+    def retrieve_sen_or_sec(
+        self, seq: str, textunit_list: list[TextUnitBuilder]
+    ) -> tuple[str, list[TextUnitBuilder]]:
         # if the seq contains only space characters, no SEN or SEC can be retrieved
         if re.search(regular_expressions.ONLY_S_RE, seq) is not None:
             return seq, textunit_list
         seq_with_whitespaces_trimmed = self.trim_trailing_sins_and_pins(seq)
         uppercase_letter = starts_with_uppercase_letter(seq_with_whitespaces_trimmed)
         end_punctuation = ends_with_end_punctuation(seq_with_whitespaces_trimmed)
-        if not uppercase_letter or not end_punctuation and re.search(regular_expressions.ONLY_S_RE, seq) is None:
+        if (
+            not uppercase_letter
+            or not end_punctuation
+            and re.search(regular_expressions.ONLY_S_RE, seq) is None
+        ):
             sec = TextUnitBuilder(TextUnitType.SEC, seq)
             textunit_list.append(sec)
             seq = ""
@@ -169,7 +181,6 @@ class TextUnitFactory:
         textunit_list: list[TextUnitBuilder] = []
 
         for s in sentence_list:
-
             # print(f"\n\n\n\n****** Analysing sentence:\n|{s}|\n******")
 
             # check if s contains only space chars > SIN
@@ -241,7 +252,9 @@ class TextUnitFactory:
                     sen = TextUnitBuilder(TextUnitType.SEN, text_wo_trailing_ws)
                     merged_textunits.append(sen)
                     remaining_content = merged_tu_text.replace(text_wo_trailing_ws, "")
-                    _, merged_textunits = self.collect_trailing_sins_and_pins(remaining_content, merged_textunits)
+                    _, merged_textunits = self.collect_trailing_sins_and_pins(
+                        remaining_content, merged_textunits
+                    )
                 prev_merged_text = j.text
                 merged = True
                 print(f"I have merged: |{merged_tu_text}|")
@@ -312,10 +325,10 @@ class TextUnitFactory:
         prev_tpsf: "TpsfECM | None",
     ) -> tuple[list[TextUnitBuilder], list[TextUnitBuilder], list[TextUnitBuilder]]:
         prev_textunits: list[TextUnitBuilder] = (
-                []
-                if prev_tpsf is None
-                else [tu.copy_to_builder() for tu in prev_tpsf.textunits]
-            )
+            []
+            if prev_tpsf is None
+            else [tu.copy_to_builder() for tu in prev_tpsf.textunits]
+        )
         if ts.label in [TSLabels.MID, TSLabels.DEL, TSLabels.REPL]:
             pre_tus, impacted_tus, post_tus = self._check_what_is_impacted(
                 textunits, prev_textunits, ts
@@ -323,11 +336,16 @@ class TextUnitFactory:
             # if the edit consists in deleting or reducing sentence interspace
             if (
                 len(impacted_tus) == 1
-                and impacted_tus[0].text_unit_type in[TextUnitType.SIN, TextUnitType.PIN]
+                and impacted_tus[0].text_unit_type
+                in [TextUnitType.SIN, TextUnitType.PIN]
                 and ts.label in (TSLabels.MID, TSLabels.DEL)
             ):
                 reduced_in_content = impacted_tus[0].text.replace(ts.text, "", 1)
-                impacted_tus = [] if reduced_in_content == "" else [impacted_tus[0].copy_with_text(reduced_in_content)]
+                impacted_tus = (
+                    []
+                    if reduced_in_content == ""
+                    else [impacted_tus[0].copy_with_text(reduced_in_content)]
+                )
             else:
                 impacted_tus = [
                     tu
@@ -345,7 +363,10 @@ class TextUnitFactory:
         return pre_tus, impacted_tus, post_tus
 
     def _check_what_is_impacted(
-        self, textunits_to_compare_with: list[TextUnitBuilder], tus_potentially_impacted: list[TextUnitBuilder], ts: TransformingSequence
+        self,
+        textunits_to_compare_with: list[TextUnitBuilder],
+        tus_potentially_impacted: list[TextUnitBuilder],
+        ts: TransformingSequence,
     ) -> tuple[list[TextUnitBuilder], list[TextUnitBuilder], list[TextUnitBuilder]]:
         pre_tus = []
         post_tus = []
@@ -357,9 +378,15 @@ class TextUnitFactory:
             # print(f"Text unit: |{tu}|")
             # print(startpos, endpos)
             # print(ts.startpos, ts.endpos)
-            if endpos < ts.startpos and tu.text in [tu.text for tu in textunits_to_compare_with]:
+            if endpos < ts.startpos and tu.text in [
+                tu.text for tu in textunits_to_compare_with
+            ]:
                 pre_tus.append(tu)
-            elif ts.endpos is not None and startpos > ts.endpos and tu.text in [tu.text for tu in textunits_to_compare_with]:
+            elif (
+                ts.endpos is not None
+                and startpos > ts.endpos
+                and tu.text in [tu.text for tu in textunits_to_compare_with]
+            ):
                 post_tus.append(tu)
             else:
                 impacted_tus.append(tu)
@@ -436,7 +463,7 @@ class TextUnitFactory:
         ):
             return SenLabels.NEW
 
-    # TODO: find a method from detecting sentence splits
+        # TODO: find a method from detecting sentence splits
         # if no_tus_increased is True:
         #     # check if tu without the ts was is prev tus list
         #     # then the status is "split"

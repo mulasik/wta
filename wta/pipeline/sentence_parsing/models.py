@@ -52,7 +52,7 @@ class ModelMapping:
                 Languages.EN: Models.DIAPARSER_EN_DEP_MODEL,
                 Languages.DE: Models.DIAPARSER_DE_DEP_MODEL,
                 Languages.FR: Models.DIAPARSER_FR_DEP_MODEL,
-            }
+            },
         },
         Grammars.CONST: {
             Parsers.SUPAR: {

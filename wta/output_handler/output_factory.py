@@ -77,6 +77,7 @@ class TpsfsOutputFactory:
     def run(cls, tpsfs: list[TpsfECM], settings: Settings) -> None:
         TpsfsTxt(tpsfs, settings).to_file()
 
+
 class TpsfsPCMOutputFactory:
     @classmethod
     def run(cls, tpsfs: list[TpsfPCM], settings: Settings) -> None:
@@ -173,7 +174,9 @@ class StatsOutputFactory:
         senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
-        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings).to_file()
+        StatsTxt(
+            b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
+        ).to_file()
         SenEditSvg(texthis, senhis, settings).to_file()
         TsTokensSvg(texthis, senhis, settings).to_file()
         TsLabelsSvg(texthis, senhis, settings).to_file()

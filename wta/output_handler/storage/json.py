@@ -2,7 +2,10 @@ import json
 from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import SenhoodDict, Sentencehood
+from wta.pipeline.sentence_histories.sentencehood_evaluator import (
+    SenhoodDict,
+    Sentencehood,
+)
 
 from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitDict
 from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
@@ -79,9 +82,7 @@ class SenhoodJson(Json[dict[int, list[SenhoodDict]]]):
         settings: Settings,
     ) -> None:
         self.data = self.preprocess_data(data)
-        json_file = (
-            f"{settings.filename}_{names.SENHOOD}.json"
-        )
+        json_file = f"{settings.filename}_{names.SENHOOD}.json"
         self.filepath = settings.paths.senhood_json_dir / json_file
 
     def preprocess_data(
