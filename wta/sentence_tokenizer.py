@@ -1,4 +1,4 @@
-from .sentence import SentenceCandidate, Sentence
+from .sentence import Sentence, SentenceCandidate
 
 
 class SentenceTokenizer:
