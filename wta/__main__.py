@@ -110,7 +110,7 @@ def run() -> None:
                         all_errors[e_cat].add(e)
             SenhoodhisOutputFactory.run(senhoodhis, settings)
 
-            # TODO: PARSE SENHIS  # noqa: TD003, FIX002, TD002
+            # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
             # dep_parser = ParsingFacade(senhis, Parsers.SUPAR, config['language'], Grammars.DEP)
             # dep_parser.run()
@@ -118,7 +118,7 @@ def run() -> None:
             # const_parser.run()
             # ParseOutputFactory.run(dep_parser.senhis_parses, const_parser.senhis_parses, settings)
             #
-            # TODO: GENERATE TRANSHIS  # noqa: TD003, FIX002, TD002
+            # TODO: GENERATE TRANSHIS
             # print('\n== TRANSFORMATION HISTORIES GENERATION ==')
             # dep_transhis_classifier = DependencyTransformationFactory(dep_parser.senhis_parses)
             # const_transhis_classifier = ConsituencyTransformationFactory(const_parser.senhis_parses)
@@ -142,7 +142,7 @@ def run() -> None:
                 settings,
             )
 
-        except:  # noqa: PERF203
+        except:
             traceback.print_exc()
             print(f"Failed for {logfile}", file=sys.stderr)
 

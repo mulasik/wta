@@ -64,7 +64,7 @@ class TextUnitFactory:
         self._assign_tpsf_ids(tus, revision_id)
 
         # TODO remove final_tu_list var after testing
-        final_tu_list = [  # noqa: F841
+        final_tu_list = [
             (
                 tu.text_unit_type,
                 tu.state if tu.state is None else tu.state.upper(),

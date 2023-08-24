@@ -289,7 +289,7 @@ class EventFactory:
                 endpos = orig_startpos + len(content)
                 rplcmt_textlen = orig_endpos - orig_startpos
                 rplcmt_endpos = orig_endpos - 1
-                return ReplacementEvent(  # noqa: TRY300
+                return ReplacementEvent(
                     content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
                 )
             except:
@@ -302,7 +302,7 @@ class EventFactory:
                 content = event.part.before.get_text()  # inserted text
                 startpos = int(event.part.position.get_text()) - len(content)
                 endpos = int(event.part.position.get_text()) - 1
-                return InsertEvent(content, startpos, endpos)  # noqa: TRY300
+                return InsertEvent(content, startpos, endpos)
             except:
                 print(
                     "FAILURE: Insert event information not available in the IDFX file."
