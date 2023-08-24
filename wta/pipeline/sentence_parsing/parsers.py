@@ -8,7 +8,7 @@ from .models import Grammars, ModelMapping, Parsers
 
 
 class TokenProp(TypedDict):
-    id: str
+    id: str  # noqa: A003
     word: str
     pos: str
     head: str
