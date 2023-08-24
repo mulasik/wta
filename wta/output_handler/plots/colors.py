@@ -1,6 +1,6 @@
 from matplotlib import colors as pltc
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF
 
 
 class Colors:

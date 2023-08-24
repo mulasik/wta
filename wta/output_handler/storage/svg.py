@@ -2,7 +2,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF
 from ...pipeline.text_history.tpsf import TpsfECM
 from ...pipeline.transformation_histories.transformation import Transformation
 from ...settings import Settings

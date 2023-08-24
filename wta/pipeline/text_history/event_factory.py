@@ -1,7 +1,6 @@
 import csv
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Union
 
 from bs4 import BeautifulSoup, Tag
 from tqdm import tqdm

@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from wta.settings import Settings
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors

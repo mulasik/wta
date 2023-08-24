@@ -2,7 +2,7 @@ import difflib
 
 from tqdm import tqdm
 
-from wta.pipeline.sentence_histories.text_unit import SPSFBuilder, TextUnit
+from wta.pipeline.sentence_histories.text_unit import SPSFBuilder
 
 from ...settings import Settings
 from .action import Action

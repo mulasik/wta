@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ..pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ..pipeline.sentence_histories.text_unit import SPSF
 from ..pipeline.sentence_parsing.parsers import TokenProp
 from ..pipeline.statistics.statistics import (
     BasicStatistics,

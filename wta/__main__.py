@@ -1,5 +1,4 @@
 import argparse
-import json
 import shutil
 import sys
 import traceback
