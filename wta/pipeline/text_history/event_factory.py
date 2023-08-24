@@ -61,7 +61,7 @@ class EventFactory:
             soup = BeautifulSoup(fp, features="lxml")
             idfx_events: Iterable[Tag] = soup.find_all("event")
         idfx_events = tqdm(idfx_events, "Processing keylogs")
-        events = [
+        return [
             event_obj
             for event_obj in (
                 self.create_event_from_scriptlog_idfx(event, settings)
@@ -69,7 +69,6 @@ class EventFactory:
             )
             if event_obj is not None
         ]
-        return events
 
     def clean_keystroke_logs(
         self, keystroke_logs: list[dict[str, int | str]]
