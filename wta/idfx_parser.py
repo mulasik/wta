@@ -344,10 +344,10 @@ class IdfxParser:
                         # if a char insertion is directly followed by a replacement,
                         # the same char occurs in two subsequent events: keyboard and replacement
                         # one of the double chars needs to be removed from output chars and from inserted sequence
-                        try:
-                            next_event = events[i + 1]["type"]
-                        except IndexError:
-                            next_event = None
+                        # try:
+                        #     next_event = events[i + 1]["type"]
+                        # except IndexError:
+                        #     next_event = None
                         # if next_event and next_event == 'replacement':
                         #     del output_chars[pos]
                         #     print(f'Inserted sequence before: *{inserted_sequence}*')

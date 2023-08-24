@@ -64,14 +64,14 @@ class TextUnitFactory:
         self._assign_tpsf_ids(tus, revision_id)
 
         # TODO remove final_tu_list var after testing
-        final_tu_list = [
-            (
-                tu.text_unit_type,
-                tu.state if tu.state is None else tu.state.upper(),
-                tu.text,
-            )
-            for tu in tus
-        ]
+        # final_tu_list = [
+        #     (
+        #         tu.text_unit_type,
+        #         tu.state if tu.state is None else tu.state.upper(),
+        #         tu.text,
+        #     )
+        #     for tu in tus
+        # ]
         # print(f"FINAL TU LIST: {final_tu_list}\n")
 
         return tuple(tu.to_text_unit() for tu in tus)
