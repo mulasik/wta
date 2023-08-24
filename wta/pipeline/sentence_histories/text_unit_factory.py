@@ -407,10 +407,10 @@ class TextUnitFactory:
             if prev_tpsf is None
             else [tu.copy_to_builder() for tu in prev_tpsf.textunits]
         )
-        no_tus_increased = len(prev_tus) < len([*pre_tus, *impacted_tus, *post_tus])
+        # no_tus_increased = len(prev_tus) < len([*pre_tus, *impacted_tus, *post_tus])
         for tu in [*pre_tus, *impacted_tus, *post_tus]:
             state = self._retrieve_tu_state(
-                tu, currentpos, pre_tus, post_tus, ts, prev_tus, no_tus_increased
+                tu, currentpos, pre_tus, post_tus, ts, prev_tus
             )
             if state is not None:
                 tu.set_state(state)
@@ -426,7 +426,6 @@ class TextUnitFactory:
         post_tus: list[TextUnitBuilder],
         ts: TransformingSequence,
         prev_tus: list[TextUnitBuilder],
-        no_tus_increased: bool,
     ) -> str | None:
         if len(tu.text) == 0:
             return None
