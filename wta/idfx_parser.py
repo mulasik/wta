@@ -259,8 +259,8 @@ class IdfxParser:
                             event_desc = self.POST_INS
                             inserted_sequence = str_insertion_value
                             n_insertion_position = pos
-                            for strChar in list(inserted_sequence):
-                                output_chars.insert(n_insertion_position, strChar)
+                            for str_char in list(inserted_sequence):
+                                output_chars.insert(n_insertion_position, str_char)
                                 n_insertion_position += 1
                             edit = (pos, removed_sequence, inserted_sequence)
                             prev_tpsf = (
@@ -312,8 +312,8 @@ class IdfxParser:
                             event_desc = self.POST_INS
                             inserted_sequence = str_insertion_value
                             n_insertion_position = pos
-                            for strChar in list(str_insertion_value):
-                                output_chars.insert(n_insertion_position, strChar)
+                            for str_char in list(str_insertion_value):
+                                output_chars.insert(n_insertion_position, str_char)
                                 n_insertion_position += 1
                             edit = (pos, removed_sequence, inserted_sequence)
                             prev_tpsf = (
@@ -336,8 +336,8 @@ class IdfxParser:
                             inserted_sequence = ""
                         else:
                             n_insertion_position = pos
-                            for strChar in list(str_insertion_value):
-                                output_chars.insert(n_insertion_position, strChar)
+                            for str_char in list(str_insertion_value):
+                                output_chars.insert(n_insertion_position, str_char)
                                 n_insertion_position += 1
                             inserted_sequence += str_insertion_value
 
@@ -488,8 +488,8 @@ class IdfxParser:
 
                 # replace the char in the output_chars list if not an empty string and delete the remaining sequence
                 n_insertion_position = startpos
-                for strChar in list(str_insertion_value):
-                    output_chars.insert(n_insertion_position, strChar)
+                for str_char in list(str_insertion_value):
+                    output_chars.insert(n_insertion_position, str_char)
                     n_insertion_position += 1
 
                 pos = startpos
@@ -521,8 +521,8 @@ class IdfxParser:
                 startpos = int(event.part.position.get_text()) - len(inserted_sequence)
                 endtime = None
                 pause = None  # TODO check if pause can be defined
-                for strChar in list(inserted_sequence):
-                    output_chars.insert(n_insertion_position, strChar)
+                for str_char in list(inserted_sequence):
+                    output_chars.insert(n_insertion_position, str_char)
                     n_insertion_position += 1
                 pos = n_insertion_position
                 event_desc = self.POST_INS
