@@ -23,7 +23,7 @@ class IdfxParser:
     NAV = "navigating without editing"
     FINAL = "final text revision"
 
-    def __init__(self, idfx, config, nlp_model):
+    def __init__(self, idfx, config, nlp_model) -> None:
         self.idfx = idfx
         self.pause_duration = config["pause_duration"]
         self.config = config

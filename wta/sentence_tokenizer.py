@@ -2,7 +2,7 @@ from .sentence import Sentence, SentenceCandidate
 
 
 class SentenceTokenizer:
-    def __init__(self, text, revision_id, transforming_sequence, nlp_model):
+    def __init__(self, text, revision_id, transforming_sequence, nlp_model) -> None:
         self.revision_id = revision_id
         self.transforming_sequence = transforming_sequence
         self.nlp_model = nlp_model
