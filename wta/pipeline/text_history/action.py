@@ -30,7 +30,7 @@ class KeyboardAction(Action):
         keyname: str,
         starttime: int,
         endtime: int,
-        pause: int | None,
+        pause: float | None,
         textlen: int,
     ) -> None:
         super().__init__(content, startpos, endpos, textlen)

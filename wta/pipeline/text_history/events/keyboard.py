@@ -60,16 +60,17 @@ class KeyboardEvent(BaseEvent):
         self.starttime = starttime
         self.endtime = endtime
         self.textlen = textlen
-        self.pause: int | None = None
+        self.pause: float | None = None
         self.settings = settings
         self.char_number_diff = char_number_diff
 
     def set_pause(self) -> None:
-        try:
-            self.pause = (self.starttime - self.prev_evnt.starttime) / 1000
-        except TypeError:
-            self.pause = None
-        except AttributeError:
+        if isinstance(self.prev_evnt, KeyboardEvent):
+            try:
+                self.pause = (self.starttime - self.prev_evnt.starttime) / 1000
+            except TypeError:
+                self.pause = None
+        else:
             self.pause = None
 
 
@@ -259,6 +260,9 @@ class NavigationKeyboardEvent(KeyboardEvent):
         )
 
     def set_endpos(self) -> None:
+        if self.next_evnt is None:
+            msg = "Next event is not set. Therefore no endpos can be set."
+            raise RuntimeError(msg)
         self.endpos = self.next_evnt.startpos
 
     def to_action(self) -> Action:

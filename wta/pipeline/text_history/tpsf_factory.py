@@ -3,7 +3,16 @@ from tqdm import tqdm
 from ...settings import Settings
 from ..sentence_histories.text_unit import TextUnit
 from ..sentence_histories.text_unit_factory import TextUnitFactory
-from .action import Action
+from .action import (
+    Action,
+    Append,
+    Deletion,
+    Insertion,
+    KeyboardAction,
+    Midletion,
+    Pasting,
+    Replacement,
+)
 from .tpsf import TpsfECM, TpsfPCM
 from .ts import TransformingSequence
 
@@ -40,17 +49,18 @@ class ECMFactory:
         tss = [ts for ts in tss if ts.label != "navigation"]
         prev_tpsf = None
         for i, ts in enumerate(tqdm(tss, "Extracting tpsfs")):
+            after_end_pos = -1 if ts.endpos is None else ts.endpos + 1
             if ts.label in ["append", "insertion", "pasting"]:
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
                     startpos += 1
             elif ts.label in ["deletion", "midletion"]:
-                text = output[ts.startpos : ts.endpos + 1]
+                text = output[ts.startpos : after_end_pos]
                 ts.set_text("".join(text))
-                del output[ts.startpos : ts.endpos + 1]
+                del output[ts.startpos : after_end_pos]
             elif ts.label == "replacement":
-                del output[ts.startpos : ts.endpos + 1]
+                del output[ts.startpos : after_end_pos]
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
@@ -110,31 +120,29 @@ class PCMFactory:
         prev_pause: float | None = None
         burst_actions: list[Action] = []
         for act in tqdm(actions, "Extracting tpsfs in PCM"):
-            act_type = type(act).__name__
             act_startpos = act.startpos
-            if act_type in ["Insertion", "Append", "Pasting"]:
+            if isinstance(act, (Insertion, Append, Pasting)):
                 for char in act.content:
                     output.insert(act_startpos, char)
                     act_startpos += 1
-            elif act_type in ["Deletion", "Midletion"]:
-                del output[act_startpos : act.endpos + 1]
-            elif act_type == "Replacement":
+            elif isinstance(act, (Deletion, Midletion)):
+                after_end_pos = -1 if act.endpos is None else act.endpos + 1
+                del output[act_startpos:after_end_pos]
+            elif isinstance(act, Replacement):
                 del output[act_startpos : act.rplcmt_endpos + 1]
                 for char in act.content:
                     output.insert(act_startpos, char)
                     act_startpos += 1
             burst_actions.append(act)
             # TODO add actions to Tpsf
-            try:
-                if (
-                    act.pause is not None
-                    and act.pause >= settings.config["pause_duration"]
-                ):
-                    content = "".join(output[:-1])
-                    tpsf_pcm = TpsfPCM(revision_id, content, prev_pause)
-                    tpsfs_pcm.append(tpsf_pcm)
-                    revision_id += 1
-                    prev_pause = act.pause
-            except AttributeError:
-                continue
+            if (
+                isinstance(act, KeyboardAction)
+                and act.pause is not None
+                and act.pause >= settings.config["pause_duration"]
+            ):
+                content = "".join(output[:-1])
+                tpsf_pcm = TpsfPCM(revision_id, content, prev_pause)
+                tpsfs_pcm.append(tpsf_pcm)
+                revision_id += 1
+                prev_pause = act.pause
         return tpsfs_pcm

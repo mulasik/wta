@@ -68,7 +68,7 @@ class SenEditPlot(StatsPlot[tuple[list[str], list[int]]]):
         )
 
 
-class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
+class TsLabelsPlot(StatsPlot[tuple[int, int, int, int, int]]):
     def preprocess_data(self) -> tuple[int, int, int, int, int]:
         (
             appended_tokens,

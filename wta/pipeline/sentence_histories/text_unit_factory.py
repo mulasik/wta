@@ -31,7 +31,8 @@ class TextUnitFactory:
             f"\n\n=============================={revision_id}==============================\n"
         )
         print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|\n")
-        print(f"Text segment impacted by the TS: |{text[ts.startpos:ts.endpos+1]}|")
+        after_end_pos = -1 if ts.endpos is None else ts.endpos + 1
+        print(f"Text segment impacted by the TS: |{text[ts.startpos:after_end_pos]}|")
         print(f"TEXT: {text}")
         print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
 

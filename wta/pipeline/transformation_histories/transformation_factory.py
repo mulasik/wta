@@ -58,9 +58,9 @@ class DependencyTransformationFactory(TransformationFactory):
                     if dep_impacted or word_modified:
                         trans = DependencyTransformation(
                             senver_id,
-                            parsed_sen,
+                            str(parsed_sen),
                             prev_senver_id,
-                            prev_parsed_sen,
+                            str(prev_parsed_sen),
                             dep_impacted,
                             word_modified,
                         )

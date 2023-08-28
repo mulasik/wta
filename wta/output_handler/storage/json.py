@@ -7,7 +7,10 @@ from wta.pipeline.sentence_histories.sentencehood_evaluator import (
     Sentencehood,
 )
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit, TextUnitDict
+from ...pipeline.sentence_histories.text_unit import (
+    SPSF,
+    SPSFDict,
+)
 from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
 from ...pipeline.transformation_histories.transformation import Transformation
 from ...settings import Settings
@@ -50,7 +53,7 @@ class TexthisJson(Json[list[TpsfECMDict]]):
         return [tpsf.to_dict() for tpsf in texthis]
 
 
-class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
+class SenhisJson(Json[dict[int, list[SPSFDict]]]):
     def __init__(
         self,
         data: dict[int, list[SPSF]],
@@ -67,8 +70,8 @@ class SenhisJson(Json[dict[int, list[TextUnitDict]]]):
         self.filepath = settings.paths.senhis_json_dir / json_file
 
     def preprocess_data(
-        self, senhis: dict[int, list[TextUnit]]
-    ) -> dict[int, list[TextUnitDict]]:
+        self, senhis: dict[int, list[SPSF]]
+    ) -> dict[int, list[SPSFDict]]:
         _senhis = {}
         for key, sens in senhis.items():
             _senhis[key] = [s.to_dict() for s in sens]
