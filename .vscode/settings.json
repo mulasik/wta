@@ -1,7 +1,6 @@
 {
     "files.eol": "\n",
     "files.insertFinalNewline": true,
-    "python.linting.mypyEnabled": true,
     "python.linting.ignorePatterns": [
         "**/site-packages/**/*.py"
     ],
