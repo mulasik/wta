@@ -278,33 +278,52 @@ class EventFactory:
                 )
         # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
         elif event["type"] == "replacement":
-            try:
-                content = (
-                    event.part.newtext.get_text()
-                )  # character to replace marked sequence
-                orig_startpos = int(event.part.start.get_text())
-                orig_endpos = int(event.part.end.get_text())
-                endpos = orig_startpos + len(content)
-                rplcmt_textlen = orig_endpos - orig_startpos
-                rplcmt_endpos = orig_endpos - 1
-                return ReplacementEvent(  # noqa: TRY300
-                    content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
-                )
-            except:
+            if (
+                event.part is None
+                or event.part.newtext is None
+                or event.part.start is None
+                or event.part.end is None
+            ):
                 print(
                     "FAILURE: Replacement event information not available in the IDFX file."
                 )
+            else:
+                try:
+                    content = (
+                        event.part.newtext.get_text()
+                    )  # character to replace marked sequence
+                    orig_startpos = int(event.part.start.get_text())
+                    orig_endpos = int(event.part.end.get_text())
+                    endpos = orig_startpos + len(content)
+                    rplcmt_textlen = orig_endpos - orig_startpos
+                    rplcmt_endpos = orig_endpos - 1
+                    return ReplacementEvent(  # noqa: TRY300
+                        content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
+                    )
+                except:
+                    print(
+                        "FAILURE: Replacement event information not available in the IDFX file."
+                    )
         # SEQUENCE INSERTION: a text sequence is inserted
         elif event["type"] == "insert":
-            try:
-                content = event.part.before.get_text()  # inserted text
-                startpos = int(event.part.position.get_text()) - len(content)
-                endpos = int(event.part.position.get_text()) - 1
-                return InsertEvent(content, startpos, endpos)  # noqa: TRY300
-            except:
+            if (
+                event.part is None
+                or event.part.before is None
+                or event.part.position is None
+            ):
                 print(
                     "FAILURE: Insert event information not available in the IDFX file."
                 )
+            else:
+                try:
+                    content = event.part.before.get_text()  # inserted text
+                    startpos = int(event.part.position.get_text()) - len(content)
+                    endpos = int(event.part.position.get_text()) - 1
+                    return InsertEvent(content, startpos, endpos)  # noqa: TRY300
+                except:
+                    print(
+                        "FAILURE: Insert event information not available in the IDFX file."
+                    )
         elif event["type"] in ["mouse", "focus", "selection", "statistics"]:
             pass
         else:
