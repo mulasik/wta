@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict, cast
 
-import diaparser
 from diaparser.parsers import Parser
+from diaparser.utils import Dataset
 
 from .models import Grammars, ModelMapping, Parsers
 
@@ -98,9 +98,7 @@ class DiaParser(BaseParserAdapter):
                 # TreeView(t)._cframe.print_to_file(output_file)
         return senhis_parses
 
-    def postprocess(
-        self, parsed_sen: diaparser.utils.transform.CoNLLSentence
-    ) -> list[TokenProp] | None:
+    def postprocess(self, parsed_sen: Dataset) -> list[TokenProp] | None:
         if self.grammar == Grammars.DEP:
             tok_lst: list[TokenProp] = []
             _tok_lst = [str(tok).split("\n") for tok in parsed_sen][0]
