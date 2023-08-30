@@ -19,3 +19,5 @@ wta/.DS_Store
 pyvenv.cfg
 /myconfig.py
 /local_config.py
+
+/.tox

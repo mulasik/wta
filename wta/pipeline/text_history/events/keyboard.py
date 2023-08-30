@@ -10,19 +10,11 @@ CHAR_NUMBER_DIFF_MAPPING = {
         "ddeletion": 1,
         "bdeletion": 2
         # Document length in the idfx file == position + 1.
-        # In case of backspace deletion the startpos == startpos - 1 because this is where the char actually gets deleted. 
+        # In case of backspace deletion the startpos == startpos - 1 because this is where the char actually gets deleted.
         # So the total diff is 2 between the position of the deleted char and the document length provided in idfx.
     },
-    "inputlog_idfx": {
-        "production": 1,
-        "ddeletion": 1,
-        "bdeletion": 2
-    },
-    "protext_csv": {
-        "production": 0,
-        "ddeletion": 0,
-        "bdeletion": 0
-    }
+    "inputlog_idfx": {"production": 1, "ddeletion": 1, "bdeletion": 2},
+    "protext_csv": {"production": 0, "ddeletion": 0, "bdeletion": 0},
 }
 
 
@@ -68,16 +60,17 @@ class KeyboardEvent(BaseEvent):
         self.starttime = starttime
         self.endtime = endtime
         self.textlen = textlen
-        self.pause: int | None = None
+        self.pause: float | None = None
         self.settings = settings
         self.char_number_diff = char_number_diff
 
     def set_pause(self) -> None:
-        try:
-            self.pause = (self.starttime - self.prev_evnt.starttime) / 1000
-        except TypeError:
-            self.pause = None
-        except AttributeError:
+        if isinstance(self.prev_evnt, KeyboardEvent):
+            try:
+                self.pause = (self.starttime - self.prev_evnt.starttime) / 1000
+            except TypeError:
+                self.pause = None
+        else:
             self.pause = None
 
 
@@ -91,7 +84,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
-        settings: Settings
+        settings: Settings,
     ) -> None:
         super().__init__(
             content,
@@ -103,7 +96,9 @@ class ProductionKeyboardEvent(KeyboardEvent):
             textlen,
             settings,
             # CHAR_NUMBER_DIFF_PRODUCTION,
-            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["production"]
+            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]][
+                "production"
+            ],
         )
 
     def to_action(self) -> Action | None:
@@ -211,7 +206,7 @@ class BDeletionKeyboardEvent(DeletionKeyboardEvent):
             endtime,
             textlen,
             settings,
-            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["bdeletion"]
+            CHAR_NUMBER_DIFF_MAPPING[settings.config["ksl_source_format"]]["bdeletion"],
         )
 
 
@@ -225,7 +220,7 @@ class DDeletionKeyboardEvent(DeletionKeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
-        settings: Settings
+        settings: Settings,
     ) -> None:
         super().__init__(
             content,
@@ -250,13 +245,24 @@ class NavigationKeyboardEvent(KeyboardEvent):
         starttime: int,
         endtime: int,
         textlen: int,
-        settings: Settings
+        settings: Settings,
     ) -> None:
         super().__init__(
-            content, startpos, endpos, keyname, starttime, endtime, textlen, settings, -1
+            content,
+            startpos,
+            endpos,
+            keyname,
+            starttime,
+            endtime,
+            textlen,
+            settings,
+            -1,
         )
 
     def set_endpos(self) -> None:
+        if self.next_evnt is None:
+            msg = "Next event is not set. Therefore no endpos can be set."
+            raise RuntimeError(msg)
         self.endpos = self.next_evnt.startpos
 
     def to_action(self) -> Action:

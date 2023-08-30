@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import TypedDict, cast
 
-import diaparser
 from diaparser.parsers import Parser
+from diaparser.utils import Dataset
 
 from .models import Grammars, ModelMapping, Parsers
 
@@ -26,6 +26,7 @@ class BaseParserAdapter(ABC):
     ) -> dict[int, list[list[TokenProp] | None]]:
         raise NotImplementedError
 
+
 class Supar(BaseParserAdapter):
     """
     SuPar predict function returns supar.utils.data.Dataset
@@ -45,7 +46,9 @@ class Supar(BaseParserAdapter):
     1   The	_	_	_	_	2	det	_	_
     2	tortoise	_	_	_	_	3	nsubj	_	_
     """
+
     ...
+
 
 class DiaParser(BaseParserAdapter):
     """
@@ -85,9 +88,7 @@ class DiaParser(BaseParserAdapter):
             print(f"Processing the sentence {sen_id}...")
             senhis_parses[sen_id] = []
             for sentext in sgl_senhis_sentexts:
-                result = pipeline.predict(
-                    sentext, text=self.lang
-                )
+                result = pipeline.predict(sentext, text=self.lang)
                 senhis_parses[sen_id].append(self.postprocess(result))
                 # TODO: visualise constituency trees:
                 # t = Tree.fromstring(str(s_tree))
@@ -97,7 +98,7 @@ class DiaParser(BaseParserAdapter):
                 # TreeView(t)._cframe.print_to_file(output_file)
         return senhis_parses
 
-    def postprocess(self, parsed_sen: diaparser.utils.transform.CoNLLSentence) -> list[TokenProp] | None:
+    def postprocess(self, parsed_sen: Dataset) -> list[TokenProp] | None:
         if self.grammar == Grammars.DEP:
             tok_lst: list[TokenProp] = []
             _tok_lst = [str(tok).split("\n") for tok in parsed_sen][0]
@@ -117,4 +118,3 @@ class DiaParser(BaseParserAdapter):
         if self.grammar == Grammars.CONST:
             return cast(list[TokenProp], list(parsed_sen)[0])
         return None
-

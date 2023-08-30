@@ -1,4 +1,4 @@
-from ..sentence_histories.text_unit import SPSF, TextUnit
+from ..sentence_histories.text_unit import SPSF
 from .models import Parsers
 from .parsers import BaseParserAdapter, DiaParser, TokenProp
 
@@ -30,7 +30,5 @@ class ParsingFacade:
     def _extract_sentexts(self) -> dict[int, list[str]]:
         senhist_sentexts = {}
         for sen_id, single_senhis in self.senhis.items():
-            senhist_sentexts[sen_id] = [
-                sen.text for sen in single_senhis if sen.text
-            ]
+            senhist_sentexts[sen_id] = [sen.text for sen in single_senhis if sen.text]
         return senhist_sentexts

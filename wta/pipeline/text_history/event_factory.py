@@ -1,7 +1,6 @@
 import csv
 from collections.abc import Iterable
 from pathlib import Path
-from typing import Any, Union
 
 from bs4 import BeautifulSoup, Tag
 from tqdm import tqdm
@@ -55,19 +54,25 @@ class EventFactory:
                 event.set_endpos()
         return events
 
-    def extract_events_from_scriptlog_idfx(self, idfx: Path, settings: Settings) -> list[BaseEvent]:
+    def extract_events_from_scriptlog_idfx(
+        self, idfx: Path, settings: Settings
+    ) -> list[BaseEvent]:
         with idfx.open() as fp:
             soup = BeautifulSoup(fp, features="lxml")
             idfx_events: Iterable[Tag] = soup.find_all("event")
         idfx_events = tqdm(idfx_events, "Processing keylogs")
-        events = [
+        return [
             event_obj
-            for event_obj in (self.create_event_from_scriptlog_idfx(event, settings) for event in idfx_events)
+            for event_obj in (
+                self.create_event_from_scriptlog_idfx(event, settings)
+                for event in idfx_events
+            )
             if event_obj is not None
         ]
-        return events
 
-    def clean_keystroke_logs(self, keystroke_logs: list[dict[str, int | str]]) -> list[dict[str, int | str]]:
+    def clean_keystroke_logs(
+        self, keystroke_logs: list[dict[str, int | str]]
+    ) -> list[dict[str, int | str]]:
         # print("=========keystroke_logs==========")
         # for ksl in keystroke_logs:
         #     print(ksl)
@@ -81,7 +86,9 @@ class EventFactory:
                 clean_ks_log: dict[str, int | str] = {}
                 clean_ks_log["st_time"] = int(ks_log["st_time"])
                 clean_ks_log["end_time"] = int(ks_log["end_time"])
-                clean_ks_log["pause"] = -1 if not ks_log["pause"] else int(ks_log["pause"])
+                clean_ks_log["pause"] = (
+                    -1 if not ks_log["pause"] else int(ks_log["pause"])
+                )
                 clean_ks_log["event"] = str(ks_log["event"])
                 clean_ks_log["pos"] = int(ks_log["pos"])
                 # print("Previous doc len:", ks_log["doc_len"], int(ks_log["pos"]))
@@ -95,11 +102,28 @@ class EventFactory:
         #     print(ksl)
         return cleaned_keystroke_logs
 
-    def extract_events_from_protext_csv(self, csv_file: Path,  settings: Settings) -> list[BaseEvent]:
+    def extract_events_from_protext_csv(
+        self, csv_file: Path, settings: Settings
+    ) -> list[BaseEvent]:
         file = csv_file.open()
-        csv_reader = csv.DictReader(file, fieldnames=[
-            "ID","session","writer","n_event","st_time","end_time","pause","event","pos","doc_len","op","type_op","charID"
-            ])
+        csv_reader = csv.DictReader(
+            file,
+            fieldnames=[
+                "ID",
+                "session",
+                "writer",
+                "n_event",
+                "st_time",
+                "end_time",
+                "pause",
+                "event",
+                "pos",
+                "doc_len",
+                "op",
+                "type_op",
+                "charID",
+            ],
+        )
         cleaned_keystroke_logs = self.clean_keystroke_logs(list(csv_reader)[1:])
         keystroke_logs = tqdm(cleaned_keystroke_logs, "Processing keylogs")
         events = []
@@ -111,7 +135,9 @@ class EventFactory:
         return events
 
     @staticmethod
-    def create_event_from_scriptlog_idfx(event: Tag, settings: Settings) -> BaseEvent | None:
+    def create_event_from_scriptlog_idfx(
+        event: Tag, settings: Settings
+    ) -> BaseEvent | None:
         """
         Collects event attributes and creates an object of type Event.
         Args:
@@ -203,11 +229,13 @@ class EventFactory:
                         starttime,
                         endtime,
                         textlen,
-                        settings
+                        settings,
                     )
                 if keyname in KeyNames.DELETION_KEYS:
                     if keyname == KeyNames.BACKSPACE:
-                        startpos = startpos - 1 if startpos > 0 else 0  # if backspace is pressed at the beginning of the document
+                        startpos = (
+                            startpos - 1 if startpos > 0 else 0
+                        )  # if backspace is pressed at the beginning of the document
                         endpos = startpos
                         return BDeletionKeyboardEvent(
                             content,
@@ -217,7 +245,7 @@ class EventFactory:
                             starttime,
                             endtime,
                             textlen,
-                            settings
+                            settings,
                         )
                     if keyname == KeyNames.DELETE:
                         endpos = startpos
@@ -229,7 +257,7 @@ class EventFactory:
                             starttime,
                             endtime,
                             textlen,
-                            settings
+                            settings,
                         )
                 else:
                     # first char is placed at startpos, so the char must be deduced from length:
@@ -242,7 +270,7 @@ class EventFactory:
                         starttime,
                         endtime,
                         textlen,
-                        settings
+                        settings,
                     )
             except IndexError:
                 print(
@@ -250,37 +278,52 @@ class EventFactory:
                 )
         # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
         elif event["type"] == "replacement":
-            try:
-                content = (
-                    event.part.newtext.get_text()
-                )  # character to replace marked sequence
-                orig_startpos = int(event.part.start.get_text())
-                orig_endpos = int(event.part.end.get_text())
-                endpos = orig_startpos + len(content)
-                rplcmt_textlen = orig_endpos - orig_startpos
-                rplcmt_endpos = orig_endpos - 1
-                return ReplacementEvent(  # noqa: TRY300
-                    content,
-                    orig_startpos,
-                    endpos,
-                    rplcmt_endpos,
-                    rplcmt_textlen
-                )
-            except:
+            if (
+                event.part is None
+                or event.part.newtext is None
+                or event.part.start is None
+                or event.part.end is None
+            ):
                 print(
                     "FAILURE: Replacement event information not available in the IDFX file."
                 )
+            else:
+                try:
+                    content = (
+                        event.part.newtext.get_text()
+                    )  # character to replace marked sequence
+                    orig_startpos = int(event.part.start.get_text())
+                    orig_endpos = int(event.part.end.get_text())
+                    endpos = orig_startpos + len(content)
+                    rplcmt_textlen = orig_endpos - orig_startpos
+                    rplcmt_endpos = orig_endpos - 1
+                    return ReplacementEvent(  # noqa: TRY300
+                        content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
+                    )
+                except:
+                    print(
+                        "FAILURE: Replacement event information not available in the IDFX file."
+                    )
         # SEQUENCE INSERTION: a text sequence is inserted
         elif event["type"] == "insert":
-            try:
-                content = event.part.before.get_text()  # inserted text
-                startpos = int(event.part.position.get_text()) - len(content)
-                endpos = int(event.part.position.get_text()) - 1
-                return InsertEvent(content, startpos, endpos)  # noqa: TRY300
-            except:
+            if (
+                event.part is None
+                or event.part.before is None
+                or event.part.position is None
+            ):
                 print(
                     "FAILURE: Insert event information not available in the IDFX file."
                 )
+            else:
+                try:
+                    content = event.part.before.get_text()  # inserted text
+                    startpos = int(event.part.position.get_text()) - len(content)
+                    endpos = int(event.part.position.get_text()) - 1
+                    return InsertEvent(content, startpos, endpos)  # noqa: TRY300
+                except:
+                    print(
+                        "FAILURE: Insert event information not available in the IDFX file."
+                    )
         elif event["type"] in ["mouse", "focus", "selection", "statistics"]:
             pass
         else:
@@ -288,7 +331,9 @@ class EventFactory:
         return None
 
     @staticmethod
-    def create_event_from_protext_ks_log(event: dict[str, int|str], settings: Settings) -> BaseEvent | None:
+    def create_event_from_protext_ks_log(
+        event: dict[str, int | str], settings: Settings
+    ) -> BaseEvent | None:
         # TODO extend the mappings!
         symbol_content_mapping = {
             "␣": " ",
@@ -307,9 +352,17 @@ class EventFactory:
         operation = int(event["op"])
         event_type = str(event["type_op"])
         event_content = str(event["event"])
-        content = str(event_content if event_content not in symbol_content_mapping else symbol_content_mapping[event_content])
+        content = str(
+            event_content
+            if event_content not in symbol_content_mapping
+            else symbol_content_mapping[event_content]
+        )
         startpos = int(event["pos"])
-        keyname = str(f"VK_{content.upper()}" if content not in content_vk_mapping else content_vk_mapping[content])
+        keyname = str(
+            f"VK_{content.upper()}"
+            if content not in content_vk_mapping
+            else content_vk_mapping[content]
+        )
         starttime = int(event["st_time"])
         endtime = int(event["end_time"])
         textlen = int(event["doc_len"])
@@ -318,7 +371,9 @@ class EventFactory:
             try:
                 if operation == -1:
                     if keyname == KeyNames.BACKSPACE:
-                        startpos = startpos - 1 if startpos > 0 else 0  # if backspace is pressed at the beginning of the document
+                        startpos = (
+                            startpos - 1 if startpos > 0 else 0
+                        )  # if backspace is pressed at the beginning of the document
                         endpos = startpos
                         return BDeletionKeyboardEvent(
                             content,
@@ -328,7 +383,7 @@ class EventFactory:
                             starttime,
                             endtime,
                             textlen,
-                            settings
+                            settings,
                         )
                     if keyname == KeyNames.DELETE:
                         endpos = startpos
@@ -340,7 +395,7 @@ class EventFactory:
                             starttime,
                             endtime,
                             textlen,
-                            settings
+                            settings,
                         )
                 elif operation == 1:
                     # first char is placed at startpos, so the char must be deduced from length:
@@ -353,7 +408,7 @@ class EventFactory:
                         starttime,
                         endtime,
                         textlen,
-                        settings
+                        settings,
                     )
             except IndexError:
                 print(

@@ -36,6 +36,7 @@ types-beautifulsoup4 = "^4.11.6.5"
 [tool.poetry.group.linter.dependencies]
 ruff = "^0.0.249"
 black = "^23.1.0"
+pip-audit = "^2.6.1"
 
 [build-system]
 requires = ["poetry-core"]

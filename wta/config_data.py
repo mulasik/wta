@@ -8,6 +8,7 @@ class ConfigData(TypedDict):
     ksl_source_format: str
     ksl_files: tuple[Path, ...]
     output_dir: Path
+    final_txt: Path
     pause_duration: int
     min_edit_distance: int
     ts_min_tokens_number: int

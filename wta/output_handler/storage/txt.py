@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF
 from ...pipeline.sentence_parsing.parsers import TokenProp
 from ...pipeline.statistics.statistics import (
     BasicStatistics,
@@ -179,7 +179,7 @@ class SenhisTxt(Txt):
             self.preprocess_data(data),
         )
 
-    def preprocess_data(self, senhis: dict[int, list[TextUnit]]) -> str:
+    def preprocess_data(self, senhis: dict[int, list[SPSF]]) -> str:
         output_str = ""
         for key, sens in senhis.items():
             output_str += f"\n******* {key} *******\n"
@@ -194,9 +194,7 @@ class SenhoodhisTxt(Txt):
         data: dict[int, list[Sentencehood]],
         settings: Settings,
     ) -> None:
-        txt_file = (
-            f"{settings.filename}_{names.SENHOOD}.txt"
-        )
+        txt_file = f"{settings.filename}_{names.SENHOOD}.txt"
         super().__init__(
             settings.paths.senhood_txt_dir / txt_file,
             self.preprocess_data(data),

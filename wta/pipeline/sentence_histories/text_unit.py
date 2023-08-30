@@ -112,21 +112,18 @@ class TextUnitBuilder:
         return self.copy_with_text(self.text + to_add)
 
     def to_text_unit(self) -> TextUnit:
-        if (
-            self.state is None
-            or self.tpsf_id is None
-        ):
+        if self.state is None or self.tpsf_id is None:
             msg = f"The text unit builder is not yet complete {vars(self)}"
             raise RuntimeError(msg)
         return TextUnit(
             text_unit_type=self.text_unit_type,
             text=self.text,
             state=self.state,
-            tpsf_id=self.tpsf_id
+            tpsf_id=self.tpsf_id,
         )
 
-class SPSFBuilder:
 
+class SPSFBuilder:
     def __init__(self, tu: TextUnit) -> None:
         self.sen_id: int | None = None
         self.text_unit_type: TextUnitType = tu.text_unit_type
@@ -146,11 +143,7 @@ class SPSFBuilder:
         self.ts = ts
 
     def to_sentence_version(self) -> "SPSF":
-        if (
-            self.sen_id is None
-            or self.pos_in_text is None
-            or self.ts is None
-        ):
+        if self.sen_id is None or self.pos_in_text is None or self.ts is None:
             msg = f"The sentence version builder is not yet complete {vars(self)}"
             raise RuntimeError(msg)
         return SPSF(
@@ -160,7 +153,7 @@ class SPSFBuilder:
             state=self.state,
             tpsf_id=self.tpsf_id,
             pos_in_text=self.pos_in_text,
-            ts=self.ts
+            ts=self.ts,
         )
 
 
@@ -183,7 +176,7 @@ class SPSF:
             "tpsf_id": self.tpsf_id,
             "pos_in_text": self.pos_in_text,
             "ts_label": self.ts.label,
-            "ts_text": self.ts.text
+            "ts_text": self.ts.text,
         }
 
     def to_text(self) -> str:

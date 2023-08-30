@@ -13,7 +13,7 @@ class TexthisPlot(BasePlot):
         self.sen_lengths = self.preprocess_data()
         self.filtered = ""
 
-    def preprocess_data(self) -> dict[int, list[tuple[str | None, int]]]:
+    def preprocess_data(self) -> dict[int, list[tuple[str, int]]]:
         sentences_lengths = {}
         for tpsf in self.texthis:
             sentences_lens = []
@@ -193,9 +193,9 @@ class FilteredTexthisPlot(TexthisPlot):
             preceding_tss = (
                 tpsf.irrelevant_tss_aggregated
                 if tpsf.irrelevant_tss_aggregated is not None
-                else []
+                else ()
             )
-            preceding_tss = [*preceding_tss, tpsf.ts]
+            preceding_tss = (*preceding_tss, tpsf.ts)
             starts = 0
             for ts in preceding_tss:
                 lbl = ts.label

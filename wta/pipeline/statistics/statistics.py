@@ -1,4 +1,4 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from pathlib import Path
 from typing import cast
 
@@ -6,11 +6,18 @@ import numpy as np
 from bs4 import BeautifulSoup
 
 from ..sentence_histories.text_unit import SPSF, TextUnitType
-from ..text_history.action import Action
+from ..text_history.action import (
+    Action,
+    Append,
+    Deletion,
+    Insertion,
+    Midletion,
+    Navigation,
+)
 from ..text_history.tpsf import TpsfECM, TpsfPCM
 
 
-class Statistics(ABC):
+class Statistics(ABC):  # noqa: B024
     """
     Statistics contain:
         Basic statistics
@@ -35,10 +42,6 @@ class Statistics(ABC):
         - Number changed sentences *
         - Number deleted sentences *
     """
-
-    @abstractmethod
-    def retrieve_stats(self) -> dict[str, int | float | str]:
-        pass
 
 
 class BasicStatistics(Statistics):
@@ -95,8 +98,7 @@ class PauseStatistics(Statistics):
         actions_pause_unknown: int = 0
         for act in actions:
             if (
-                type(act).__name__
-                in ["Append", "Insertion", "Deletion", "Midletion", "Navigation"]
+                isinstance(act, (Append, Insertion, Deletion, Midletion, Navigation))
                 and act.pause is not None
             ):
                 pauses.append(act.pause)
@@ -153,9 +155,7 @@ class TSStatistics(Statistics):
 
 
 class SentenceStatistics(Statistics):
-    def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
-    ) -> None:
+    def __init__(self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]) -> None:
         self.texthis = texthis
         self.senhis = senhis
         self.data = self.retrieve_stats()

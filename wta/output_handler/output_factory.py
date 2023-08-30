@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ..pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ..pipeline.sentence_histories.text_unit import SPSF
 from ..pipeline.sentence_parsing.parsers import TokenProp
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
@@ -76,6 +76,7 @@ class TpsfsOutputFactory:
     @classmethod
     def run(cls, tpsfs: list[TpsfECM], settings: Settings) -> None:
         TpsfsTxt(tpsfs, settings).to_file()
+
 
 class TpsfsPCMOutputFactory:
     @classmethod
@@ -173,7 +174,9 @@ class StatsOutputFactory:
         senhis: dict[int, list[SPSF]],
         settings: Settings,
     ) -> None:
-        StatsTxt(b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings).to_file()
+        StatsTxt(
+            b_stats, e_stats, p_stats, ts_stats, sen_stats, idfx, settings
+        ).to_file()
         SenEditSvg(texthis, senhis, settings).to_file()
         TsTokensSvg(texthis, senhis, settings).to_file()
         TsLabelsSvg(texthis, senhis, settings).to_file()

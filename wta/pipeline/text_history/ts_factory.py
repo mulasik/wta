@@ -2,10 +2,10 @@ import difflib
 
 from tqdm import tqdm
 
-from wta.pipeline.sentence_histories.text_unit import SPSFBuilder, TextUnit
+from wta.pipeline.sentence_histories.text_unit import SPSFBuilder
 
 from ...settings import Settings
-from .action import Action
+from .action import Action, KeyboardAction, Replacement
 from .ts import TransformingSequence
 
 
@@ -28,27 +28,31 @@ class TsFactory:
             a list of objects of type TransformingSequence
         """
         tss = []
-        prev_endtime = None
+        prev_endtime: int | None = None
         rplcmt_textlen = None
         for acttyp, actgro in tqdm(
             action_groups.items(), "Extracting transforming sequences"
         ):
             text = "".join([a.content for a in actgro])
             actlbl = acttyp.split("_")[0].lower()
-            startpos = actgro[0].startpos
-            endpos = actgro[-1].endpos
-            try:
-                starttime = actgro[0].starttime
-                endtime = actgro[-1].endtime
+            first_action = actgro[0]
+            last_action = actgro[-1]
+            startpos = first_action.startpos
+            endpos = last_action.endpos
+            if isinstance(first_action, KeyboardAction) and isinstance(
+                last_action, KeyboardAction
+            ):
+                starttime = first_action.starttime
+                endtime = last_action.endtime
                 duration = endtime - starttime
                 preceding_pause = None if not prev_endtime else starttime - prev_endtime
-            except AttributeError:
+            else:
                 starttime, endtime, duration, preceding_pause = None, None, None, None
-            if actlbl in ["deletion", "midletion"]:
+            if actlbl in ["deletion", "midletion"] and endpos is not None:
                 startpos, endpos = endpos, startpos
-            elif actlbl == "replacement":
-                endpos = actgro[-1].rplcmt_endpos
-                rplcmt_textlen = actgro[0].textlen
+            elif actlbl == "replacement" and isinstance(last_action, Replacement):
+                endpos = last_action.rplcmt_endpos
+                rplcmt_textlen = first_action.textlen
             prev_endtime = endtime
             ts = TransformingSequence(
                 text,

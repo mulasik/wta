@@ -13,9 +13,7 @@ from .text_unit import SPSF, SPSFBuilder, TextUnitType
 
 
 class SentenceHistoryGenerator:
-    def run(
-        self, tpsfs: list[TpsfECM], settings: Settings
-    ) -> dict[int, list[SPSF]]:
+    def run(self, tpsfs: list[TpsfECM], settings: Settings) -> dict[int, list[SPSF]]:
         sentence_history_builder: dict[int, list[SPSFBuilder]] = {}
         sentence_history = {}
         global_new_sens = []
@@ -29,7 +27,7 @@ class SentenceHistoryGenerator:
                 if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
             ]
             for index, csb in enumerate(current_spsf_builders):
-                csb.set_pos_in_text(index+1)
+                csb.set_pos_in_text(index + 1)
 
             number_new = 0
             if i == 0:
@@ -55,8 +53,14 @@ class SentenceHistoryGenerator:
                             csv.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(csv)
                     elif csv.state in [SenLabels.MOD, SenLabels.UNC_POST]:
-                        prev_spsf_ids = [spsf.sen_id for spsf in prev_spsf_builders if re.search(csv.text, spsf.text) is not None]
-                        prev_spsf_id = None if len(prev_spsf_ids) == 0 else prev_spsf_ids[0]
+                        prev_spsf_ids = [
+                            spsf.sen_id
+                            for spsf in prev_spsf_builders
+                            if re.search(csv.text, spsf.text) is not None
+                        ]
+                        prev_spsf_id = (
+                            None if len(prev_spsf_ids) == 0 else prev_spsf_ids[0]
+                        )
                         if prev_spsf_id is not None:
                             csv.set_id(prev_spsf_id)
                             sentence_history_builder[prev_spsf_id].append(csv)
@@ -144,9 +148,7 @@ class SentenceHistoryGenerator:
             sentence_history_duplicates_eliminated[key] = sens_duplicates_eliminated
         return sentence_history_duplicates_eliminated
 
-    def filter_senhis(
-        self, senhis: dict[int, list[SPSF]]
-    ) -> dict[int, list[SPSF]]:
+    def filter_senhis(self, senhis: dict[int, list[SPSF]]) -> dict[int, list[SPSF]]:
         filtered_senhis = {}
         for sen_id, sen_versions in senhis.items():
             filtered_sen_versions = [s for s in sen_versions if s.ts.relevance is True]

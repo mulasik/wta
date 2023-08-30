@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 from wta.settings import Settings
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnit
+from ...pipeline.sentence_histories.text_unit import SPSF
 from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
@@ -68,9 +68,15 @@ class SenEditPlot(StatsPlot[tuple[list[str], list[int]]]):
         )
 
 
-class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
+class TsLabelsPlot(StatsPlot[tuple[int, int, int, int, int]]):
     def preprocess_data(self) -> tuple[int, int, int, int, int]:
-        appended_tokens, inserted_tokens, deleted_tokens, pasted_tokens, replaced_tokens = 0, 0, 0, 0, 0
+        (
+            appended_tokens,
+            inserted_tokens,
+            deleted_tokens,
+            pasted_tokens,
+            replaced_tokens,
+        ) = (0, 0, 0, 0, 0)
         for tpsf in self.texthis:
             if tpsf.ts.label == "append":
                 appended_tokens += len(tpsf.ts.text.split(" "))
@@ -82,7 +88,13 @@ class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
                 pasted_tokens += len(tpsf.ts.text.split(" "))
             if tpsf.ts.label == "replacement":
                 replaced_tokens += len(tpsf.ts.text.split(" "))
-        return appended_tokens, inserted_tokens, pasted_tokens, deleted_tokens, replaced_tokens
+        return (
+            appended_tokens,
+            inserted_tokens,
+            pasted_tokens,
+            deleted_tokens,
+            replaced_tokens,
+        )
 
     def create_figure(self) -> None:
         plt.rcParams.update({"font.size": 35})
@@ -95,6 +107,7 @@ class TsLabelsPlot(StatsPlot[tuple[int, int, int]]):
             labels=["insertions", "appends", "pastings", "deletions", "replacements"],
             colors=["teal", "cadetblue", "orange", "lightcoral", "tan"],
         )
+
 
 class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
     def preprocess_data(self) -> tuple[list[int], list[int]]:
