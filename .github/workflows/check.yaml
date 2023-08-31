@@ -1,0 +1,25 @@
+---
+name: THEtool
+on: [push]
+jobs:
+  tox:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+          cache: "pip"
+      - name: Install tox and any other packages
+        run: pip install tox poetry
+      - name: Run tox
+        run: tox
+  pre-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v3
+      - uses: pre-commit/action@v3.0.0
+        with:
+          extra_args: --all-files
