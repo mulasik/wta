@@ -11,7 +11,8 @@ def check_texthis_correctness(
 ) -> bool:
     if settings.config["ksl_source_format"] in ["inputlog_idfx", "scriptlog_idfx"]:
         txt_file = Path(
-            settings.config["final_txt"], f"{filename.replace('_0', '_ori').replace('il', 'ft')}.txt"
+            settings.config["final_txt"],
+            f"{filename.replace('_0', '_ori').replace('il', 'ft')}.txt",
         )
     elif settings.config["ksl_source_format"] == "protext_csv":
         txt_file = Path(settings.config["final_txt"], f"{filename}.txt")
