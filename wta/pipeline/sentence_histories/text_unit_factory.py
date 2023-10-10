@@ -1,3 +1,4 @@
+from pathlib import Path
 import re
 from typing import TYPE_CHECKING
 
@@ -7,6 +8,7 @@ from ...settings import Settings
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
 from .. import regular_expressions
 from .text_unit import TextUnit, TextUnitBuilder, TextUnitType
+from wta.utils.other import ensure_path
 
 if TYPE_CHECKING:
     from ..text_history.tpsf import TpsfECM
@@ -27,6 +29,16 @@ class TextUnitFactory:
 
         sentence_list = settings.nlp_model.segment_text(text)
 
+        _txt_sen_file = settings.config["output_dir"] / "sentence_lists" / settings.filename / f"{revision_id}_sentence_list.txt"
+        ensure_path(settings.config["output_dir"] / "sentence_lists" / settings.filename)
+
+
+        with open(_txt_sen_file, "w") as f:
+            str_to_save = ""
+            for s in sentence_list:
+                str_to_save += f"\n|{s}|\n"
+            f.write(str_to_save)
+
         print(
             f"\n\n=============================={revision_id}==============================\n"
         )
@@ -37,6 +49,8 @@ class TextUnitFactory:
         print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
 
         textunit_list = self._split_in_textunits(sentence_list)
+
+        
 
         merged_textunit_list = self._merge_double_textunits(textunit_list)
 
