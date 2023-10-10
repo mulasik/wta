@@ -8,6 +8,7 @@ from wta.settings import Settings
 _GRAMMAR = {
     "de": ["GRAMMAR"],
     "fr": ["CAT_GRAMMAIRE", "AGREEMENT", "CAT_HOMONYMES_PARONYMES"],
+    "en": ["GRAMMAR", "AGREEMENT"]
 }
 _MECHANICS = {
     "de": ["TYPOS", "CASING", "HILFESTELLUNG_KOMMASETZUNG"],
@@ -19,11 +20,13 @@ _MECHANICS = {
         "CAT_MAJUSCULES",
         "PUNCTUATION",
     ],
+    "en": ["TYPOS", "CASING", "PUNCTUATION"]
 }
 
 
 class SenhoodDict(TypedDict):
     text: str
+    syntactic_data: list
     mech_completeness: bool
     con_completeness: bool
     syn_completeness: bool
@@ -43,6 +46,7 @@ class Sentencehood:
     """
 
     text: str
+    syntactic_data: list
     mech_completeness: bool
     con_completeness: bool
     syn_completeness: bool
@@ -52,6 +56,7 @@ class Sentencehood:
     def to_dict(self) -> SenhoodDict:
         return {
             "text": self.text,
+            "syntactic_data": self.syntactic_data,
             "mech_completeness": self.mech_completeness,
             "con_completeness": self.con_completeness,
             "syn_completeness": self.syn_completeness,
@@ -88,7 +93,7 @@ class SentencehoodEvaluator:
                 errors = nlp_model.tool.check(spsf.text)
                 error_types = {e.category for e in errors}
                 for e in errors:
-                    if e.category not in error_details.keys():
+                    if e.category not in error_details:
                         error_details[e.category] = set(
                             spsf.text[e.offset : e.offset + e.errorLength]
                         )
@@ -110,6 +115,7 @@ class SentencehoodEvaluator:
                 mech_correctness = bool(mech_completeness and mechanical_errors == [])
                 sentencehood = Sentencehood(
                     text=spsf.text,
+                    syntactic_data=syn_data,
                     mech_completeness=mech_completeness,
                     con_completeness=con_completeness,
                     syn_completeness=syn_completeness,
