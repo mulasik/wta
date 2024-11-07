@@ -1,0 +1,101 @@
+revision_id,transformation class,impacted sentence part,impacted sentence part.1,impacted sentence part.2,impacted sentence part.3,ts_text,ts_label,affected_tus
+0,multi_sentence,com_sen,com_sen,com_sen,com_sen,"Die Sprache ist ein Instrument, welches uns hilft, das Umfeld sowie Handlungen zu benennen. Dank diesem Mittel ist es uns möglich mit unserem sozialen Umfeld in Kontakt zu treten. Darum bildet die Sprache ein erstes Sprungbrett für die Integration und die Zugehörigkeit zu einer Gesellschaft. Ich selbst bin bilingual aufgewachsen. ",pasting,"['Die Sprache ist ein Instrument, welches uns hilft, das Umfeld sowie Handlungen zu benennen.', ' ', 'Dank diesem Mittel ist es uns möglich mit unserem sozialen Umfeld in Kontakt zu treten.', ' ', 'Darum bildet die Sprache ein erstes Sprungbrett für die Integration und die Zugehörigkeit zu einer Gesellschaft.', ' ', 'Ich selbst bin bilingual aufgewachsen.', ' ']"
+1,in_sentence,sen_start,,,, ,append,['  ']
+2,in_sentence,sen_start,,,, ,deletion,[' ']
+3,in_sentence,sen_start,,,,Bei der Aneignung einer neuen SS,append,['Bei der Aneignung einer neuen SS']
+4,in_sentence,sen_middle,,,,S,deletion,['Bei der Aneignung einer neuen S']
+5,in_sentence,sen_middle,,,,prache fliessen die Sprache und das Umfeldd ,append,['Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeldd ']
+6,in_sentence,sen_middle,,,,d ,deletion,['Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld']
+7,in_sentence,sen_end,,,, unvermeindilch ineinander. ,append,"['Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindilch ineinander.', ' ']"
+8,in_sentence,sen_middle,,,,il,midletion,['Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindch ineinander.']
+9,in_sentence,sen_middle,,,,li,insertion,['Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindlich ineinander.']
+10,in_sentence,sen_start,,,,Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu der,append,['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu der']
+11,in_sentence,sen_middle,,,, der,deletion,['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu']
+12,in_sentence,sen_middle,,,,"r Sprache als Kinder, die ",append,"['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, die ']"
+13,in_sentence,sen_middle,,,,die ,deletion,"['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, ']"
+14,in_sentence,sen_middle,,,,welche ausschliesslich mit ihrer Muttersprace,append,"['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprace']"
+15,in_sentence,sen_middle,,,,e,deletion,"['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprac']"
+16,cross_sentence,sen_end,sen_start,,,he konfrontiert wurden. Ich stee a,append,"['Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprache konfrontiert wurden.', ' ', 'Ich stee a']"
+17,in_sentence,sen_middle,,,,ee a,deletion,['Ich st']
+18,in_sentence,sen_middle,,,,ehe also in direkter Rea,append,['Ich stehe also in direkter Rea']
+19,in_sentence,sen_middle,,,,a,deletion,['Ich stehe also in direkter Re']
+20,in_sentence,sen_end,,,,"lation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.",append,"['Ich stehe also in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.']"
+21,in_sentence,sen_middle,,,,also ,midletion,"['Ich stehe in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.']"
+22,in_sentence,sen_middle,,,,somit ,insertion,"['Ich stehe somit in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.']"
+23,in_sentence,sen_start,,,, All dies prägt m,append,"[' ', 'All dies prägt m']"
+24,in_sentence,sen_middle,,,, m,deletion,['All dies prägt']
+25,in_sentence,sen_end,,,,e mich gleichermassen. ,append,"['All dies prägte mich gleichermassen.', ' ']"
+26,in_sentence,sen_middle,,,,e,midletion,['All dies prägt mich gleichermassen.']
+27,in_sentence,sen_middle,,,,,replacement,['All dies prägtmich gleichermassen.']
+28,in_sentence,sen_middle,,,, ,insertion,['All dies prägt mich gleichermassen.']
+29,in_sentence,sen_start,,,,Um beim Aufbauei,append,['Um beim Aufbauei']
+30,in_sentence,sen_middle,,,,ei,deletion,['Um beim Aufbau']
+31,in_sentence,sen_middle,,,, eines Lebens in einem anderssprachigen l,append,['Um beim Aufbau eines Lebens in einem anderssprachigen l']
+32,in_sentence,sen_middle,,,,l,deletion,['Um beim Aufbau eines Lebens in einem anderssprachigen ']
+33,in_sentence,sen_end,,,,"Land Unterstützung zu bieten, muss man sich mit dem Lernenden seiner Herkunft und seinen Fähigkeiten auseinandersetzen.",append,"['Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden seiner Herkunft und seinen Fähigkeiten auseinandersetzen.']"
+34,in_sentence,sen_middle,,,,",",insertion,"['Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden, seiner Herkunft und seinen Fähigkeiten auseinandersetzen.']"
+35,in_sentence,sen_start,,,,  in die,append,"['  ', 'in die']"
+36,in_sentence,sen_start,,,,in die,deletion,[]
+37,in_sentence,sen_start,,,,In dies,append,['In dies']
+38,in_sentence,sen_middle,,,,s,deletion,['In die']
+39,cross_sentence,sen_end,sen_start,,,sem Konstrukt stellt die Sprachvermittlung einen essenziellen Aspekt dar. Haupt,append,"['In diesem Konstrukt stellt die Sprachvermittlung einen essenziellen Aspekt dar.', ' ', 'Haupt']"
+40,in_sentence,sen_middle,,,,t,deletion,['Haup']
+41,in_sentence,sen_middle,,,,tsächlich ,append,['Hauptsächlich ']
+42,in_sentence,sen_start,,,,Hauptsächlich ,deletion,[]
+43,in_sentence,sen_start,,,,"Genauso wichtig ist es, wen ",append,"['Genauso wichtig ist es, wen ']"
+44,in_sentence,sen_middle,,,, ,deletion,"['Genauso wichtig ist es, wen']"
+45,in_sentence,sen_middle,,,,n mn,append,"['Genauso wichtig ist es, wenn mn']"
+46,in_sentence,sen_middle,,,,n,deletion,"['Genauso wichtig ist es, wenn m']"
+47,in_sentence,sen_end,,,,"an versucht zu verstehen, wie jemand anderes etwas versteht.",append,"['Genauso wichtig ist es, wenn man versucht zu verstehen, wie jemand anderes etwas versteht.']"
+48,in_sentence,sen_middle,,,,t ,midletion,"['Genauso wichtig ist es, wenn man versuchzu verstehen, wie jemand anderes etwas versteht.']"
+49,in_sentence,sen_middle,,,,en ,insertion,"['Genauso wichtig ist es, wenn man versuchen zu verstehen, wie jemand anderes etwas versteht.']"
+50,in_sentence,sen_middle,,,,wenn man ,midletion,"['Genauso wichtig ist es, versuchen zu verstehen, wie jemand anderes etwas versteht.']"
+51,in_sentence,sen_start,,,," Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichtn",append,"[' ', 'Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichtn']"
+52,in_sentence,sen_middle,,,,n,deletion,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterricht']"
+53,in_sentence,sen_middle,,,,"en und vermitteln weiss, so ",append,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, so ']"
+54,in_sentence,sen_middle,,,,so ,deletion,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, ']"
+55,in_sentence,sen_middle,,,,wird das Lernen einer neuen Sprache ,append,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache ']"
+56,in_sentence,sen_middle,,,,extr,insertion,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nichtextr zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache ']"
+57,in_sentence,sen_middle,,,,extr,midletion,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache ']"
+58,cross_sentence,sen_end,sen_start,,,extrem schwer. Wenn man diese wichtigen Aspekte in Angriff genommen hat,append,"['Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache extrem schwer.', ' ', 'Wenn man diese wichtigen Aspekte in Angriff genommen hat']"
+59,in_sentence,sen_middle,,,,Aspekte,midletion,['Wenn man diese wichtigen  in Angriff genommen hat']
+60,in_sentence,sen_middle,,,,Punkte,insertion,['Wenn man diese wichtigen Punkte in Angriff genommen hat']
+61,in_sentence,sen_middle,,,,", befindet man sich mitten in der Integration u",append,"['Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration u']"
+62,in_sentence,sen_middle,,,,u,deletion,"['Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration ']"
+63,cross_sentence,sen_end,sen_start,,,"und damit im Prozess der Aufnahme in die Gesellschaft. Mit diesem Studium habe ich die Chance, etwas zu ",append,"['Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration und damit im Prozess der Aufnahme in die Gesellschaft.', ' ', 'Mit diesem Studium habe ich die Chance, etwas zu ']"
+64,in_sentence,sen_middle,,,,zu ,deletion,"['Mit diesem Studium habe ich die Chance, etwas ']"
+65,in_sentence,sen_end,,,,"das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.",append,"['Mit diesem Studium habe ich die Chance, etwas das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.']"
+66,in_sentence,sen_middle,,,,",",insertion,"['Mit diesem Studium habe ich die Chance, etwas, das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.']"
+67,in_sentence,sen_start,,,, Vor allem möchte ich mir die Fähigkeiten und Fertigkeiten,append,"[' ', 'Vor allem möchte ich mir die Fähigkeiten und Fertigkeiten']"
+68,in_sentence,sen_middle,,,, die,midletion,['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten']
+69,in_sentence,sen_middle,,,, wie zum Beispiel ,append,['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel ']
+70,in_sentence,sen_middle,,,, ,deletion,['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel']
+71,in_sentence,sen_middle,,,, das wissenschaftliche Arbeiten ,append,['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel das wissenschaftliche Arbeiten ']
+72,in_sentence,sen_middle,,,,",",insertion,"['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten ']"
+73,in_sentence,sen_middle,,,, ,deletion,"['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten']"
+74,in_sentence,sen_middle,,,,", aneignen ",append,"['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen ']"
+75,in_sentence,sen_middle,,,, ,deletion,"['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen']"
+76,cross_sentence,sen_end,sen_start,,,". Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem",append,"['Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen.', ' ', 'Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem']"
+77,in_sentence,sen_middle,,,,auf dem,deletion,"['Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch ']"
+78,in_sentence,sen_end,,,,im Berufsleben einen bedeutenden Bereich dar.,append,"['Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch im Berufsleben einen bedeutenden Bereich dar.']"
+79,in_sentence,sen_middle,,,,,replacement,"['Diese können in einer Ausbildung nicht erlernt werden, stellen jedocheinen bedeutenden Bereich dar.']"
+80,in_sentence,sen_middle,,,, auf dem Arbeitsmarkt ,insertion,"['Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem Arbeitsmarkt einen bedeutenden Bereich dar.']"
+81,in_sentence,sen_start,,,," Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements ",append,"[' ', 'Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements ']"
+82,in_sentence,sen_middle,,,, ,deletion,"['Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements']"
+83,multi_sentence,sen_end,com_sen,sen_start,,", weg. Ohne ein Studium kann man in diesen Arbeitsfeldern nicht arbeiten. Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig ",append,"['Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements, weg.', ' ', 'Ohne ein Studium kann man in diesen Arbeitsfeldern nicht arbeiten.', ' ', 'Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig ']"
+84,in_sentence,sen_middle,,,, ,deletion,"['Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig']"
+85,multi_sentence,sen_end,com_sen,com_sen,sen_start,", sodass sie letztendlich ein Ganzes ergeben. Die Theorie sowie der Mensch stehen im Vordergrund. Sprache hat mich schon immer sehr interessiert. kOMM",append,"['Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig, sodass sie letztendlich ein Ganzes ergeben.', ' ', 'Die Theorie sowie der Mensch stehen im Vordergrund.', ' ', 'Sprache hat mich schon immer sehr interessiert.', ' ', 'kOMM']"
+86,in_sentence,sen_start,,,,kOMM,deletion,[]
+87,cross_sentence,com_sen,sen_start,,,"Kommunikationsfähigkeit sowie Offenheit gehören zu meinen Stärken. Was mich aber am meisten Freut, ist, dass hier der Mensch se",append,"['Kommunikationsfähigkeit sowie Offenheit gehören zu meinen Stärken.', ' ', 'Was mich aber am meisten Freut, ist, dass hier der Mensch se']"
+88,in_sentence,sen_middle,,,, se,deletion,"['Was mich aber am meisten Freut, ist, dass hier der Mensch']"
+89,in_sentence,sen_middle,,,,", sein Wesen ",append,"['Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen ']"
+90,in_sentence,sen_middle,,,, ,deletion,"['Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen']"
+91,cross_sentence,sen_end,sen_start,,,", seine Herkunft und seine Kultur ebenfalls eine grosse Rolle spielen. Ich erhoffe mir in diesem Sinn",append,"['Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen, seine Herkunft und seine Kultur ebenfalls eine grosse Rolle spielen.', ' ', 'Ich erhoffe mir in diesem Sinn']"
+92,in_sentence,sen_middle,,,,Sinn,deletion,['Ich erhoffe mir in diesem ']
+93,in_sentence,sen_middle,,,,Studiengang ,append,['Ich erhoffe mir in diesem Studiengang ']
+94,in_sentence,sen_middle,,,, ,deletion,['Ich erhoffe mir in diesem Studiengang']
+95,in_sentence,sen_middle,,,,", meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förddern",append,"['Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förddern']"
+96,in_sentence,sen_middle,,,,dern,deletion,"['Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förd']"
+97,multi_sentence,sen_end,com_sen,com_sen,,"ern. Ich möchte die Welt ein wenig besser machen und den heutzutage immer grösser werdenden Defiziten und Krisen entgegenwirken. Wenn ich Menschen durch meine berufliche Tätigkeit unterstützen und aktiv fördern kann, habe ich mein Ziel erreicht.",append,"['Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu fördern.', ' ', 'Ich möchte die Welt ein wenig besser machen und den heutzutage immer grösser werdenden Defiziten und Krisen entgegenwirken.', ' ', 'Wenn ich Menschen durch meine berufliche Tätigkeit unterstützen und aktiv fördern kann, habe ich mein Ziel erreicht.']"
+98,in_sentence,sen_middle,,,,,replacement,['Die Theorie sowie der Mensch.']
+99,in_sentence,sen_middle,,,, kommen nicht zu kurz,insertion,['Die Theorie sowie der Mensch kommen nicht zu kurz.']

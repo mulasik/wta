@@ -1,0 +1,115 @@
+sen_id,tpsf_id,sen_pos_in_text,sen_text,operation
+286319025822505284884006470261002251396,0.0,1.0,"|Die Sprache ist ein Instrument, welches uns hilft, das Umfeld sowie Handlungen zu benennen.|",production
+286319032953039911167796853679957781636,0.0,2.0,|Dank diesem Mittel ist es uns möglich mit unserem sozialen Umfeld in Kontakt zu treten.|,production
+286319034537603161453083605550836788356,0.0,3.0,|Darum bildet die Sprache ein erstes Sprungbrett für die Integration und die Zugehörigkeit zu einer Gesellschaft.|,production
+286319036122166411738370357421715795076,0.0,4.0,|Ich selbst bin bilingual aufgewachsen.|,production
+286319054344643790019168003936824372356,3.0,5.0,|Bei der Aneignung einer neuen SS|,production
+286319054344643790019168003936824372356,4.0,5.0,|Bei der Aneignung einer neuen S|,pre-contextual deletion
+286319054344643790019168003936824372356,5.0,5.0,|Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeldd |,production
+286319054344643790019168003936824372356,6.0,5.0,|Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld|,pre-contextual deletion
+286319054344643790019168003936824372356,7.0,5.0,|Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindilch ineinander.|,production
+286319054344643790019168003936824372356,8.0,5.0,|Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindch ineinander.|,contextual deletion
+286319054344643790019168003936824372356,9.0,5.0,|Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindlich ineinander.|,contextual insertion
+286319090789598546580763296967041526916,10.0,6.0,|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu der|,production
+286319090789598546580763296967041526916,11.0,6.0,|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu|,pre-contextual deletion
+286319090789598546580763296967041526916,12.0,6.0,"|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, die |",production
+286319090789598546580763296967041526916,13.0,6.0,"|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, |",pre-contextual deletion
+286319090789598546580763296967041526916,14.0,6.0,"|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprace|",production
+286319090789598546580763296967041526916,15.0,6.0,"|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprac|",pre-contextual deletion
+286319090789598546580763296967041526916,16.0,6.0,"|Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprache konfrontiert wurden.|",production
+286319127234553303142358589997258681476,16.0,7.0,|Ich stee a|,production
+286319127234553303142358589997258681476,17.0,7.0,|Ich st|,pre-contextual deletion
+286319127234553303142358589997258681476,18.0,7.0,|Ich stehe also in direkter Rea|,production
+286319127234553303142358589997258681476,19.0,7.0,|Ich stehe also in direkter Re|,pre-contextual deletion
+286319127234553303142358589997258681476,20.0,7.0,"|Ich stehe also in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.|",production
+286319127234553303142358589997258681476,21.0,7.0,"|Ich stehe in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.|",contextual deletion
+286319127234553303142358589997258681476,22.0,7.0,"|Ich stehe somit in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.|",contextual insertion
+286319172394605936273031018317310372996,23.0,8.0,|All dies prägt m|,production
+286319172394605936273031018317310372996,24.0,8.0,|All dies prägt|,pre-contextual deletion
+286319172394605936273031018317310372996,25.0,8.0,|All dies prägte mich gleichermassen.|,production
+286319172394605936273031018317310372996,26.0,8.0,|All dies prägt mich gleichermassen.|,contextual deletion
+286319172394605936273031018317310372996,27.0,8.0,|All dies prägtmich gleichermassen.|,contextual deletion
+286319172394605936273031018317310372996,28.0,8.0,|All dies prägt mich gleichermassen.|,contextual insertion
+286319218346940194546346822572801567876,29.0,9.0,|Um beim Aufbauei|,production
+286319218346940194546346822572801567876,30.0,9.0,|Um beim Aufbau|,pre-contextual deletion
+286319218346940194546346822572801567876,31.0,9.0,|Um beim Aufbau eines Lebens in einem anderssprachigen l|,production
+286319218346940194546346822572801567876,32.0,9.0,|Um beim Aufbau eines Lebens in einem anderssprachigen |,pre-contextual deletion
+286319218346940194546346822572801567876,33.0,9.0,"|Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden seiner Herkunft und seinen Fähigkeiten auseinandersetzen.|",production
+286319218346940194546346822572801567876,34.0,9.0,"|Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden, seiner Herkunft und seinen Fähigkeiten auseinandersetzen.|",contextual insertion
+286319322928114713375272446050816011396,35.0,10.0,|in die|,production
+,,,,pre-contextual deletion
+286319341150592091656070092565924588676,37.0,10.0,|In dies|,production
+286319341150592091656070092565924588676,38.0,10.0,|In die|,pre-contextual deletion
+286319341150592091656070092565924588676,39.0,10.0,|In diesem Konstrukt stellt die Sprachvermittlung einen essenziellen Aspekt dar.|,production
+286319360165351095079511115016472669316,39.0,11.0,|Haupt|,production
+286319360165351095079511115016472669316,40.0,11.0,|Haup|,pre-contextual deletion
+286319360165351095079511115016472669316,41.0,11.0,|Hauptsächlich |,production
+,,,,pre-contextual deletion
+286319395025742601355819656175810817156,43.0,11.0,"|Genauso wichtig ist es, wen |",production
+286319395025742601355819656175810817156,44.0,11.0,"|Genauso wichtig ist es, wen|",pre-contextual deletion
+286319395025742601355819656175810817156,45.0,11.0,"|Genauso wichtig ist es, wenn mn|",production
+286319395025742601355819656175810817156,46.0,11.0,"|Genauso wichtig ist es, wenn m|",pre-contextual deletion
+286319395025742601355819656175810817156,47.0,11.0,"|Genauso wichtig ist es, wenn man versucht zu verstehen, wie jemand anderes etwas versteht.|",production
+286319395025742601355819656175810817156,48.0,11.0,"|Genauso wichtig ist es, wenn man versuchzu verstehen, wie jemand anderes etwas versteht.|",contextual deletion
+286319395025742601355819656175810817156,49.0,11.0,"|Genauso wichtig ist es, wenn man versuchen zu verstehen, wie jemand anderes etwas versteht.|",contextual insertion
+286319395025742601355819656175810817156,50.0,11.0,"|Genauso wichtig ist es, versuchen zu verstehen, wie jemand anderes etwas versteht.|",contextual deletion
+286319463954243988765793362559047609476,51.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichtn|",production
+286319463954243988765793362559047609476,52.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterricht|",pre-contextual deletion
+286319463954243988765793362559047609476,53.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, so |",production
+286319463954243988765793362559047609476,54.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, |",pre-contextual deletion
+286319463954243988765793362559047609476,55.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache |",production
+286319463954243988765793362559047609476,56.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nichtextr zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache |",pre-contextual insertion
+286319463954243988765793362559047609476,57.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache |",pre-contextual deletion
+286319463954243988765793362559047609476,58.0,12.0,"|Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache extrem schwer.|",production
+286319530505900500747836941135965891716,58.0,13.0,|Wenn man diese wichtigen Aspekte in Angriff genommen hat|,production
+286319530505900500747836941135965891716,59.0,13.0,|Wenn man diese wichtigen  in Angriff genommen hat|,pre-contextual deletion
+286319530505900500747836941135965891716,60.0,13.0,|Wenn man diese wichtigen Punkte in Angriff genommen hat|,production
+286319530505900500747836941135965891716,61.0,13.0,"|Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration u|",production
+286319530505900500747836941135965891716,62.0,13.0,"|Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration |",pre-contextual deletion
+286319530505900500747836941135965891716,63.0,13.0,"|Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration und damit im Prozess der Aufnahme in die Gesellschaft.|",production
+286319583588769385304943128810412616836,63.0,14.0,"|Mit diesem Studium habe ich die Chance, etwas zu |",production
+286319583588769385304943128810412616836,64.0,14.0,"|Mit diesem Studium habe ich die Chance, etwas |",pre-contextual deletion
+286319583588769385304943128810412616836,65.0,14.0,"|Mit diesem Studium habe ich die Chance, etwas das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.|",production
+286319583588769385304943128810412616836,66.0,14.0,"|Mit diesem Studium habe ich die Chance, etwas, das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.|",contextual insertion
+286319643802172896145839699903814872196,67.0,15.0,|Vor allem möchte ich mir die Fähigkeiten und Fertigkeiten|,production
+286319643802172896145839699903814872196,68.0,15.0,|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten|,pre-contextual deletion
+286319643802172896145839699903814872196,69.0,15.0,|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel |,production
+286319643802172896145839699903814872196,70.0,15.0,|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel|,pre-contextual deletion
+286319643802172896145839699903814872196,71.0,15.0,|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel das wissenschaftliche Arbeiten |,production
+286319643802172896145839699903814872196,72.0,15.0,"|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten |",production
+286319643802172896145839699903814872196,73.0,15.0,"|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten|",pre-contextual deletion
+286319643802172896145839699903814872196,74.0,15.0,"|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen |",production
+286319643802172896145839699903814872196,75.0,15.0,"|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen|",pre-contextual deletion
+286319643802172896145839699903814872196,76.0,15.0,"|Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen.|",production
+286319746798784164689478571510950308996,76.0,16.0,"|Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem|",production
+286319746798784164689478571510950308996,77.0,16.0,"|Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch |",pre-contextual deletion
+286319746798784164689478571510950308996,78.0,16.0,"|Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch im Berufsleben einen bedeutenden Bereich dar.|",production
+286319746798784164689478571510950308996,79.0,16.0,"|Diese können in einer Ausbildung nicht erlernt werden, stellen jedocheinen bedeutenden Bereich dar.|",contextual deletion
+286319746798784164689478571510950308996,80.0,16.0,"|Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem Arbeitsmarkt einen bedeutenden Bereich dar.|",contextual insertion
+286319809389032550958305270410671074436,81.0,17.0,"|Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements |",production
+286319809389032550958305270410671074436,82.0,17.0,"|Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements|",pre-contextual deletion
+286319809389032550958305270410671074436,83.0,17.0,"|Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements, weg.|",production
+286319837911171056093466804086493195396,83.0,18.0,|Ohne ein Studium kann man in diesen Arbeitsfeldern nicht arbeiten.|,production
+286319839495734306378753555957372202116,83.0,19.0,"|Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig |",production
+286319839495734306378753555957372202116,84.0,19.0,"|Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig|",pre-contextual deletion
+286319839495734306378753555957372202116,85.0,19.0,"|Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig, sodass sie letztendlich ein Ganzes ergeben.|",production
+286319871186999312084488593374952336516,85.0,20.0,|Die Theorie sowie der Mensch stehen im Vordergrund.|,production
+286319871186999312084488593374952336516,98.0,20.0,|Die Theorie sowie der Mensch.|,contextual deletion
+286319871186999312084488593374952336516,99.0,20.0,|Die Theorie sowie der Mensch kommen nicht zu kurz.|,contextual insertion
+286319872771562562369775345245831343236,85.0,21.0,|Sprache hat mich schon immer sehr interessiert.|,production
+286319873563844187512418721181270846596,85.0,22.0,|kOMM|,production
+286319923477586571498951405113959558276,87.0,22.0,|Kommunikationsfähigkeit sowie Offenheit gehören zu meinen Stärken.|,production
+286319925062149821784238156984838564996,87.0,23.0,"|Was mich aber am meisten Freut, ist, dass hier der Mensch se|",production
+286319925062149821784238156984838564996,88.0,23.0,"|Was mich aber am meisten Freut, ist, dass hier der Mensch|",pre-contextual deletion
+286319925062149821784238156984838564996,89.0,23.0,"|Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen |",production
+286319925062149821784238156984838564996,90.0,23.0,"|Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen|",pre-contextual deletion
+286319925062149821784238156984838564996,91.0,23.0,"|Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen, seine Herkunft und seine Kultur ebenfalls eine grosse Rolle spielen.|",production
+286319996367496084622141991174393867396,91.0,24.0,|Ich erhoffe mir in diesem Sinn|,production
+286319996367496084622141991174393867396,92.0,24.0,|Ich erhoffe mir in diesem |,pre-contextual deletion
+286319996367496084622141991174393867396,93.0,24.0,|Ich erhoffe mir in diesem Studiengang |,production
+286319996367496084622141991174393867396,94.0,24.0,|Ich erhoffe mir in diesem Studiengang|,pre-contextual deletion
+286319996367496084622141991174393867396,95.0,24.0,"|Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förddern|",production
+286319996367496084622141991174393867396,96.0,24.0,"|Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förd|",pre-contextual deletion
+286319996367496084622141991174393867396,97.0,24.0,"|Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu fördern.|",production
+286320105702360354306927870265045331076,97.0,25.0,|Ich möchte die Welt ein wenig besser machen und den heutzutage immer grösser werdenden Defiziten und Krisen entgegenwirken.|,production
+286320107286923604592214622135924337796,97.0,26.0,"|Wenn ich Menschen durch meine berufliche Tätigkeit unterstützen und aktiv fördern kann, habe ich mein Ziel erreicht.|",production

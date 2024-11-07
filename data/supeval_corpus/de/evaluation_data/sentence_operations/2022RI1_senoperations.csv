@@ -1,0 +1,112 @@
+sen_text,true_senoperations,predicted_senoperations
+"Die Sprache ist ein Instrument, welches uns hilft, das Umfeld sowie Handlungen zu benennen.",production,production
+Dank diesem Mittel ist es uns möglich mit unserem sozialen Umfeld in Kontakt zu treten.,production,production
+Darum bildet die Sprache ein erstes Sprungbrett für die Integration und die Zugehörigkeit zu einer Gesellschaft.,production,production
+Ich selbst bin bilingual aufgewachsen.,production,production
+Bei der Aneignung einer neuen SS,production,production
+Bei der Aneignung einer neuen S,pre-contextual_deletion,pre-contextual_deletion
+Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeldd ,production,production
+Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld,pre-contextual_deletion,pre-contextual_deletion
+Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindilch ineinander.,production,production
+Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindch ineinander.,contextual_deletion,contextual_deletion
+Bei der Aneignung einer neuen Sprache fliessen die Sprache und das Umfeld unvermeindlich ineinander.,contextual_insertion,contextual_insertion
+Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu der,production,production
+Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zu,pre-contextual_deletion,pre-contextual_deletion
+"Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, die ",production,production
+"Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, ",pre-contextual_deletion,pre-contextual_deletion
+"Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprace",production,production
+"Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprac",pre-contextual_deletion,pre-contextual_deletion
+"Als Kind einer Auswandererfamilie habe ich einen anderen Bezug zur Sprache als Kinder, welche ausschliesslich mit ihrer Muttersprache konfrontiert wurden.",production,production
+Ich stee a,production,production
+Ich st,pre-contextual_deletion,pre-contextual_deletion
+Ich stehe also in direkter Rea,production,production
+Ich stehe also in direkter Re,pre-contextual_deletion,pre-contextual_deletion
+"Ich stehe also in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.",production,production
+"Ich stehe in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.",contextual_deletion,contextual_deletion
+"Ich stehe somit in direkter Relation zu zwei Sprachen, zwei Ländern, zwei Kulturen und zwei Gesellschaften.",contextual_insertion,contextual_insertion
+All dies prägt m,production,production
+All dies prägt,pre-contextual_deletion,pre-contextual_deletion
+All dies prägte mich gleichermassen.,production,production
+All dies prägt mich gleichermassen.,contextual_insertion,contextual_deletion,contextual_insertion
+All dies prägtmich gleichermassen.,contextual_deletion,contextual_deletion
+Um beim Aufbauei,production,production
+Um beim Aufbau,pre-contextual_deletion,pre-contextual_deletion
+Um beim Aufbau eines Lebens in einem anderssprachigen l,production,production
+Um beim Aufbau eines Lebens in einem anderssprachigen ,pre-contextual_deletion,pre-contextual_deletion
+"Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden seiner Herkunft und seinen Fähigkeiten auseinandersetzen.",production,production
+"Um beim Aufbau eines Lebens in einem anderssprachigen Land Unterstützung zu bieten, muss man sich mit dem Lernenden, seiner Herkunft und seinen Fähigkeiten auseinandersetzen.",contextual_insertion,contextual_insertion
+in die,production,production
+,pre-contextual_deletion
+In dies,production,production
+In die,pre-contextual_deletion,pre-contextual_deletion
+In diesem Konstrukt stellt die Sprachvermittlung einen essenziellen Aspekt dar.,production,production
+Haupt,production,production
+Haup,pre-contextual_deletion,pre-contextual_deletion
+Hauptsächlich ,production,production
+"Genauso wichtig ist es, wen ",production,production
+"Genauso wichtig ist es, wen",pre-contextual_deletion,pre-contextual_deletion
+"Genauso wichtig ist es, wenn mn",production,production
+"Genauso wichtig ist es, wenn m",pre-contextual_deletion,pre-contextual_deletion
+"Genauso wichtig ist es, wenn man versucht zu verstehen, wie jemand anderes etwas versteht.",production,production
+"Genauso wichtig ist es, wenn man versuchzu verstehen, wie jemand anderes etwas versteht.",contextual_deletion,contextual_deletion
+"Genauso wichtig ist es, wenn man versuchen zu verstehen, wie jemand anderes etwas versteht.",contextual_insertion,contextual_insertion
+"Genauso wichtig ist es, versuchen zu verstehen, wie jemand anderes etwas versteht.",contextual_deletion,contextual_deletion
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichtn",production,production
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterricht",pre-contextual_deletion,pre-contextual_deletion
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, so ",production,production
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, ",pre-contextual_deletion,pre-contextual_deletion
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache ",pre-contextual_deletion,production,pre-contextual_insertion
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nichtextr zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache ",pre-contextual_insertion,pre-contextual_insertion
+"Denn man kann noch so gut eine Sprache beherrschen, wenn man sie nicht zu unterrichten und vermitteln weiss, wird das Lernen einer neuen Sprache extrem schwer.",production,production
+Wenn man diese wichtigen Aspekte in Angriff genommen hat,production,production
+Wenn man diese wichtigen  in Angriff genommen hat,pre-contextual_deletion,production
+Wenn man diese wichtigen Punkte in Angriff genommen hat,production,pre-contextual_insertion
+"Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration u",production,production
+"Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration ",pre-contextual_deletion,pre-contextual_deletion
+"Wenn man diese wichtigen Punkte in Angriff genommen hat, befindet man sich mitten in der Integration und damit im Prozess der Aufnahme in die Gesellschaft.",production,production
+"Mit diesem Studium habe ich die Chance, etwas zu ",production,production
+"Mit diesem Studium habe ich die Chance, etwas ",pre-contextual_deletion,pre-contextual_deletion
+"Mit diesem Studium habe ich die Chance, etwas das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.",production,production
+"Mit diesem Studium habe ich die Chance, etwas, das mich bereits mein Leben lang begleitet, in meinen Beruf umzuwndeln.",contextual_insertion,contextual_insertion
+Vor allem möchte ich mir die Fähigkeiten und Fertigkeiten,production,production
+Vor allem möchte ich mir Fähigkeiten und Fertigkeiten,pre-contextual_deletion,production
+Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel ,production,production
+Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel,pre-contextual_deletion,pre-contextual_deletion
+Vor allem möchte ich mir Fähigkeiten und Fertigkeiten wie zum Beispiel das wissenschaftliche Arbeiten ,production,production
+"Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten ",production,pre-contextual_insertion
+"Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten",pre-contextual_deletion,pre-contextual_deletion
+"Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen ",production,production
+"Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen",pre-contextual_deletion,pre-contextual_deletion
+"Vor allem möchte ich mir Fähigkeiten und Fertigkeiten, wie zum Beispiel das wissenschaftliche Arbeiten, aneignen.",production,production
+"Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem",production,production
+"Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch ",pre-contextual_deletion,pre-contextual_deletion
+"Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch im Berufsleben einen bedeutenden Bereich dar.",production,production
+"Diese können in einer Ausbildung nicht erlernt werden, stellen jedocheinen bedeutenden Bereich dar.",contextual_deletion,contextual_deletion
+"Diese können in einer Ausbildung nicht erlernt werden, stellen jedoch auf dem Arbeitsmarkt einen bedeutenden Bereich dar.",contextual_insertion,contextual_insertion
+"Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements ",production,production
+"Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements",pre-contextual_deletion,pre-contextual_deletion
+"Dadurch fallen bestimmte berufliche Ziele, wie der Bereich der Forschung und des Managements, weg.",production,production
+Ohne ein Studium kann man in diesen Arbeitsfeldern nicht arbeiten.,production,production
+"Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig ",production,production
+"Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig",pre-contextual_deletion,pre-contextual_deletion
+"Der Bachelor Studiengang ""Sprachliche Integration"" berücksichtigt in meinen Augen all die wichtigen Komponenten genau richtig, sodass sie letztendlich ein Ganzes ergeben.",production,production
+Die Theorie sowie der Mensch stehen im Vordergrund.,production,production
+Die Theorie sowie der Mensch.,contextual_deletion,contextual_deletion
+Die Theorie sowie der Mensch kommen nicht zu kurz.,contextual_insertion,contextual_insertion
+Sprache hat mich schon immer sehr interessiert.,production,production
+kOMM,production,production
+Kommunikationsfähigkeit sowie Offenheit gehören zu meinen Stärken.,production,production
+"Was mich aber am meisten Freut, ist, dass hier der Mensch se",production,production
+"Was mich aber am meisten Freut, ist, dass hier der Mensch",pre-contextual_deletion,pre-contextual_deletion
+"Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen ",production,production
+"Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen",pre-contextual_deletion,pre-contextual_deletion
+"Was mich aber am meisten Freut, ist, dass hier der Mensch, sein Wesen, seine Herkunft und seine Kultur ebenfalls eine grosse Rolle spielen.",production,production
+Ich erhoffe mir in diesem Sinn,production,production
+Ich erhoffe mir in diesem ,pre-contextual_deletion,pre-contextual_deletion
+Ich erhoffe mir in diesem Studiengang ,production,production
+Ich erhoffe mir in diesem Studiengang,pre-contextual_deletion,pre-contextual_deletion
+"Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förddern",production,production
+"Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu förd",pre-contextual_deletion,pre-contextual_deletion
+"Ich erhoffe mir in diesem Studiengang, meine Sprachgewandtheit voll entfalten zu können und vor allem die Menschlichkeit zu fördern.",production,production
+Ich möchte die Welt ein wenig besser machen und den heutzutage immer grösser werdenden Defiziten und Krisen entgegenwirken.,production,production
+"Wenn ich Menschen durch meine berufliche Tätigkeit unterstützen und aktiv fördern kann, habe ich mein Ziel erreicht.",production,production
