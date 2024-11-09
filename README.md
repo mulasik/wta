@@ -177,15 +177,21 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 
 ## Citation
 
-If you use THEtool, please cite our paper as follows:
+If you use THEtool, please cite our paper [Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing](https://doi.org/10.1007/s11145-021-10234-6) as follows:
 
 ```
-@article{mahlow2022extraction,
-  title={Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing},
-  author={Mahlow, Cerstin and Ulasik, Malgorzata Anna and Tuggener, Don},
-  journal={Reading and Writing},
-  pages={1--40},
-  year={2022},
-  publisher={Springer}
+@article{mahlow_extraction_2024,
+	title = {Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing},
+	volume = {37},
+	issn = {1573-0905},
+	url = {https://doi.org/10.1007/s11145-021-10234-6},
+	doi = {10.1007/s11145-021-10234-6},
+	abstract = {Producing written texts is a non-linear process: in contrast to speech, writers are free to change already written text at any place at any point in time. Linguistic considerations are likely to play an important role, but so far, no linguistic models of the writing process exist. We present an approach for the analysis of writing processes with a focus on linguistic structures based on the novel concepts of transforming sequences, text history, and sentence history. The processing of raw keystroke logging data and the application of natural language processing tools allows for the extraction and filtering of product and process data to be stored in a hierarchical data structure. This structure is used to re-create and visualize the genesis and history for a text and its individual sentences. Focusing on sentences as primary building blocks of written language and full texts, we aim to complement established writing process analyses and, ultimately, to interpret writing timecourse data with respect to linguistic structures. To enable researchers to explore this view, we provide a fully functional implementation of our approach as an open-source software tool and visualizations of the results. We report on a small scale exploratory study in German where we used our tool. The results indicate both the feasibility of the approach and that writers actually revise on a linguistic level. The latter confirms the need for modeling written text production from the perspective of linguistic structures beyond the word level.},
+	number = {2},
+	journal = {Reading and Writing},
+	author = {Mahlow, Cerstin and Ulasik, Malgorzata Anna and Tuggener, Don},
+	month = feb,
+	year = {2024},
+	pages = {443--482},
 }
 ```
