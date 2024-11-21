@@ -8,7 +8,7 @@ The tool uses two main modes to capture text versions from idfx files:
 * the Pause Capturing Mode (PCM), which relies on a preset pause duration in the text production to yield versions,
 * and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 
-## Tool Outputs
+## Tool Outputs TODO
 
 The main outputs of the tool are:
 * text history in ECM in JSON format
@@ -42,7 +42,7 @@ The following figure provides an overview of the processing steps.
 
 ![Processing Pipeline](docs/charts/Concept_Overview.png)
 
-An example of a TPD exported to JSON format:
+An example of a TPSF exported to JSON format:
 
 ```
 {
@@ -118,17 +118,23 @@ An example of a TPD exported to JSON format:
 
 ```
 
-For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used two of them: ```en_core_web_md``` for processing English texts and ```de_core_web_md``` for German data.
+For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
 
 ## Tool Configuration
 
 Several parameters related to TPSF generation are configurable. These are:
-* xml_paths: a list of paths to idfx files to be parsed
-* output_path: path to the directory where the all output files should be stored
+* ksl_source_format: either "scriptlog_idfx" (an xml file produced by Scriptlog) or "inputlog idfx" (an xml file produced by Inputlog)
+* ksl_files: a list of paths to idfx files containg keystroke logs to be parsed
+* output_dir: path to the directory where all output files should be stored
+* final_txt: path to the directory where the final text produced during the writing session should be stored
 * pause_duration: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
-* edit_distance: the maximum edit distance between two TPSFs which makes a TPSFs morphosyntactically irrelevant, default = 3
-* filtering: if set to True, a filtered TPSF list will be generated next to an unfiltered one, default = True
-* language: 'German' or 'English'
+* language: Languages.EN (for English), Languages.DE (for German), Languages.FR (for French), Languages.GR (for Greek)
+The following parameters are also part of theTOOL configuration and are applied for *relevance evaluation* of TPSFs:
+* min_edit_distance: the minimum edit distance between two TPSFs which makes a TPSFs morphosyntactically relevant, default = 3
+* ts_min_tokens_number: the minimum number of tokens in a transforming sequence which makes a TPSFs morphosyntactically relevant, default = 2
+* combine_edit_distance_with_tok_number: by default the min_edit_distance is not taken into account, if the difference between versions contains more than one token. In such case a TPSFs is considered morphosyntactically relevant even if the edit distance is less than the min_edit_distance. Set this parapeter to true if you want THEtool to check min_edit_distance even if the transforming sequence contains more than 1 token
+* enable_spellchecking: set this parameter to true if you want THEtool to classify a TPSF *morphosyntactically irrelevant* if it contains a spelling error
+* include_punctuation_edits: set this parameter to true if you want THEtool to classify a TPSF morphosyntactically irrelevant if the transformation consists only in removing or adding punctuation marks
 
 The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
 
@@ -136,12 +142,17 @@ The configuration structure:
 
 ```
 <YOUR CONFIGURATION NAME> = {
-    'xml_paths': [],
-    'output_path': '',
-    'pause_duration': int,
-    'edit_distance': int,
-    'filtering': int,
-    'language': ''
+    "ksl_source_format": '',
+    "ksl_files": (),
+    "output_dir": '',
+    "final_txt": '',
+    "pause_duration": int,
+    "min_edit_distance": int,
+    "ts_min_tokens_number": int,
+    "combine_edit_distance_with_tok_number": bool,
+    "enable_spellchecking": bool,
+    "include_punctuation_edits": bool,
+    "language": ''
 }
 ```
 
@@ -167,9 +178,33 @@ poetry run wta config.VIDEO
 
 By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
 
-## Relevant Definitions
+## Key Terms and their Definitions
 
-**SENTENCE MORPHOSYNTACTIC RELEVANCE** A sentence is morphosyntactically relevant if:
+**TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs as proposed by Mahlow (2015). A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions as proposed by Lindgren et al (2019b), (b) continuous deletion of something, (c) continuous insertion of something into existing text.
+
+**TRANSFORMING SEQUENCE (TS)**: The textual material (i.e., product data) combined with the edit operations (i.e., process data) that comprises the difference between two adjacent versions.
+
+**TEXT HISTORY (texthis)**: The text history comprises all TPSF versions captured throughout the tracking of the text production process.
+
+**TPSF MORPHOSYNTACTIC RELEVANCE**:
+
+**SPSF (sentence produced so far)**
+
+**TEXT UNIT (TU)**
+
+**SENTENCE (SEN)**
+
+**SENTENCE CANDIDATE (SEC)**
+
+**SENTENCE INTERSPACE (SIN)**
+
+**Paragraph INTERSPACE (PIN)**
+
+**SENTENCE HISTORY (senhis)**
+
+**SENTENCEHOOD**
+
+**SENTENCE MORPHOSYNTACTIC RELEVANCE**: A sentence is morphosyntactically relevant if:
 * it does not contain any spelling errors
 * it does not contain any tokens of the length 1
 * the edit distance between the sentence and its previous version is larger than 3 (only relevant if the difference between the sentence versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens.)
