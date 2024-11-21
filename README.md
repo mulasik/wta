@@ -199,9 +199,9 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 
 **INTERSPACE**: A text unit used to separate SPSFs from each other and structure the text.
 
-**SENTENCE INTERSPACE (SIN)**
+**SENTENCE INTERSPACE (SIN)**: A SIN is typically built of space characters and intervenes between SPSFs.
 
-**PARAGRAPH INTERSPACE (PIN)**
+**PARAGRAPH INTERSPACE (PIN)**: A PIN is typically comprised of newline characters and possibly indentation signalling the boundary between two paragraphs.
 
 **SENTENCE HISTORY (senhis)**: A sentence history is created for each of the sentences. This also includes sentences that are not part of the final product due to a revision. A single sentence history contains all versions of a particular sentence in chronological order.
 
