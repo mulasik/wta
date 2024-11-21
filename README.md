@@ -123,18 +123,18 @@ For supplementing the analysis with relevant linguistic annotations, we apply [s
 ## Tool Configuration
 
 Several parameters related to TPSF generation are configurable. These are:
-* ksl_source_format: either "scriptlog_idfx" (an xml file produced by Scriptlog) or "inputlog idfx" (an xml file produced by Inputlog)
-* ksl_files: a list of paths to idfx files containg keystroke logs to be parsed
-* output_dir: path to the directory where all output files should be stored
-* final_txt: path to the directory where the final text produced during the writing session should be stored
-* pause_duration: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
-* language: Languages.EN (for English), Languages.DE (for German), Languages.FR (for French), Languages.GR (for Greek)
-The following parameters are also part of theTOOL configuration and are applied for *relevance evaluation* of TPSFs:
-* min_edit_distance: the minimum edit distance between two TPSFs which makes a TPSFs morphosyntactically relevant, default = 3
-* ts_min_tokens_number: the minimum number of tokens in a transforming sequence which makes a TPSFs morphosyntactically relevant, default = 2
-* combine_edit_distance_with_tok_number: by default the min_edit_distance is not taken into account, if the difference between versions contains more than one token. In such case a TPSFs is considered morphosyntactically relevant even if the edit distance is less than the min_edit_distance. Set this parapeter to true if you want THEtool to check min_edit_distance even if the transforming sequence contains more than 1 token
-* enable_spellchecking: set this parameter to true if you want THEtool to classify a TPSF *morphosyntactically irrelevant* if it contains a spelling error
-* include_punctuation_edits: set this parameter to true if you want THEtool to classify a TPSF morphosyntactically irrelevant if the transformation consists only in removing or adding punctuation marks
+* ```ksl_source_format```: either "scriptlog_idfx" (an xml file produced by Scriptlog) or "inputlog idfx" (an xml file produced by Inputlog)
+* ```ksl_files```: a list of paths to idfx files containg keystroke logs to be parsed
+* ```output_dir```: path to the directory where all output files should be stored
+* ```final_txt```: path to the directory where the final text produced during the writing session should be stored
+* ```pause_duration```: the duration of the pause that should trigger TPSF generation in PCM mode, default = 2
+* ```language```: Languages.EN (for English), Languages.DE (for German), Languages.FR (for French), Languages.GR (for Greek)
+The following parameters are also part of theTOOL configuration and are applied for *morphosyntactic relevance evaluation* of TPSFs:
+* ```min_edit_distance```: the minimum edit distance between two TPSFs which makes a TPSFs morphosyntactically relevant, default = 3
+* ```ts_min_tokens_number```: the minimum number of tokens in a transforming sequence which makes a TPSFs morphosyntactically relevant, default = 2
+* ```combine_edit_distance_with_tok_number```: by default the min_edit_distance is not taken into account, if the difference between versions contains more than one token. In such case a TPSFs is considered morphosyntactically relevant even if the edit distance is less than the min_edit_distance. Set this parapeter to true if you want THEtool to check min_edit_distance even if the transforming sequence contains more than 1 token
+* ```enable_spellchecking```: set this parameter to true if you want THEtool to classify a TPSF *morphosyntactically irrelevant* if it contains a spelling error
+* ```include_punctuation_edits```: set this parameter to true if you want THEtool to classify a TPSF morphosyntactically irrelevant if the transformation consists only in removing or adding punctuation marks
 
 The configuration file ```config.py``` is stored in the tool root directory. You can define multiple configurations in the configuration file.
 
@@ -180,35 +180,36 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 
 ## Key Terms and their Definitions
 
-**TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs as proposed by Mahlow (2015). A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions as proposed by Lindgren et al (2019b), (b) continuous deletion of something, (c) continuous insertion of something into existing text.
+**TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs. A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions, (b) continuous deletion of something, (c) continuous insertion of something into existing text.
 
 **TRANSFORMING SEQUENCE (TS)**: The textual material (i.e., product data) combined with the edit operations (i.e., process data) that comprises the difference between two adjacent versions.
 
 **TEXT HISTORY (texthis)**: The text history comprises all TPSF versions captured throughout the tracking of the text production process.
 
-**TPSF MORPHOSYNTACTIC RELEVANCE**:
+**TEXT UNIT (TU)**: In order to accurately track the content of each TPSF version, we propose the concept of a text unit. We consider that the full content of a given text version can be split into text units in such a way that each character produced, including whitespaces, belongs to one text unit. We distinguish between two main types of text units: SPSFs and interspace.
 
-**SPSF (sentence produced so far)**
+**SENTENCEHOOD DEGREE**: A set of properties of a text unit which indicates to what extend the given text unit can be classified as a sentence. We distinguish between 5 sentencehood criteria: mechanical completeness, conceptual completeness, syntactic completeness, mechanical correctness, and grammatical correctness.
 
-**TEXT UNIT (TU)**
+**SPSF (sentence produced so far)**: A text unit which holds textual content as opposed to an interspace, which is used to separate SPSFs from each other and to structure the text. In order to distinguish between full-fledged sentences and sequences of characters that do not meet the sentencehood criteria, we introduce two types of SPSFs: a sentence (SEN) and a sentence candidate (SEC).
 
-**SENTENCE (SEN)**
+**SENTENCE (SEN)** We interpret the writer’s behaviour as follows: the writer indicates the beginning of a sentence by capitalising its first letter and indicates its end by entering a final punctuation mark (“.”, “?”, or “!”). Following this interpretation, we define a SEN a sequence of characters that starts with a capital letter and ends with sentence-final punctuation. Once a sequence of characters has been identified as a sentence, its status remains unchanged as long as the writer does not clearly signal a revision of the sentence scope by removing the capitalisation of the initial letter or adjusting the final punctuation mark. In other words, as long as the sentence frame stays untouched, we treat the sequence of characters within this frame as a sentence, even if other sentencehood criteria are not satisfied.
 
-**SENTENCE CANDIDATE (SEC)**
+**SENTENCE CANDIDATE (SEC)**: a sequence of characters that does not start with a capital letter and/or does not end in sentence-final punctuation. In other words, it fails the mechanical completeness criterion. A sentence candidate can
+appear in different positions in a TPSF: (a) between the beginning and the edge of the text or (b) between a sentence interspace or paragraph interspace and the edge of the text or (c) between the beginning of the text and a sentence or a paragraph interspace or (d) between a sentence interspace or paragraph interspace and a sentence or (e) between two paragraph interspaces or (f) between two sentences.
+
+**INTERSPACE**: A text unit used to separate SPSFs from each other and structure the text.
 
 **SENTENCE INTERSPACE (SIN)**
 
-**Paragraph INTERSPACE (PIN)**
+**PARAGRAPH INTERSPACE (PIN)**
 
-**SENTENCE HISTORY (senhis)**
+**SENTENCE HISTORY (senhis)**: A sentence history is created for each of the sentences. This also includes sentences that are not part of the final product due to a revision. A single sentence history contains all versions of a particular sentence in chronological order.
 
-**SENTENCEHOOD**
-
-**SENTENCE MORPHOSYNTACTIC RELEVANCE**: A sentence is morphosyntactically relevant if:
-* it does not contain any spelling errors
-* it does not contain any tokens of the length 1
-* the edit distance between the sentence and its previous version is larger than 3 (only relevant if the difference between the sentence versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens.)
-
+**MORPHOSYNTACTIC RELEVANCE**: According to our definition, a TPSF or an SPSF version is morphosyntactically relevant if: 
+* the edit distance between the current and the previous version is larger than 3 (note: it is only relevant if the difference between the versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens),
+* the transformation does not consist only in adding or removing punctuation marks,
+* the resulting version does not contain any spelling errors.
+The definition can be adopted by changing the configuration parameters related to morphosyntacic relevance evaluation (see section Tool Configuration).
 
 ## Citation
 
