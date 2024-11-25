@@ -212,6 +212,9 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 
 The definition can be adopted by changing the configuration parameters related to morphosyntacic relevance evaluation (see section Tool Configuration).
 
+![Visualisation of the key terms](docs/charts/key_terms_visual.png)
+
+
 ## Citation
 
 If you use THEtool, please cite our paper [Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing](https://doi.org/10.1007/s11145-021-10234-6) as follows:
