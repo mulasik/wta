@@ -7,7 +7,7 @@ The input file processed by the tool is an idfx file in XML format.
 **Processing Pipeline:**
 
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
-2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and the start and end time of the production is stored in the *TS* data structure. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
+2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
 4. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
 5. Each text version together with a list of *text units* is stored as a *TPSF* data structure.
 6. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
