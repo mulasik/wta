@@ -13,7 +13,7 @@ The input file processed by the tool is an idfx file in XML format.
 6. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
 7. All extracted *TPSFs* constitute *text history*.
 8. The *text history* builds the basis for another output: *sentence histories*.
-9. THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
+9. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
 10. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
 11. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
 12. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
