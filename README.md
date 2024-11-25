@@ -185,5 +185,5 @@ If you use THEtool, please cite our paper [Extraction of transforming sequences 
 ```
 
 ## Related Papers
-[Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing](https://doi.org/10.1007/s11145-021-10234-6)
-[Automated Extraction and Analysis of Sentences under Production: A Theoretical Framework and Its Evaluation](https://www.mdpi.com/2226-471X/9/3/71)
+* [Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing](https://doi.org/10.1007/s11145-021-10234-6)
+* [Automated Extraction and Analysis of Sentences under Production: A Theoretical Framework and Its Evaluation](https://www.mdpi.com/2226-471X/9/3/71)
