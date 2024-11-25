@@ -209,6 +209,7 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 * the edit distance between the current and the previous version is larger than 3 (note: it is only relevant if the difference between the versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens),
 * the transformation does not consist only in adding or removing punctuation marks,
 * the resulting version does not contain any spelling errors.
+
 The definition can be adopted by changing the configuration parameters related to morphosyntacic relevance evaluation (see section Tool Configuration).
 
 ## Citation
