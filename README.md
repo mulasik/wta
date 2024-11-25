@@ -1,10 +1,12 @@
-# Text History Extraction Tool (THEtool). A tool for Linguistic Modeling of Written Text Production
+# Text History Extraction Tool (THEtool) <br>A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), and extracting histories of all produced sentences (*sentence histories*).
+An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), and extracting intermediate versions of all produced sentences (*sentence histories*).
 
 The input file processed by the tool is an idfx file in XML format.
 
 **Processing Pipeline:**
+
+The main steps of the processing pipeline are described below. The terms marked in italics are explained in more detail in the section [Key Terms and Their Definitions](#key-terms-and-their-definitions) and in our papers (see [Related Papers](#related-papers)).
 
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
@@ -21,7 +23,7 @@ The input file processed by the tool is an idfx file in XML format.
 14. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
 15. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
 
-Note: the terms marked below in italics are explained in more detail in the section **Key Terms and Their Definitions** and in our papers (see **Citation** and **Related Papers**).
+
 
 For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
 
