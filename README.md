@@ -17,8 +17,9 @@ The input file processed by the tool is an idfx file in XML format.
 10. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
 11. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
 12. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
-13. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
-14. There are as many *sentence histories* as new sentences created in the given writing sessions. There are *sentence histories* even for sentences which do not occur in the final text due to deletion.
+13. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
+14. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
+15. There are as many *sentence histories* as new sentences created in the given writing sessions. There are *sentence histories* even for sentences which do not occur in the final text due to deletion.
 
 Note: the terms marked below in italics are explained in more detail in the section **Key Terms and Their Definitions** and in our papers (see **Citation** and **Related Papers**).
 
