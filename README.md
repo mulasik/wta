@@ -1,128 +1,32 @@
 # Text History Extraction Tool (THEtool). A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions produced during this session, and eventually generating text and sentence histories based on the collected information.
+An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), and extracting histories of all produced sentences (*sentence histories*).
 
 The input file processed by the tool is an idfx file in XML format.
 
-The tool uses two main modes to capture text versions from idfx files:
-* the Pause Capturing Mode (PCM), which relies on a preset pause duration in the text production to yield versions,
-* and the Edit Capturing Mode (ECM), which uses a change production mode to determine versions. A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
+**Processing Pipeline:**
 
-## Tool Outputs TODO
+1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
+2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and the start and end time of the production is stored in the *TS* data structure. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
+4. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
+5. Each text version together with a list of *text units* is stored as a *TPSF* data structure.
+6. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
+7. All extracted *TPSFs* constitute *text history*.
+8. The *text history* builds the basis for another output: *sentence histories*.
+9. THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
+10. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
+11. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
+12. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
+13. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
+14. There are as many *sentence histories* as new sentences created in the given writing sessions. There are *sentence histories* even for sentences which do not occur in the final text due to deletion.
 
-The main outputs of the tool are:
-* text history in ECM in JSON format
-* all text versions in ECM exported to TXT format
-* visualisation of text history in ECM in SVG format
-* text history in PCM in JSON format
-* sentence history in JSON format
-* sentence history visualisation in SVG format
-
-In case filtering has been activated in the configuration:
-* filtered text history in JSON format
-* filtered text versions exported to TXT format
-* filtered sentence history in JSON format
-* visualisation of filtered text history in ECM in SVG format
-* filtered sentence history visualisation in SVG format
-
-## Processing Pipeline
-
-The central building block of the tool is TPSF. It is a data type for storing the text version together with further details retrieved from the processed keystroke logging data.
-
-Generating a TPSF comprises the following steps:
-* First the input file is parsed and the keystroke logging data is processed to capture all details on the particular text version.
-* This data is next stored in a TPSF data structure and subsequently used to retrieve information on the sentences constituting this version.
-* Finally, the version is evaluated for its morphosyntactic relevance.
-
-In each step, the TPSF is enriched with the newly collected details.
-
-An accomplished collection of TPSFs results in a text history which constitutes the basis for another output: the sentence history. Based on the relevancy label of each TPSF, both the text and the sentence history can be filtered.
-
-The following figure provides an overview of the processing steps.
-
-![Processing Pipeline](docs/charts/Concept_Overview.png)
-
-An example of a TPSF exported to JSON format:
-
-```
-{
-	"revision_id": 4,
-	"previous_text_version": "An edit operation is an act of either removing or inserting a sequence. ",
-	"preceding_pause": 0.54,
-	"result_text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
-	"edit": {
-		"edit_start_position": 70,
-		"transforming_sequence": {
-			"label": "insertion",
-			"text": " without interruption",
-			"tags": [
-				{"text": " ", "pos": "SPACE", "pos_details": "_SP", "dep": "", "lemma": " ", "oov": false, "is_punct": false, "is_space": true},
-				"text": "without", "pos": "ADP", "pos_details": "IN", "dep": "ROOT", "lemma": "without", "oov": false, "is_punct": false, "is_space": false},
-				"text": "interruption", "pos": "NOUN", "pos_details": "NN", "dep": "pobj", "lemma": "interruption", "oov": false, "is_punct": false, "is_space": false},
-				]
-	},
-	"sentences": {
-		"previous_sentence_list": [
-			{
-				"text": "An edit operation is an act of either removing or inserting a sequence. ",
-				"start_index": 0,
-				"end_index": 70,
-				"revision_id": 3,
-				"pos_in_text": 0
-			}
-		],
-		"current_sentence_list": [
-			{
-				"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
-				"start_index": 0,
-				"end_index": 91,
-				"revision_id": 3,
-				"pos_in_text": 0,
-				"label": "modified"
-			},
-		"new_sentences": [],
-		"edited_sentences": [
-			{
-				"previous_sentence": {
-					"text": "An edit operation is an act of either removing or inserting a sequence. ",
-					"start_index": 0,
-					"end_index": 70,
-					"revision_id": 3,
-					"pos_in_text": 0
-				},
-				"current_sentence": {
-					"text": "An edit operation is an act of either removing or inserting a sequence without interruption. ",
-					"start_index": 0,
-					"end_index": 91,
-					"revision_id": 3,
-					"pos_in_text": 0,
-					"label": "modified"
-				}
-			}
-		],
-		"deleted_sentences": [],
-		"unchanged_sentences": []
-	},
-	"morphosyntactic_relevance_evaluation": [
-		"number_affected_tokens": 3,
-		"affected_tokens": [
-			{"prev_tok": ("sequence.", 62, 70), "cur_tok": ("sequence", 62, 69)},
-			{"prev_tok": ("", null, null), "cur_tok": ("without", 71, 77)},
-			{"prev_tok": ("", null, null), "cur_tok": ("interruption.", 79, 91)},
-		]
-		"is_any_tok_oov": false,
-		"edit_distance": 21
-	],
-	"morphosyntactic_relevance": true
-}
-
-```
+Note: the terms marked below in italics are explained in more detail in the section **Key Terms and Their Definitions** and in our papers (see **Citation** and **Related Papers**).
 
 For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
 
 ## Tool Configuration
 
-Several parameters related to TPSF generation are configurable. These are:
+Several parameters related to text and sentence history generation are configurable. These are:
 * ```ksl_source_format```: either "scriptlog_idfx" (an xml file produced by Scriptlog) or "inputlog idfx" (an xml file produced by Inputlog)
 * ```ksl_files```: a list of paths to idfx files containg keystroke logs to be parsed
 * ```output_dir```: path to the directory where all output files should be stored
@@ -178,7 +82,24 @@ poetry run wta config.VIDEO
 
 By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
 
-## Key Terms and their Definitions
+## Tool Outputs TODO
+
+The main outputs of the tool are:
+* text history in ECM in JSON format
+* all text versions in ECM exported to TXT format
+* visualisation of text history in ECM in SVG format
+* text history in PCM in JSON format
+* sentence history in JSON format
+* sentence history visualisation in SVG format
+
+In case filtering has been activated in the configuration:
+* filtered text history in JSON format
+* filtered text versions exported to TXT format
+* filtered sentence history in JSON format
+* visualisation of filtered text history in ECM in SVG format
+* filtered sentence history visualisation in SVG format
+
+## Key Terms and Their Definitions
 
 **TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs. A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions, (b) continuous deletion of something, (c) continuous insertion of something into existing text.
 
@@ -235,3 +156,7 @@ If you use THEtool, please cite our paper [Extraction of transforming sequences 
 	pages = {443--482},
 }
 ```
+
+## Related Papers
+[Extraction of transforming sequences and sentence histories from writing process data: a first step towards linguistic modeling of writing](https://doi.org/10.1007/s11145-021-10234-6)
+[Automated Extraction and Analysis of Sentences under Production: A Theoretical Framework and Its Evaluation](https://www.mdpi.com/2226-471X/9/3/71)
