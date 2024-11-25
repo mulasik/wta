@@ -19,7 +19,7 @@ The input file processed by the tool is an idfx file in XML format.
 12. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
 13. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
 14. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
-15. There are as many *sentence histories* as new sentences created in the given writing sessions. There are *sentence histories* even for sentences which do not occur in the final text due to deletion.
+15. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
 
 Note: the terms marked below in italics are explained in more detail in the section **Key Terms and Their Definitions** and in our papers (see **Citation** and **Related Papers**).
 
@@ -83,22 +83,33 @@ poetry run wta config.VIDEO
 
 By default, the tool will create a directory ```wta``` in the user's home directory where it will store the output files. The output path can be changed by modifying the ```output_path```in the ```VIDEO``` configuration in ```config.py```.
 
-## Tool Outputs TODO
+## Tool Outputs
 
-The main outputs of the tool are:
-* text history in ECM in JSON format
-* all text versions in ECM exported to TXT format
-* visualisation of text history in ECM in SVG format
-* text history in PCM in JSON format
-* sentence history in JSON format
-* sentence history visualisation in SVG format
+Text history:
+* text history in JSON format
+* all text versions exported to TXT format
+* visualisation of text history in SVG format
 
-In case filtering has been activated in the configuration:
+Sentence histories:
+* sentence histories in JSON format
+* sentence histories in TXT format
+* sentence histories visualisation in SVG format
+
+Sentencehood:
+* a JSON containing the results of sentencehood evaluation for each SPSF in all sentence histories
+* a TXT containing the results of sentencehood evaluation for each SPSF in all sentence histories
+
+In case filtering has been activated in the configuration, THEtool also generates filtered versions of the text history and sentence histories.
+
+Text history:
 * filtered text history in JSON format
 * filtered text versions exported to TXT format
-* filtered sentence history in JSON format
 * visualisation of filtered text history in ECM in SVG format
-* filtered sentence history visualisation in SVG format
+
+Sentence histories:
+* filtered sentence histories in JSON format
+* filtered sentence histories in TXT format
+* filtered sentence histories visualisation in SVG format
 
 ## Key Terms and Their Definitions
 
@@ -111,6 +122,19 @@ In case filtering has been activated in the configuration:
 **TEXT UNIT (TU)**: In order to accurately track the content of each TPSF version, we propose the concept of a text unit. We consider that the full content of a given text version can be split into text units in such a way that each character produced, including whitespaces, belongs to one text unit. We distinguish between two main types of text units: SPSFs and interspace.
 
 **SENTENCEHOOD DEGREE**: A set of properties of a text unit which indicates to what extend the given text unit can be classified as a sentence. We distinguish between 5 sentencehood criteria: mechanical completeness, conceptual completeness, syntactic completeness, mechanical correctness, and grammatical correctness.
+
+**MECHANICAL COMPLETENESS**: It refers to the existence of a sentence frame: the capital letter at the beginning and the final punctuation mark at the end of a sentence6. The
+classification of a sentence as mechanically complete is based on its surface representation, which is the visible product of writing.
+
+**CONCEPTUAL COMPLETENESS**: We define the conceptual completeness of a sentence under production as a state when the writer seems to be satisfied with the sentence content. When working with keystroke logging data, we clearly do not know the writer’s intention. Hence, when deciding on a sentence’s conceptual completeness, we can only speculate. We base the speculations on writers’
+behavioural data: when the writer puts a final punctuation mark at the end of a word sequence and moves on with the writing process by producing or editing a different sentence (as opposed to revising the current sentence), we interpret their behaviour as a signal that they consider the sentence as complete.
+
+**SYNTACTIC COMPLETENESS**: We restrict our definition of syntactic completeness to the existence of a main clause with a lexical or pronominal subject and a predicate in the form of a finite verb form that agrees with the subject in person and number.
+
+**MECHANICAL CORRECTNESS**: We classify a sentence as mechanically correct if it does not contain any punctuation, spelling, or capitalisation errors.
+
+**GRAMMATICAL CORRECTNESS**: A grammatically correct sentence is a form which “should not be corrigible”. As we are working with sentences under production which often contain incomplete
+grammatical structures, typos, and/or incomplete words, we limit the grammatical correctness check to the sequence of mechanically correct words and exclude the remaining words. We also do not take into consideration the completeness of the grammatical structure, meaning a sentence can be classified as grammatically correct even if missing obligatory constituents.
 
 **SPSF (sentence produced so far)**: A text unit which holds textual content as opposed to an interspace, which is used to separate SPSFs from each other and to structure the text. In order to distinguish between full-fledged sentences and sequences of characters that do not meet the sentencehood criteria, we introduce two types of SPSFs: a sentence (SEN) and a sentence candidate (SEC).
 
