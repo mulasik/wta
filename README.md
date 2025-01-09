@@ -9,19 +9,21 @@ The input file processed by the tool is an idfx file in XML format.
 The main steps of the processing pipeline are described below. The terms marked in italics are explained in more detail in the section [Key Terms and Their Definitions](#key-terms-and-their-definitions) and in our papers (see [Related Papers](#related-papers)).
 
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
-2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
+2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for ech keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
 4. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
-5. Each text version together with a list of *text units* is stored as a *TPSF* data structure.
-6. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
-7. All extracted *TPSFs* constitute *text history*.
-8. The *text history* builds the basis for another output: *sentence histories*.
-9. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
-10. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
-11. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
-12. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
-13. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
-14. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
-15. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
+5. In the next step, the modified and deleted *text units* are identified. Based on this information, the given transformation of the TPSF is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. This is the *scope* of the transformation. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
+6. It is also identified which segments of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
+7. Each text version together with a list of *text units* and all details related to the performed transformation is stored as a *TPSF* data structure.
+8. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
+9. All extracted *TPSFs* constitute *text history*.
+10. The *text history* builds the basis for another output: *sentence histories*.
+11. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
+12. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
+13. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
+14. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
+15. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
+16. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
+17. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
 
 
 
