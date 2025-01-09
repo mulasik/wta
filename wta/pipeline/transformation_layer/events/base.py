@@ -19,11 +19,11 @@ class BaseEvent:
     def set_next_evnt(self, next_evnt: Optional["BaseEvent"]) -> None:
         self.next_evnt = next_evnt
 
-    def set_pause(self) -> None:
+    def set_preceding_pause(self) -> None:
         pass
 
-    def set_endpos(self) -> None:
-        pass
+    # def set_endpos(self) -> None:
+    #     pass
 
     def to_action(self) -> Action | None:
         return None

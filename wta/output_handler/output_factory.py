@@ -1,9 +1,12 @@
 from pathlib import Path
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
+from wta.output_handler.storage.csv import SenTranshisCsv, SenTranshisSegmentsCsv, TextTranshisCsv
+from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation import SentenceTransformation
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
+from wta.pipeline.transformation_layer.text_transformation import TextTransformation
 
-from ..pipeline.sentence_histories.text_unit import SPSF
-from ..pipeline.sentence_parsing.parsers import TokenProp
+from ..pipeline.sentence_layer.sentence_parsing.parsers import TokenProp
+from ..pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
@@ -11,13 +14,13 @@ from ..pipeline.statistics.statistics import (
     SentenceStatistics,
     TSStatistics,
 )
-from ..pipeline.text_history.action import Action
-from ..pipeline.text_history.events.base import BaseEvent
-from ..pipeline.text_history.tpsf import TpsfECM, TpsfPCM
-from ..pipeline.text_history.ts import TransformingSequence
-from ..pipeline.transformation_histories.transformation import Transformation
+from ..pipeline.transformation_layer.action import Action
+from ..pipeline.transformation_layer.events.base import BaseEvent
+from ..pipeline.transformation_layer.text_unit import SPSF
+from ..pipeline.transformation_layer.tpsf import TpsfECM, TpsfPCM
+from ..pipeline.transformation_layer.ts import TransformingSequence
 from ..settings import Settings
-from .storage.json import SenhisJson, SenhoodJson, TexthisJson, TranshisJson
+from .storage.json import SenhisJson, SenhoodJson, TexthisJson, TextTranshisJson, TranshisJson
 from .storage.svg import (
     ConstTranshisSvg,
     DeletionsSvg,
@@ -26,6 +29,7 @@ from .storage.svg import (
     InsertionsSvg,
     SenEditSvg,
     SenhisSvg,
+    SentranshisInitRevSvg,
     SynBarTranshisSvg,
     SynPieTranshisSvg,
     TexthisSvg,
@@ -42,6 +46,7 @@ from .storage.txt import (
     SenhoodhisTxt,
     StatsTxt,
     TexthisTxt,
+    TextTranshisTxt,
     TpsfsPCMTxt,
     TpsfsTxt,
     TssTxt,
@@ -103,6 +108,15 @@ class TexthisFltrOutputFactory:
         FilteredTexthisSvg(texthis_fltr, settings).to_file()
 
 
+class TextTranshisOutputFactory:
+    @classmethod
+    def run(cls, text_transformation_history: list[TextTransformation], settings: Settings) -> None:
+        print("Generating JSON for text transformation history")
+        TextTranshisJson(text_transformation_history, settings).to_file()
+        TextTranshisTxt(text_transformation_history, settings).to_file()
+        TextTranshisCsv(text_transformation_history, settings).to_file()
+
+
 class SenhisOutputFactory:
     @classmethod
     def run(
@@ -120,6 +134,14 @@ class SenhisOutputFactory:
         SenhisSvg(texthis, senhis, settings).to_file()
         SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
 
+
+class SenTranshisOutputFactory:
+    @classmethod
+    def run(cls, sentranshis: list[SentenceTransformation], settings: Settings) -> None:
+        print("Generating JSON for text transformation history")
+        SenTranshisCsv(sentranshis, settings).to_file()
+        SenTranshisSegmentsCsv(sentranshis, settings).to_file()
+        SentranshisInitRevSvg(sentranshis, settings).to_file()
 
 class SenhoodhisOutputFactory:
     @classmethod

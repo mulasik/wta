@@ -20,11 +20,14 @@ class TransformingSequence:
         label: str,
         startpos: int,
         endpos: int | None,
-        starttime: int | None,
-        endtime: int | None,
-        duration: int | None,
+        starttime: float | None,
+        endtime: float | None,
+        duration: float | None,
+        writing_speed_per_min: float | None,
+        avg_pause_duration: float | None,
         preceding_pause: int | None,
         rplcmt_textlen: int | None,
+        bursts: list[tuple[str, float]] | None,
         settings: Settings,
     ) -> None:
         """
@@ -46,7 +49,10 @@ class TransformingSequence:
         self.starttime = starttime
         self.endtime = endtime
         self.duration = duration
+        self.writing_speed_per_min = writing_speed_per_min
+        self.avg_pause_duration = avg_pause_duration
         self.preceding_pause = preceding_pause
+        self.bursts = bursts
 
         self.relevance = (
             False
@@ -84,6 +90,21 @@ class TransformingSequence:
             if self.text is None
             else f'{self.label} ({self.startpos}-{self.endpos}): "{self.text}"'
         )
+
+    def to_dict(self):
+        return {
+            "text": self.text,
+            "label": self.label,
+            "startpos": self.startpos,
+            "endpos": self.endpos,
+            "starttime": self.starttime,
+            "endtime": self.endtime,
+            "duration": self.duration,
+            "writing_speed_per_min": self.writing_speed_per_min,
+            "avg_pause_duration": self.avg_pause_duration,
+            "preceding_pause": self.preceding_pause,
+            "subsegments": [ss.to_dict() for ss in self.bursts]
+        }
 
 
 class SenTs:

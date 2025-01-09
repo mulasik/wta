@@ -1,4 +1,4 @@
-from ..sentence_histories.text_unit import SPSF
+from ..transformation_layer.text_unit import SPSF
 from .models import Parsers
 from .parsers import BaseParserAdapter, DiaParser, TokenProp
 

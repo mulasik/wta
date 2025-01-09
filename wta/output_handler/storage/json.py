@@ -2,17 +2,18 @@ import json
 from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import (
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import (
     SenhoodDict,
     Sentencehood,
 )
+from wta.pipeline.transformation_layer.text_transformation import TextTransformation, TextTransformationDict
 
-from ...pipeline.sentence_histories.text_unit import (
+from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
+from ...pipeline.transformation_layer.text_unit import (
     SPSF,
     SPSFDict,
 )
-from ...pipeline.text_history.tpsf import TpsfECM, TpsfECMDict
-from ...pipeline.transformation_histories.transformation import Transformation
+from ...pipeline.transformation_layer.tpsf import TpsfECM, TpsfECMDict
 from ...settings import Settings
 from .. import names
 from .base import BaseStorage
@@ -28,6 +29,7 @@ class Json(BaseStorage, Generic[_T]):
         self.data = data
 
     def to_file(self) -> None:
+        print(f"Will save as {self.filepath}")
         with self.filepath.open("w") as f:
             json.dump(self.data, f)
 
@@ -51,6 +53,24 @@ class TexthisJson(Json[list[TpsfECMDict]]):
 
     def preprocess_data(self, texthis: list[TpsfECM]) -> list[TpsfECMDict]:
         return [tpsf.to_dict() for tpsf in texthis]
+
+
+class TextTranshisJson(Json[list[TextTransformationDict]]):
+    def __init__(
+        self,
+        data: list[TextTransformation],
+        settings: Settings,
+    ) -> None:
+        json_file = (
+            f"{settings.filename}_{names.TEXT_TRANSHIS}.json"
+        )
+        super().__init__(
+            settings.paths.text_transhis_json_dir / json_file, self.preprocess_data(data)
+        )
+
+    def preprocess_data(self, text_transformations: list[TextTransformation]) -> list[TextTransformationDict]:
+        print("Preprocessing the data...")
+        return [tt.to_dict() for tt in text_transformations]
 
 
 class SenhisJson(Json[dict[int, list[SPSFDict]]]):

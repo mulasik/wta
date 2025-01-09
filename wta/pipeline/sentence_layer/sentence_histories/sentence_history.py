@@ -1,15 +1,14 @@
 import re
 import uuid
 
-from tqdm import tqdm
+from tqdm import tqdm  # type: ignore
 
-from wta.pipeline.text_history.ts import TransformingSequence
-from wta.pipeline.text_history.ts_factory import retrieve_sen_ts
+from wta.pipeline.names import SenLabels
+from wta.pipeline.transformation_layer.text_unit import SPSF, SPSFBuilder, TextUnitType
+from wta.pipeline.transformation_layer.tpsf import TpsfECM
+from wta.pipeline.transformation_layer.ts import TransformingSequence
+from wta.pipeline.transformation_layer.ts_factory import retrieve_sen_ts
 from wta.settings import Settings
-
-from ..names import SenLabels
-from ..text_history.tpsf import TpsfECM
-from .text_unit import SPSF, SPSFBuilder, TextUnitType
 
 
 class SentenceHistoryGenerator:
@@ -46,9 +45,9 @@ class SentenceHistoryGenerator:
                 # print(
                 #     f"Sentence deletion detected: from {len(prev_spsf_builders)} to {len(current_spsf_builders)}"
                 # )
-                for i, csv in enumerate(current_spsf_builders):
+                for ci, csv in enumerate(current_spsf_builders):
                     if csv.state == SenLabels.UNC_PRE:
-                        prev_sen_id = prev_spsf_builders[i].sen_id
+                        prev_sen_id = prev_spsf_builders[ci].sen_id
                         if prev_sen_id is not None:
                             csv.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(csv)
@@ -68,9 +67,9 @@ class SentenceHistoryGenerator:
                 # print(
                 #     f"Sentence creation detected: from {len(prev_spsf_builders)} to {len(current_senver_builders)}"
                 # )
-                for i, ctu in enumerate(current_spsf_builders):
+                for ci, ctu in enumerate(current_spsf_builders):
                     if ctu.state == SenLabels.UNC_PRE:
-                        prev_sen_id = prev_spsf_builders[i].sen_id
+                        prev_sen_id = prev_spsf_builders[ci].sen_id
                         if prev_sen_id is not None:
                             ctu.set_id(prev_sen_id)
                             sentence_history_builder[prev_sen_id].append(ctu)
@@ -90,15 +89,15 @@ class SentenceHistoryGenerator:
                         global_new_sens.append(ctu.text)
                     elif ctu.state in [SenLabels.MOD, SenLabels.UNC_POST]:
                         try:
-                            prev_sen_id = prev_spsf_builders[i - number_new].sen_id
+                            prev_sen_id = prev_spsf_builders[ci - number_new].sen_id
                             if prev_sen_id is not None:
                                 ctu.set_id(prev_sen_id)
                                 sentence_history_builder[prev_sen_id].append(ctu)
                         except IndexError:
                             print(
-                                "ATTENTION: Detected error when counting textunits."
-                                "Probably a textunit segementation error."
-                                "Cannot assign the textunit to any sentence history."
+                                "ATTENTION: Detected error when counting textunits. "
+                                "Probably a textunit segementation error. "
+                                "Cannot assign the textunit to any sentence history. "
                                 "Creating a new sentence history."
                             )
                             uid = uuid.uuid1().int
@@ -110,16 +109,19 @@ class SentenceHistoryGenerator:
             sentence_versions = []
             for i, svb in enumerate(senver_builders):
                 if i == 0:
-                    ts_label = [
+                    ts_label = next(
                         tpsf.ts.label
                         for tpsf in tpsfs
                         if tpsf.revision_id == svb.tpsf_id
-                    ][0]
+                    )
                     sen_ts = TransformingSequence(
                         svb.text,
                         ts_label,
                         0,
                         len(svb.text),
+                        None,
+                        None,
+                        None,
                         None,
                         None,
                         None,

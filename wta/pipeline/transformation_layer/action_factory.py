@@ -2,7 +2,7 @@ from collections.abc import Collection
 
 from tqdm import tqdm
 
-from .action import Action
+from .action import Action, KeyboardAction
 from .events.base import BaseEvent
 
 
@@ -79,8 +79,9 @@ class ActionAggregator:
             # print(act_type, act.__dict__)
             non_consecutive_act = abs(act.startpos - acts[i - 1].startpos) > 1
             consecutive_del = (
-                act.startpos - acts[i - 1].startpos == 0
-                and act.textlen < acts[i - 1].textlen
+                act_type == "KeyboardAction"
+                and act.startpos - acts[i - 1].startpos == 0
+                and (isinstance(acts[i - 1], KeyboardAction) and act.textlen < acts[i - 1].textlen)
             )
             # if the action type has just changed
             # or this is an action of type 'Replacement', 'Pasting' or 'Navigation'
@@ -112,4 +113,19 @@ class ActionAggregator:
                 current_act_type = f"{act_type}_{counter}"
                 act_groups[current_act_type] = [act]
             prev_act_type = act_type
+        # act_groups_processed = {}
+        # prev_act_group = None
+        # for act_name, act_group in act_groups.items():
+        #     group_content = "".join([a.content for a in act_group])
+        #     act_group_starttime = act_group[0].starttime
+        #     act_group_endtime = act_group[-1].endtime
+        #     act_group_preceding_pause = "Unknown" if not prev_act_group else act_group[0].starttime - prev_act_group[-1].starttime
+        #     prev_act_group = act_group
+        #     act_groups_processed[act_name] = {
+        #         "content": group_content,
+        #         "starttime": act_group_starttime,
+        #         "endtime": act_group_endtime,
+        #         "preceding_pause": act_group_preceding_pause
+        #     }
         return act_groups
+

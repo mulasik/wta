@@ -1,9 +1,9 @@
 from pathlib import Path
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
+from wta.pipeline.transformation_layer.text_transformation import TextTransformation
 
-from ...pipeline.sentence_histories.text_unit import SPSF
-from ...pipeline.sentence_parsing.parsers import TokenProp
+from ...pipeline.sentence_layer.sentence_parsing.parsers import TokenProp
 from ...pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
@@ -11,10 +11,11 @@ from ...pipeline.statistics.statistics import (
     SentenceStatistics,
     TSStatistics,
 )
-from ...pipeline.text_history.action import Action
-from ...pipeline.text_history.events.base import BaseEvent
-from ...pipeline.text_history.tpsf import TpsfECM, TpsfPCM
-from ...pipeline.text_history.ts import TransformingSequence
+from ...pipeline.transformation_layer.action import Action
+from ...pipeline.transformation_layer.events.base import BaseEvent
+from ...pipeline.transformation_layer.text_unit import SPSF
+from ...pipeline.transformation_layer.tpsf import TpsfECM, TpsfPCM
+from ...pipeline.transformation_layer.ts import TransformingSequence
 from ...settings import Settings
 from ...utils.other import ensure_path
 from .. import names
@@ -40,7 +41,10 @@ class EventsTxt(Txt):
     def preprocess_data(self, events: list[BaseEvent]) -> str:
         output_str = ""
         for event in events:
-            output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]}\n\n'
+            if type(event).__name__ == "ProductionKeyboardEvent":
+                output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]} {event.__dict__["starttime"]}-{event.__dict__["endtime"]} (pause before: {event.__dict__["preceding_pause"]})\n\n'
+            else:
+                output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]} {"Unknown"}-{"Unknown"} (pause before: {"Unknown"})\n\n'
         return output_str
 
 
@@ -54,9 +58,14 @@ class ActionsTxt(Txt):
     def preprocess_data(self, actions: list[Action]) -> str:
         output_str = ""
         for a in actions:
-            output_str += (
-                f"{type(a).__name__} ({a.startpos}:{a.endpos}) *{a.content}*\n\n"
+            if type(a).__name__ not in ["Replacement", "Pasting"]:
+                output_str += (
+                f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| {a.starttime}-{a.endtime} (pause before: {a.preceding_pause}))\n\n"
             )
+            else:
+                output_str += (
+                    f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| Unknown-Unknown (pause before: Unknown))\n\n"
+                )
         return output_str
 
 
@@ -82,7 +91,7 @@ class TssTxt(Txt):
     def preprocess_data(self, tss: list[TransformingSequence]) -> str:
         output_str = ""
         for ts in tss:
-            output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}, dur: {ts.duration}, pause: {ts.preceding_pause}): "{ts.text}"\n\n'
+            output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}, dur: {ts.duration}, writing speed per min: {ts.writing_speed_per_min}, avg pause duration: {ts.avg_pause_duration}, preceding pause: {ts.preceding_pause}): "{ts.text}"\n\n'
         return output_str
 
 
@@ -158,6 +167,24 @@ class TexthisTxt(Txt):
         output_str = ""
         for tpsf in texthis:
             output_str += f"{tpsf.to_text()}\n"
+        return output_str
+
+
+class TextTranshisTxt(Txt):
+    def __init__(
+        self,
+        data: list[TextTransformation],
+        settings: Settings,
+    ) -> None:
+        txt_file = f"{settings.filename}_{names.TEXT_TRANSHIS}.txt"
+        super().__init__(
+            settings.paths.text_transhis_txt_dir / txt_file, self.preprocess_data(data)
+        )
+
+    def preprocess_data(self, text_transhis: list[TextTransformation]) -> str:
+        output_str = ""
+        for tt in text_transhis:
+            output_str += f"{tt.to_text()}\n"
         return output_str
 
 

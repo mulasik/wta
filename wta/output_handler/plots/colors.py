@@ -1,6 +1,6 @@
 from matplotlib import colors as pltc
 
-from ...pipeline.sentence_histories.text_unit import SPSF
+from ...pipeline.transformation_layer.text_unit import SPSF
 
 
 class Colors:
@@ -69,6 +69,10 @@ class Colors:
             "black",
         ]
     ]
+    DRAFT_COLORS = {
+        "initial_draft": "steelblue",
+        "revision_draft": "darkred"
+    }
 
     BOOL_COLORS = {True: "indianred", False: "teal"}
 

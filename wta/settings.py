@@ -16,6 +16,11 @@ class Paths:
     texthis_json_dir: Path
     texthis_txt_dir: Path
     texthis_visual_dir: Path
+    text_transhis_json_dir: Path
+    text_transhis_txt_dir: Path
+    text_transhis_csv_dir: Path
+    sen_transhis_csv_dir: Path
+    sen_transhis_svg_dir: Path
     stats_dir: Path
     senhis_json_dir: Path
     senhis_txt_dir: Path
@@ -48,6 +53,8 @@ class Settings:
 def _create_paths(output_dir: Path) -> Paths:
     preprocessing_dir = output_dir / names.PREPROCESSING
     texthis_dir = output_dir / names.TEXTHIS
+    text_transhis_dir = output_dir / names.TEXT_TRANSHIS
+    sen_transhis_dir = output_dir / names.SEN_TRANSHIS
     transhis_dir = output_dir / names.TRANSHIS
     senhis_dir = output_dir / names.SENHIS
     senhood_dir = output_dir / names.SENHOOD
@@ -61,6 +68,11 @@ def _create_paths(output_dir: Path) -> Paths:
         texthis_json_dir=texthis_dir / names.JSON,
         texthis_txt_dir=texthis_dir / names.TXT,
         texthis_visual_dir=texthis_dir / names.VISUAL,
+        text_transhis_json_dir=text_transhis_dir / names.JSON,
+        text_transhis_txt_dir=text_transhis_dir / names.TXT,
+        text_transhis_csv_dir=text_transhis_dir / names.CSV,
+        sen_transhis_csv_dir=sen_transhis_dir / names.CSV,
+        sen_transhis_svg_dir=sen_transhis_dir / names.VISUAL,
         stats_dir=output_dir / names.STATS,
         senhis_json_dir=senhis_dir / names.JSON,
         senhis_txt_dir=senhis_dir / names.TXT,

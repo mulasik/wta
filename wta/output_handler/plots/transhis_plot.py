@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.axes import Axes
 
-from ...pipeline.transformation_histories.transformation import Transformation
+from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
 from ...settings import Settings
 from .base import BasePlot
 from .colors import Colors

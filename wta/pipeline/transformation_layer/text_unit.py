@@ -6,7 +6,7 @@ from typing import TypedDict
 
 from typing_extensions import Self
 
-from wta.pipeline.text_history.ts import TransformingSequence
+from wta.pipeline.transformation_layer.ts import TransformingSequence
 
 
 class TextUnitDict(TypedDict):

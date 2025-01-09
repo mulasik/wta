@@ -6,7 +6,8 @@ from importlib import import_module
 from pathlib import Path
 from typing import cast
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import SentencehoodEvaluator
+from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation_history import SenTransHistoryGenerator
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import SentencehoodEvaluator
 
 # from wta.pipeline.sentence_parsing.facade import ParsingFacade
 # from wta.pipeline.sentence_parsing.models import Grammars, Parsers
@@ -18,20 +19,22 @@ from .output_handler.output_factory import (
     EventsOutputFactory,
     SenhisOutputFactory,
     SenhoodhisOutputFactory,
+    SenTranshisOutputFactory,
     StatsOutputFactory,
     TexthisFltrOutputFactory,
     TexthisOutputFactory,
+    TextTranshisOutputFactory,
     TpsfsOutputFactory,
     TpsfsPCMOutputFactory,
     TssOutputFactory,
 )
 from .pipeline.evaluation.texthis_correctness import check_texthis_correctness
-from .pipeline.sentence_histories.sentence_history import SentenceHistoryGenerator
+from .pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistoryGenerator
 from .pipeline.statistics.statistics_factory import StatsFactory
-from .pipeline.text_history.action_factory import ActionAggregator, ActionFactory
-from .pipeline.text_history.event_factory import EventFactory
-from .pipeline.text_history.tpsf_factory import ECMFactory, PCMFactory, filter_tpsfs
-from .pipeline.text_history.ts_factory import TsFactory
+from .pipeline.transformation_layer.action_factory import ActionAggregator, ActionFactory
+from .pipeline.transformation_layer.event_factory import EventFactory
+from .pipeline.transformation_layer.tpsf_factory import ECMFactory, PCMFactory, filter_tpsfs
+from .pipeline.transformation_layer.ts_factory import TsFactory
 from .settings import Settings
 
 
@@ -51,6 +54,7 @@ def run() -> None:
     correctly_processed: list[str] = []
 
     all_errors = {}
+    all_tss = []
 
     for i, logfile in enumerate(config["ksl_files"]):
         try:
@@ -72,6 +76,8 @@ def run() -> None:
             action_groups = ActionAggregator.run(actions)
             ActionGroupsOutputFactory.run(action_groups, settings)
             tss = TsFactory().run(action_groups, settings)
+            for ts in tss:
+                all_tss.append(ts)
             TssOutputFactory.run(tss, settings)
             tpsfs = ECMFactory().run(tss, settings)
             TpsfsOutputFactory.run(tpsfs, settings)
@@ -91,6 +97,9 @@ def run() -> None:
             print(
                 f"{len(correctly_processed)} idfx files processed successfully so far: The final version of the text corresponds to the original text."
             )
+            print("\n== TEXT TRANSFORMATION HISTORY GENERATION ==")
+            text_transformation_history = [tpsf.text_transformation for tpsf in tpsfs]
+            TextTranshisOutputFactory.run(text_transformation_history, settings)
 
             # GENERATE SENHIS
             print("\n== SENTENCE HISTORIES GENERATION ==")
@@ -108,6 +117,17 @@ def run() -> None:
                     for e in e_list:
                         all_errors[e_cat].add(e)
             SenhoodhisOutputFactory.run(senhoodhis, settings)
+            # GENERATE SENTRANS HISTORY
+            print("\n== SENTENCE TRANSFORMATION HISTORIES GENERATION ==")  
+            sentranshis_generator = SenTransHistoryGenerator()
+            sentranshis = sentranshis_generator.run(senhis)
+            SenTranshisOutputFactory.run(sentranshis, settings)
+            for ts in sentranshis.values():
+                for t in ts:
+                    print(t.to_dict())
+                print()
+
+            # print("\n== TEXT TRANSFORMATION HISTORY ==")
 
             # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')
@@ -151,7 +171,8 @@ def run() -> None:
     print(
         f"{len(correctly_processed)} idfx files processed successfully: The final version of the text corresponds to the original text."
     )
-
+    print("\n== SUMMARY ==")
+    print(f"Total number of transforming sequences: {len(all_tss)}")
 
 if __name__ == "__main__":
     run()

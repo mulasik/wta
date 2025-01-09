@@ -1,13 +1,11 @@
 import dataclasses
 from typing import Any, Optional, TypedDict
 
+from wta.pipeline.transformation_layer.text_transformation import TextTransformation, TextTransformationDict
+
 from ...settings import Settings
-from ..sentence_histories.text_unit import TextUnit, TextUnitDict
+from .text_unit import TextUnit, TextUnitDict
 from .ts import TransformingSequence
-
-
-class EditDict(TypedDict):
-    transforming_sequence: dict[str, Any]
 
 
 class TextUnitsDict(TypedDict):
@@ -19,7 +17,8 @@ class TpsfECMDict(TypedDict):
     revision_id: int
     prev_text_version: str | None
     result_text: str
-    edit: EditDict
+    transforming_sequence: dict[str, Any]
+    text_transformation: TextTransformationDict
     textunits: TextUnitsDict
 
 
@@ -32,6 +31,7 @@ class TpsfECM:
     textunits: tuple[TextUnit, ...]
     relevance: bool
     irrelevant_tss_aggregated: tuple[TransformingSequence, ...]
+    text_transformation: TextTransformation
     final: bool = False
 
     def _determine_tpsf_relevance(self, settings: Settings) -> bool:
@@ -70,9 +70,8 @@ TEXT UNITS:
             "revision_id": self.revision_id,
             "prev_text_version": None if not self.prev_tpsf else self.prev_tpsf.text,
             "result_text": self.text,
-            "edit": {
-                "transforming_sequence": self.ts.__dict__,
-            },
+            "transforming_sequence": self.ts.to_dict(),
+            "text_transformation": self.text_transformation.to_dict(),
             "textunits": {
                 "previous_textunits": []
                 if not self.prev_tpsf

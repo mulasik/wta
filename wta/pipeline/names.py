@@ -47,3 +47,42 @@ class SenLabels:
     UNC_PRE = "unchanged_pre"
     UNC_POST = "unchanged_post"
     SPLIT = "split"
+
+
+class TextTransScope:
+    IN_SEN = "in-sentence transformation"
+    SEN = "full sentence transformation"
+    CROSS_SEN = "cross-sentence"
+    MULTI_SEN = "multi-sentence"
+    NO_SEN = "no-sentence"
+    UNK = "unknown_text_trans_scope"
+
+
+class SenSegmentTypes:
+    SEN_BEG = "sentence_beginning"
+    SEN_MID = "sentence_middle"
+    SEN_END = "sentence_end"
+    SEN = "full_sentence"
+    UNK = "unknown_segment_type"
+    PIN = "paragraph_interspace"
+    SIN = "sentence_interspace"
+
+
+class PointOfInscription:
+    END = "text_end"
+    MID = "text_middle"
+
+
+class ProductionStages:
+    PRECON = "pre-contextual"
+    CON = "contextual"
+
+
+class SenTransformationTypes:
+    PROD = "production"
+    PRECON_DEL = "pre-contextual_deletion"
+    PRECON_INS = "pre-contextual_insertion"
+    PRECON_REV = "pre-contextual_revision"
+    CON_DEL = "contextual_deletion"
+    CON_INS = "contextual_insertion"
+    CON_REV = "contextual_revision"

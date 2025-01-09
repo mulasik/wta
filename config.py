@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from wta.config_data import ConfigData
-from wta.pipeline.sentence_parsing.models import Languages
+from wta.pipeline.sentence_layer.sentence_parsing.models import Languages
 
 usr_home = Path.home()
 _VIDEO_DATA_DIR = Path(usr_home, "thetool", "input_data", "DE", "video")
@@ -23,7 +23,7 @@ _VIDEO_IDFX_FILES = tuple(
 VIDEO: ConfigData = {
     "ksl_source_format": "scriptlog_idfx",
     "ksl_files": _VIDEO_IDFX_FILES,
-    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf0",
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "default_setting",
     "final_txt": _VIDEO_DATA_DIR / "txt",
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
@@ -37,7 +37,7 @@ VIDEO: ConfigData = {
 VIDEO_CONF1: ConfigData = {
     "ksl_source_format": "scriptlog_idfx",
     "ksl_files": _VIDEO_IDFX_FILES,
-    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf1",
     "final_txt": _VIDEO_DATA_DIR / "txt",
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
@@ -51,7 +51,7 @@ VIDEO_CONF1: ConfigData = {
 VIDEO_CONF2: ConfigData = {
     "ksl_source_format": "scriptlog_idfx",
     "ksl_files": _VIDEO_IDFX_FILES,
-    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf2",
     "final_txt": _VIDEO_DATA_DIR / "txt",
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
@@ -65,7 +65,7 @@ VIDEO_CONF2: ConfigData = {
 VIDEO_CONF3: ConfigData = {
     "ksl_source_format": "scriptlog_idfx",
     "ksl_files": tuple(f for f in _VIDEO_IDFX_FILES if f.name.startswith("R")),
-    "output_dir": _VIDEO_OUTPUT_DATA_DIR,
+    "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf3",
     "final_txt": _VIDEO_DATA_DIR / "txt",
     "pause_duration": DEFAULT_PAUSE_DURATION,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,

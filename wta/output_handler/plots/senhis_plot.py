@@ -2,9 +2,9 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
 from wta.pipeline.names import SenLabels
+from wta.pipeline.transformation_layer.text_unit import SPSF, TextUnitType
+from wta.pipeline.transformation_layer.tpsf import TpsfECM
 
-from ...pipeline.sentence_histories.text_unit import SPSF, TextUnitType
-from ...pipeline.text_history.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
 

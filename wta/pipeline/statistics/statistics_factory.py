@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from ..sentence_histories.text_unit import SPSF
-from ..text_history.action import Action
-from ..text_history.tpsf import TpsfECM, TpsfPCM
+from ..transformation_layer.action import Action
+from ..transformation_layer.text_unit import SPSF
+from ..transformation_layer.tpsf import TpsfECM, TpsfPCM
 from .statistics import (
     BasicStatistics,
     EventStatistics,

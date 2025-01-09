@@ -13,12 +13,11 @@ class Action:
     """
 
     def __init__(
-        self, content: str, startpos: int, endpos: int | None, textlen: int
+        self, content: str, startpos: int, endpos: int | None
     ) -> None:
         self.content = content
         self.startpos = startpos
         self.endpos = endpos
-        self.textlen = textlen
 
 
 class KeyboardAction(Action):
@@ -28,16 +27,17 @@ class KeyboardAction(Action):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
-        pause: float | None,
+        starttime: float,
+        endtime: float,
+        preceding_pause: float,
         textlen: int,
     ) -> None:
-        super().__init__(content, startpos, endpos, textlen)
+        super().__init__(content, startpos, endpos)
+        self.textlen = textlen
         self.keyname = keyname
         self.starttime = starttime
         self.endtime = endtime
-        self.pause = pause
+        self.preceding_pause = preceding_pause
 
 
 class Append(KeyboardAction):
@@ -69,12 +69,13 @@ class Replacement(Action):
         rplcmt_endpos: int,
         rplcmt_textlen: int,
     ) -> None:
-        super().__init__(content, startpos, endpos, rplcmt_textlen)
+        super().__init__(content, startpos, endpos)
+        self.rplcmt_textlen = rplcmt_textlen
         self.rplcmt_endpos = rplcmt_endpos
 
 
 class Pasting(Action):
     def __init__(
-        self, content: str, startpos: int, endpos: int | None, textlen: int
+        self, content: str, startpos: int, endpos: int | None
     ) -> None:
-        super().__init__(content, startpos, endpos, textlen)
+        super().__init__(content, startpos, endpos)

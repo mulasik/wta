@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 
 from wta.settings import Settings
 
-from ...pipeline.sentence_histories.text_unit import SPSF
-from ...pipeline.text_history.tpsf import TpsfECM
+from ...pipeline.transformation_layer.text_unit import SPSF
+from ...pipeline.transformation_layer.tpsf import TpsfECM
 from .base import BasePlot
 from .colors import Colors
 
@@ -79,15 +79,15 @@ class TsLabelsPlot(StatsPlot[tuple[int, int, int, int, int]]):
         ) = (0, 0, 0, 0, 0)
         for tpsf in self.texthis:
             if tpsf.ts.label == "append":
-                appended_tokens += len(tpsf.ts.text.split(" "))
+                appended_tokens += len(tpsf.ts.text.strip().split(" "))
             if tpsf.ts.label == "insertion":
-                inserted_tokens += len(tpsf.ts.text.split(" "))
+                inserted_tokens += len(tpsf.ts.text.strip().split(" "))
             if tpsf.ts.label in ["deletion", "midletion"]:
-                deleted_tokens += len(tpsf.ts.text.split(" "))
+                deleted_tokens += len(tpsf.ts.text.strip().split(" "))
             if tpsf.ts.label == "pasting":
-                pasted_tokens += len(tpsf.ts.text.split(" "))
+                pasted_tokens += len(tpsf.ts.text.strip().split(" "))
             if tpsf.ts.label == "replacement":
-                replaced_tokens += len(tpsf.ts.text.split(" "))
+                replaced_tokens += len(tpsf.ts.text.strip().split(" "))
         return (
             appended_tokens,
             inserted_tokens,
@@ -115,7 +115,7 @@ class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
         for tpsf in self.texthis:
             if tpsf.ts.text:
                 tpsf_ids.append(tpsf.revision_id)
-                no_edited_tokens = len(tpsf.ts.text.split(" "))
+                no_edited_tokens = len(tpsf.ts.text.strip().split(" "))
                 if tpsf.ts.label in ["deletion", "midletion"]:
                     no_edited_tokens = no_edited_tokens * -1
                 ts_tokens.append(no_edited_tokens)

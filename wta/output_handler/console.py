@@ -1,7 +1,7 @@
 import json
 
-from ..pipeline.sentence_histories.text_unit import TextUnit
-from ..pipeline.text_history.tpsf import TpsfECM
+from ..pipeline.transformation_layer.text_unit import TextUnit
+from ..pipeline.transformation_layer.tpsf import TpsfECM
 
 
 class Console:

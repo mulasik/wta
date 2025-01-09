@@ -2,7 +2,7 @@ import dataclasses
 from typing import TypedDict
 
 from wta.language_models.spacy import SpacyModel
-from wta.pipeline.sentence_histories.text_unit import SPSF, TextUnitType
+from wta.pipeline.transformation_layer.text_unit import SPSF, TextUnitType
 from wta.settings import Settings
 
 _GRAMMAR = {

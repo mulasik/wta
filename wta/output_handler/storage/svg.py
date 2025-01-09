@@ -2,9 +2,12 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ...pipeline.sentence_histories.text_unit import SPSF
-from ...pipeline.text_history.tpsf import TpsfECM
-from ...pipeline.transformation_histories.transformation import Transformation
+from wta.output_handler.plots.sentranshis_plot import SentransDraftPlot
+from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation import SentenceTransformation
+
+from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
+from ...pipeline.transformation_layer.text_unit import SPSF
+from ...pipeline.transformation_layer.tpsf import TpsfECM
 from ...settings import Settings
 from .. import names
 from ..plots.senhis_plot import SenhisPlot
@@ -239,3 +242,20 @@ class InsertionsSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         InsertionsPlot(texthis, senhis, settings).run()
+
+
+class SentranshisInitRevSvg(Svg):
+    def __init__(
+        self,
+        sentranshis: dict[int, list[SentenceTransformation]],
+        settings: Settings,
+    ) -> None:
+        self.preprocess_data(sentranshis, settings)
+        super().__init__(
+            settings.paths.sen_transhis_svg_dir / f"{settings.filename}_initial_revision_draft.svg"
+        )
+
+    def preprocess_data(
+        self, sentranshis: dict[int, list[SentenceTransformation]], settings: Settings
+    ) -> None:
+        SentransDraftPlot(sentranshis, settings).run()
