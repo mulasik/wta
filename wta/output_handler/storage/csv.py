@@ -4,9 +4,8 @@ from typing import Generic, TypeVar
 
 from wta.output_handler import names
 from wta.output_handler.storage.base import BaseStorage
-from wta.pipeline.names import SenSegmentTypes
-from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation import SentenceTransformation
-from wta.pipeline.transformation_layer.text_transformation import TextTransformation, TextTransformationDict
+from wta.pipeline.transformation_layer.text_unit import SPSF
+from wta.pipeline.transformation_layer.tpsf import TpsfECM
 from wta.settings import Settings
 
 _T = TypeVar("_T")
@@ -25,26 +24,30 @@ class Csv(BaseStorage, Generic[_T]):
             write.writerows(self.data[1:])
 
 
-class TextTranshisCsv(Csv[list[TextTransformationDict]]):
+class TexthisCsv(Csv[list[TpsfECM]]):
     def __init__(
         self,
-        data: list[TextTransformationDict],
+        data: list[TpsfECM],
         settings: Settings,
+        mode: str = "ecm",
+        filtered: bool = False,
     ) -> None:
 
+        self.mode = mode
+        filter_label = "" if not filtered else "_filtered"
         csv_file = (
-            f"{settings.filename}_{names.TEXT_TRANSHIS}.csv"
+            f"{settings.filename}_{names.TEXTHIS}_{self.mode}{filter_label}.csv"
         )
         super().__init__(
-            settings.paths.text_transhis_csv_dir / csv_file, self.preprocess_data(data)
+            settings.paths.texthis_csv_dir / csv_file, self.preprocess_data(data)
         )
 
-    def preprocess_data(self, data: list[TextTransformation]) -> list[str]:
+    def preprocess_data(self, data: list[TpsfECM]) -> list[str]:
         print("Preprocessing the data...")
         fields = [
             "tpsf_id",
             "tpsf_text",
-            "transformation_text",
+            "ts_text",
             "scope",
             "ts_label",
             # "duration",
@@ -54,33 +57,25 @@ class TextTranshisCsv(Csv[list[TextTransformationDict]]):
             # "avg_pause_duration",
             # "preceding_pause",
             "bursts",
-            "sentence_segments",
-            "sentence_beginning",
-            "sentence_middle",
-            "sentence_end"
+            "sentence_segments"
             ]
         rows = [fields]
-        for tt in data:
-            tpsf_id = tt.tpsf_id
-            tpsf_text = tt.tpsf_text
-            transformation_text = tt.ts.text
-            scope = tt.scope
-            ts_label = tt.ts.label
+        for tpsf in data:
+            tpsf_id = tpsf.revision_id
+            tpsf_text = tpsf.text
+            ts_text = tpsf.ts.text
+            scope = tpsf.transformation_scope
+            ts_label = tpsf.ts.label
             # duration = tt.duration
             # length = tt.length
             # point_of_insc = tt.point_of_insc
             # preceding_pause = tt.ts.preceding_pause
-            segments = [(seg.segment_type, seg.text) for seg in tt.sentence_segments]
-            bursts = [ss.to_dict() for ss in tt.ts.bursts]
+            bursts = [ss.to_dict() for ss in tpsf.ts.bursts]
             first = True
-            for seg in segments:
-                sentence_beginning = seg[1] if seg[0] == SenSegmentTypes.SEN_BEG else ""
-                sentence_middle = seg[1] if seg[0] == SenSegmentTypes.SEN_MID else ""
-                sentence_end = seg[1] if seg[0] == SenSegmentTypes.SEN_END else ""
-                tt_data = [
+            tt_data = [
                     tpsf_id if first else "",
                     tpsf_text if first else "",
-                    transformation_text if first else "",
+                    ts_text if first else "",
                     scope if first else "",
                     ts_label if first else "",
                     # duration,
@@ -88,32 +83,32 @@ class TextTranshisCsv(Csv[list[TextTransformationDict]]):
                     # point_of_insc,
                     # preceding_pause,
                     bursts,
-                    [seg.segment_type for seg in tt.sentence_segments],
-                    sentence_beginning,
-                    sentence_middle,
-                    sentence_end
-                    ]
-                rows.append(tt_data)
-                first = False
+                    [seg.segment_type for seg in tpsf.sentence_segments]
+            ]
+            rows.append(tt_data)
         return rows
 
 
-class SenTranshisCsv(Csv[dict[int, list[SentenceTransformation]]]):
+class SenhisCsv(Csv[dict[int, list[SPSF]]]):
 
     def __init__(
         self,
-        data: list[str],
+        data: dict[int, list[SPSF]],
         settings: Settings,
+        view_mode: str = "normal",
+        filtered: bool = False,
     ) -> None:
 
+        self.view_mode = "" if view_mode == "normal" else f"_{view_mode}"
+        filter_label = "" if not filtered else "_filtered"
         csv_file = (
-            f"{settings.filename}_{names.SEN_TRANSHIS}.csv"
+            f"{settings.filename}_{names.SENHIS}{self.view_mode}{filter_label}.csv"
         )
         super().__init__(
-            settings.paths.sen_transhis_csv_dir / csv_file, self.preprocess_data(data)
+            settings.paths.senhis_csv_dir / csv_file, self.preprocess_data(data)
         )
 
-    def preprocess_data(self, data: list[SentenceTransformation]) -> list[str]:
+    def preprocess_data(self, data: dict[int, list[SPSF]]) -> list[str]:
         print("Preprocessing the data...")
         fields = [
             "tpsf_id",
@@ -128,43 +123,20 @@ class SenTranshisCsv(Csv[dict[int, list[SentenceTransformation]]]):
             "sentence_segment",
             ]
         rows = [fields]
-        for sen_id, sentrans in data.items():
-            for st in sentrans:
+        for sen_id, senvers in data.items():
+            for sv in senvers:
                 sentrans_data = [
-                    st.spsf.tpsf_id,
+                    sv.tpsf_id,
                     sen_id,
-                    st.spsf.text,
-                    st.spsf.text_unit_type,
-                    st.spsf.ts.text,
-                    st.spsf.ts.startpos,
-                    st.spsf.ts.endpos,
-                    len(st.spsf.text),
-                    st.operation,
-                    st.sentence_segment
+                    sv.text,
+                    sv.text_unit_type,
+                    sv.ts.text,
+                    sv.ts.startpos,
+                    sv.ts.endpos,
+                    len(sv.text),
+                    sv.operation,
+                    sv.sentence_segment
                 ]
                 rows.append(sentrans_data)
         return rows
 
-
-class SenTranshisSegmentsCsv(Csv[dict[int, list[SentenceTransformation]]]):
-
-    def __init__(
-        self,
-        data: list[str],
-        settings: Settings,
-    ) -> None:
-
-        csv_file = (
-            f"{settings.filename}_{names.SEN_TRANSHIS}_sensegments.csv"
-        )
-        super().__init__(
-            settings.paths.sen_transhis_csv_dir / csv_file, self.preprocess_data(data)
-        )
-
-    def preprocess_data(self, data: list[SentenceTransformation]) -> list[str]:
-        print("Preprocessing the data...")
-        rows = []
-        for sen_id, sentrans in data.items():
-            sentence_segments = [sen_id] + [st.sentence_segment for st in sentrans]
-            rows.append(sentence_segments)
-        return rows

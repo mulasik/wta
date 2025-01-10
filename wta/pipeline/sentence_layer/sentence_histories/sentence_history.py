@@ -4,6 +4,9 @@ import uuid
 from tqdm import tqdm  # type: ignore
 
 from wta.pipeline.names import SenLabels
+from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation_classifier import (
+    SenTransformationClassifier,
+)
 from wta.pipeline.transformation_layer.text_unit import SPSF, SPSFBuilder, TextUnitType
 from wta.pipeline.transformation_layer.tpsf import TpsfECM
 from wta.pipeline.transformation_layer.ts import TransformingSequence
@@ -107,6 +110,7 @@ class SentenceHistoryGenerator:
         sentence_history_builder = self.eliminate_duplicates(sentence_history_builder)
         for sen_id, senver_builders in sentence_history_builder.items():
             sentence_versions = []
+            pre_completion = True
             for i, svb in enumerate(senver_builders):
                 if i == 0:
                     ts_label = next(
@@ -132,6 +136,9 @@ class SentenceHistoryGenerator:
                 else:
                     sen_ts = retrieve_sen_ts(senver_builders[i - 1], svb, settings)
                 svb.set_ts(sen_ts)
+                pre_completion, operation, sen_segment = SenTransformationClassifier().run(pre_completion, svb)
+                svb.set_operation(operation)
+                svb.set_sentence_segment(sen_segment)
                 sentence_versions.append(svb.to_sentence_version())
             sentence_history[sen_id] = sentence_versions
         return sentence_history

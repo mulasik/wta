@@ -1,7 +1,7 @@
 import dataclasses
 from typing import Any, Optional, TypedDict
 
-from wta.pipeline.transformation_layer.text_transformation import TextTransformation, TextTransformationDict
+from wta.pipeline.transformation_layer.sentence_segment import SentenceSegment
 
 from ...settings import Settings
 from .text_unit import TextUnit, TextUnitDict
@@ -18,7 +18,8 @@ class TpsfECMDict(TypedDict):
     prev_text_version: str | None
     result_text: str
     transforming_sequence: dict[str, Any]
-    text_transformation: TextTransformationDict
+    transformation_scope: str
+    sentence_segments: list[SentenceSegment]
     textunits: TextUnitsDict
 
 
@@ -31,7 +32,8 @@ class TpsfECM:
     textunits: tuple[TextUnit, ...]
     relevance: bool
     irrelevant_tss_aggregated: tuple[TransformingSequence, ...]
-    text_transformation: TextTransformation
+    transformation_scope: str
+    sentence_segments: list[SentenceSegment]
     final: bool = False
 
     def _determine_tpsf_relevance(self, settings: Settings) -> bool:
@@ -60,6 +62,12 @@ RESULT TEXT:
 TRANSFORMING SEQUENCE:
 {self.ts.label.upper()} *{self.ts.text}*
 
+SCOPE:
+{self.transformation_scope}
+
+SENTENCE SEGMENTS:
+{[ss.to_text() for ss in self.sentence_segments]}
+
 TEXT UNITS:
 {[(tu.state, tu.text) for tu in self.textunits]}
 
@@ -71,7 +79,8 @@ TEXT UNITS:
             "prev_text_version": None if not self.prev_tpsf else self.prev_tpsf.text,
             "result_text": self.text,
             "transforming_sequence": self.ts.to_dict(),
-            "text_transformation": self.text_transformation.to_dict(),
+            "transformation_scope": self.transformation_scope,
+            "sentence_segments": [ss.to_dict() for ss in self.sentence_segments],
             "textunits": {
                 "previous_textunits": []
                 if not self.prev_tpsf
@@ -86,6 +95,10 @@ TPSF version {self.revision_id}:
 {self.text}
 TS:
 {(self.ts.text, self.ts.label.upper())}
+SCOPE:
+{self.transformation_scope}
+SENTENCE SEGMENTS:
+{[ss.to_text() for ss in self.sentence_segments]}
 TEXT UNITS:
 {[(tu.state, tu.text) for tu in self.textunits]}
             """

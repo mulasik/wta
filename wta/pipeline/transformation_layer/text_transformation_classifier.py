@@ -6,7 +6,6 @@ from wta.pipeline.transformation_layer.text_transformation import (
     TextTransformation,
 )
 from wta.pipeline.transformation_layer.text_unit import TextUnit
-from wta.pipeline.transformation_layer.tpsf import TpsfECM
 from wta.pipeline.transformation_layer.ts import TransformingSequence
 
 
@@ -23,20 +22,14 @@ class TextTransformationClassifier:
             sequence_removed_by_repl: str | None,
             prev_tpst_text: str
         ) -> TextTransformation:
-        print("=====")
-        print(f"TS: |{ts.text}| ({ts.label})")
         modified_spsfs = [tu for tu in textunits if tu.state == SenLabels.MOD and tu.text_unit_type in [2, 3]]
         modified_spsfs_prev = [tu for tu in impacted_tus_from_prev_tpsf if tu.text_unit_type in [2, 3] and tu not in modified_spsfs]
         deleted_spsfs = [tu for tu in deleted_tus if tu.text_unit_type in [2, 3]]
-        print(f"Modified TUs: {[s.text for s in modified_spsfs]}")
-        print(f"Modified TUs prev: {[s.text for s in modified_spsfs_prev]}")
         if ts.label in [TSLabels.DEL, TSLabels.MID]:
-            print(f"Deleted spsfs in deletion: {[s.text for s in deleted_spsfs]}")
             impacted_spsfs = [*modified_spsfs, *deleted_spsfs]
             scope = self._calculate_scope(impacted_spsfs, ts)
             return TextDelTransformation(tpsf_id, tpsf_text, scope, modified_spsfs, ts, prev_tpst_text, deleted_spsfs, modified_spsfs_prev)
         if ts.label == TSLabels.REPL:
-            print(f"Deleted spsfs in replacement: {[s.text for s in deleted_spsfs]}")
             impacted_spsfs = [*modified_spsfs, *deleted_spsfs]
             scope = self._calculate_scope(impacted_spsfs, ts)
             return TextReplTransformation(tpsf_id, tpsf_text, scope, modified_spsfs, ts, prev_tpst_text, deleted_spsfs, modified_spsfs_prev, sequence_removed_by_repl)

@@ -1,43 +1,36 @@
-from wta.pipeline.names import ProductionStages, SenSegmentTypes, SenTransformationTypes, TSLabels
-from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation import SentenceTransformation
-from wta.pipeline.transformation_layer.text_unit import SPSF
+from wta.pipeline.names import SenSegmentTypes, SenTransformationTypes, TSLabels
+from wta.pipeline.transformation_layer.text_unit import SPSF, SPSFBuilder
 
 
-class SenTransHistoryGenerator:
-    def run(self, senhis: dict[int, list[SPSF]]) -> dict[int, list[SentenceTransformation]]:
-        sentrans_history: dict[int, list[SentenceTransformation]] = {}
-        for sen_id, sen_vers in senhis.items():
-            pre_completion = True
-            sentrans_history[sen_id] = []
-            for sv in sen_vers:
-                if pre_completion is True:
-                    if sv.ts.label == TSLabels.APP:
+class SenTransformationClassifier:
+
+    def run(self, pre_completion: bool, sen_version: SPSFBuilder) -> tuple[bool, str, str]:
+        if pre_completion is True:
+                if sen_version.ts.label == TSLabels.APP:
                         operation = SenTransformationTypes.PROD
-                    elif sv.ts.label == TSLabels.PAST and sv.ts.endpos < len(sv.text):
+                elif sen_version.ts.label == TSLabels.PAST and sen_version.ts.endpos < len(sen_version.text):
                         operation = SenTransformationTypes.PRECON_INS
-                    elif sv.ts.label == TSLabels.PAST and sv.ts.endpos == len(sv.text):
+                elif sen_version.ts.label == TSLabels.PAST and sen_version.ts.endpos == len(sen_version.text):
                         operation = SenTransformationTypes.PROD
-                    elif sv.ts.label == TSLabels.DEL:
+                elif sen_version.ts.label in [TSLabels.DEL, TSLabels.MID]:
                         operation = SenTransformationTypes.PRECON_DEL
-                    elif sv.ts.label == TSLabels.INS:
+                elif sen_version.ts.label == TSLabels.INS:
                         operation = SenTransformationTypes.PRECON_INS
-                    elif sv.ts.label == TSLabels.REPL:
+                elif sen_version.ts.label == TSLabels.REPL:
                         operation = SenTransformationTypes.PRECON_REV
-                elif pre_completion is False:
-                    if sv.ts.label in [TSLabels.APP, TSLabels.INS, TSLabels.PAST]:
+        elif pre_completion is False:
+                if sen_version.ts.label in [TSLabels.APP, TSLabels.INS, TSLabels.PAST]:
                         operation = SenTransformationTypes.CON_INS
-                    elif sv.ts.label in [TSLabels.DEL, TSLabels.MID]:
+                elif sen_version.ts.label in [TSLabels.DEL, TSLabels.MID]:
                         operation = SenTransformationTypes.CON_DEL
-                    elif sv.ts.label == TSLabels.REPL:
+                elif sen_version.ts.label == TSLabels.REPL:
                         operation = SenTransformationTypes.CON_REV
-                sen_segment = self.retreive_sen_segment_info(sv)
-                sentrans = SentenceTransformation(sv, operation, sen_segment)
-                sentrans_history[sen_id].append(sentrans)
-                if sv.text_unit_type == 3:
-                    pre_completion = False
-        return sentrans_history
+        sen_segment = self._retreive_sen_segment_info(sen_version)
+        if sen_version.text_unit_type == 3:
+            pre_completion = False
+        return pre_completion, operation, sen_segment
 
-    def retreive_sen_segment_info(self, sv: SPSF) -> str:
+    def _retreive_sen_segment_info(self, sv: SPSF) -> str:
         sen_segment = SenSegmentTypes.UNK
         if sv.ts.startpos == 0 and sv.text_unit_type != 3:
             sen_segment = SenSegmentTypes.SEN_BEG

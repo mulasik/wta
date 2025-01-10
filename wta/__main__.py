@@ -6,7 +6,6 @@ from importlib import import_module
 from pathlib import Path
 from typing import cast
 
-from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation_history import SenTransHistoryGenerator
 from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import SentencehoodEvaluator
 
 # from wta.pipeline.sentence_parsing.facade import ParsingFacade
@@ -19,11 +18,9 @@ from .output_handler.output_factory import (
     EventsOutputFactory,
     SenhisOutputFactory,
     SenhoodhisOutputFactory,
-    SenTranshisOutputFactory,
     StatsOutputFactory,
     TexthisFltrOutputFactory,
     TexthisOutputFactory,
-    TextTranshisOutputFactory,
     TpsfsOutputFactory,
     TpsfsPCMOutputFactory,
     TssOutputFactory,
@@ -97,13 +94,10 @@ def run() -> None:
             print(
                 f"{len(correctly_processed)} idfx files processed successfully so far: The final version of the text corresponds to the original text."
             )
-            print("\n== TEXT TRANSFORMATION HISTORY GENERATION ==")
-            text_transformation_history = [tpsf.text_transformation for tpsf in tpsfs]
-            TextTranshisOutputFactory.run(text_transformation_history, settings)
 
             # GENERATE SENHIS
             print("\n== SENTENCE HISTORIES GENERATION ==")
-            senhis_generator = SentenceHistoryGenerator()
+            senhis_generator = SentenceHistoryGenerator()   
             senhis = senhis_generator.run(tpsfs, settings)
             senhis_fltr = senhis_generator.filter_senhis(senhis)
             SenhisOutputFactory.run(tpsfs, tpsfs_fltr, senhis, senhis_fltr, settings)
@@ -117,17 +111,6 @@ def run() -> None:
                     for e in e_list:
                         all_errors[e_cat].add(e)
             SenhoodhisOutputFactory.run(senhoodhis, settings)
-            # GENERATE SENTRANS HISTORY
-            print("\n== SENTENCE TRANSFORMATION HISTORIES GENERATION ==")  
-            sentranshis_generator = SenTransHistoryGenerator()
-            sentranshis = sentranshis_generator.run(senhis)
-            SenTranshisOutputFactory.run(sentranshis, settings)
-            for ts in sentranshis.values():
-                for t in ts:
-                    print(t.to_dict())
-                print()
-
-            # print("\n== TEXT TRANSFORMATION HISTORY ==")
 
             # TODO: PARSE SENHIS
             # print('\n== SENTENCE HISTORIES SYNTACTIC PARSING ==')

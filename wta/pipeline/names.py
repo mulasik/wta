@@ -52,8 +52,8 @@ class SenLabels:
 class TextTransScope:
     IN_SEN = "in-sentence transformation"
     SEN = "full sentence transformation"
-    CROSS_SEN = "cross-sentence"
-    MULTI_SEN = "multi-sentence"
+    CROSS_SEN = "cross-sentence transformation"
+    MULTI_SEN = "multi-sentence transformation"
     NO_SEN = "no-sentence"
     UNK = "unknown_text_trans_scope"
 

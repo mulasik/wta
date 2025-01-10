@@ -55,24 +55,6 @@ class TexthisJson(Json[list[TpsfECMDict]]):
         return [tpsf.to_dict() for tpsf in texthis]
 
 
-class TextTranshisJson(Json[list[TextTransformationDict]]):
-    def __init__(
-        self,
-        data: list[TextTransformation],
-        settings: Settings,
-    ) -> None:
-        json_file = (
-            f"{settings.filename}_{names.TEXT_TRANSHIS}.json"
-        )
-        super().__init__(
-            settings.paths.text_transhis_json_dir / json_file, self.preprocess_data(data)
-        )
-
-    def preprocess_data(self, text_transformations: list[TextTransformation]) -> list[TextTransformationDict]:
-        print("Preprocessing the data...")
-        return [tt.to_dict() for tt in text_transformations]
-
-
 class SenhisJson(Json[dict[int, list[SPSFDict]]]):
     def __init__(
         self,

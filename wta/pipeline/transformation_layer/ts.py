@@ -103,7 +103,7 @@ class TransformingSequence:
             "writing_speed_per_min": self.writing_speed_per_min,
             "avg_pause_duration": self.avg_pause_duration,
             "preceding_pause": self.preceding_pause,
-            "subsegments": [ss.to_dict() for ss in self.bursts]
+            "bursts": [ss.to_dict() for ss in self.bursts]
         }
 
 

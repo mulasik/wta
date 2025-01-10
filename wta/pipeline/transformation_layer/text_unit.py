@@ -23,17 +23,6 @@ class TextUnitType(enum.IntEnum):
     PIN = enum.auto()
 
 
-class SPSFDict(TypedDict):
-    sen_id: int
-    text_unit_type: "TextUnitType"
-    text: str
-    state: str
-    tpsf_id: int
-    pos_in_text: int
-    ts_label: str
-    ts_text: str
-
-
 @dataclasses.dataclass(frozen=True)
 class TextUnit:
     """
@@ -132,6 +121,8 @@ class SPSFBuilder:
         self.tpsf_id: int = tu.tpsf_id
         self.pos_in_text: int | None = None
         self.ts: TransformingSequence | None = None
+        self.operation: str | None = None
+        self.sentence_segment: str | None = None
 
     def set_pos_in_text(self, pos_in_text: int) -> None:
         self.pos_in_text = pos_in_text
@@ -141,6 +132,12 @@ class SPSFBuilder:
 
     def set_ts(self, ts: TransformingSequence) -> None:
         self.ts = ts
+
+    def set_operation(self, operation: str) -> None:
+        self.operation = operation
+
+    def set_sentence_segment(self, sentence_segment: str) -> None:
+        self.sentence_segment = sentence_segment
 
     def to_sentence_version(self) -> "SPSF":
         if self.sen_id is None or self.pos_in_text is None or self.ts is None:
@@ -154,7 +151,21 @@ class SPSFBuilder:
             tpsf_id=self.tpsf_id,
             pos_in_text=self.pos_in_text,
             ts=self.ts,
+            operation=self.operation,
+            sentence_segment=self.sentence_segment
         )
+
+class SPSFDict(TypedDict):
+    sen_id: int
+    text_unit_type: "TextUnitType"
+    text: str
+    state: str
+    tpsf_id: int
+    pos_in_text: int
+    ts_label: str
+    ts_text: str
+    operation: str
+    sentence_segment: str
 
 
 @dataclasses.dataclass(frozen=True)
@@ -166,6 +177,8 @@ class SPSF:
     tpsf_id: int
     pos_in_text: int
     ts: TransformingSequence
+    operation: str
+    sentence_segment: str
 
     def to_dict(self) -> SPSFDict:
         return {
@@ -177,6 +190,8 @@ class SPSF:
             "pos_in_text": self.pos_in_text,
             "ts_label": self.ts.label,
             "ts_text": self.ts.text,
+            "operation": self.operation,
+            "sentence_segment": self.sentence_segment
         }
 
     def to_text(self) -> str:
@@ -186,4 +201,6 @@ TPSF {s["tpsf_id"]}, position {s["pos_in_text"]}:
     {s["text"]}
 {s["ts_label"].upper()}:
     |{s["ts_text"]}|
+Operation: {s["operation"]}
+Sentence segment: {s["sentence_segment"]}
                 """

@@ -79,7 +79,7 @@ class ECMFactory:
                 else _determine_tpsf_relevance(tus, settings)
             )
             tpsf = TpsfECM(
-                i, tpsf_text, ts, prev_tpsf, tus, relevance, aggregated_tss, transformation
+                i, tpsf_text, ts, prev_tpsf, tus, relevance, aggregated_tss, transformation.scope, transformation.sentence_segments
             )
             aggregated_tss = () if tpsf.relevance else (*aggregated_tss, ts)
             tpsfs.append(tpsf)

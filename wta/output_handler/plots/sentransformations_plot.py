@@ -5,18 +5,18 @@ import numpy as np
 
 from wta.output_handler.plots.base import BasePlot
 from wta.pipeline.names import SenTransformationTypes
-from wta.pipeline.sentence_layer.sentence_histories.sentence_transformation import SentenceTransformation
+from wta.pipeline.transformation_layer.text_unit import SPSF
 from wta.settings import Settings
 
 from .colors import Colors
 
 _T = TypeVar("_T")
 
-class SentransHisPlot(BasePlot, Generic[_T]):
+class SenTransformationsPlot(BasePlot, Generic[_T]):
     def __init__(
-        self, sentranshis: dict[int, list[SentenceTransformation]], settings: Settings
+        self, senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
-        self.sentranshis = sentranshis
+        self.senhis = senhis
         self.settings = settings
         self.data = self.preprocess_data()
 
@@ -37,15 +37,15 @@ class SentransHisPlot(BasePlot, Generic[_T]):
         self.plot_data()
         # self.set_legend()
 
-class SentransDraftPlot(SentransHisPlot[dict[int, list[SentenceTransformation]]]):
-    def preprocess_data(self) -> tuple[str, dict[str, list[int]]]:
+class SenProductionStagePlot(SenTransformationsPlot[tuple[list[str], dict[str, list[int]]]]):
+    def preprocess_data(self) -> tuple[list[str], dict[str, list[int]]]:
         sen_ids = []
         i = 0
-        number_senversions = {
+        number_senversions: dict[str, list[int]] = {
             "initial_draft": [],
             "revision_draft": []
         }
-        for senvers in self.sentranshis.values():
+        for senvers in self.senhis.values():
             sen_ids.append(str(i))
             initial_draft_versions = [
                 sv for sv in senvers if sv.operation in [
