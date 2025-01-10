@@ -4,18 +4,26 @@ An open-source application implemented in Python for parsing raw keystroke loggi
 
 The input file processed by the tool is an idfx file in XML format.
 
-**Processing Pipeline:**
+## Processing Pipeline
 
 The main steps of the processing pipeline are described below. The terms marked in italics are explained in more detail in the section [Key Terms and Their Definitions](#key-terms-and-their-definitions) and in our papers (see [Related Papers](#related-papers)).
 
+#### Transformation Layer Generation
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for ech keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
-4. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
-5. In the next step, the modified and deleted *text units* are identified. Based on this information, the given transformation of the TPSF is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. This is the *scope* of the transformation. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
+#### Sentence Layer Generation
+3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
+4. In the next step, the modified and deleted *text units* are identified based on the content of the *transforming sequence*.
+#### Projecting Sentence Layer on Transformation Layer
+5. By mapping information collected in *Transformation Layer* on the *Sentence Layer*, it is possible to define the *scope* of the transformation with regards to sentences. Depending on the *scope* the transformation is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
 6. It is also identified which *segments* of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
+#### Projecting Burst Layer on Transformation Layer
+*under construction*
+#### Text History
 7. Each text version together with a list of *text units* and all details related to the performed transformation is stored as a *TPSF* data structure.
 8. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
 9. All extracted *TPSFs* constitute *text history*.
+#### Extending Sentence Layer with Sentence Histories
 10. The *text history* builds the basis for another output: *sentence histories*.
 11. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
 12. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
@@ -24,8 +32,8 @@ The main steps of the processing pipeline are described below. The terms marked 
 15. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
 16. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
 17. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
-
-
+#### Projecting Transformation Layer on Sentence Layer
+18. ...
 
 For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
 
