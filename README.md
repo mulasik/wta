@@ -22,7 +22,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 *under construction*
 #### Text History
 7. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
-8. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering the text versions.
+8. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 9. All extracted *TPSFs* constitute *text history*.
 #### Extending Sentence Layer with Sentence Histories
 10. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*.
