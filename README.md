@@ -26,7 +26,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 9. All extracted *TPSFs* constitute *text history*.
 #### Extending Sentence Layer with Sentence Histories
 10. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*.
-11. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
+11. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
 12. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
 13. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
 14. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
