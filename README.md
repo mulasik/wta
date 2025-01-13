@@ -11,7 +11,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 #### Transformation Layer Generation
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for ech keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
-#### Sentence Layer Generation
+#### Sentence Layer Initialization
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence or an unfinished sentence) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
 4. In the next step, the modified and deleted *text units* are identified based on the content of the *transforming sequence*.
 #### Projecting Sentence Layer on Transformation Layer
@@ -20,13 +20,13 @@ The main steps of the processing pipeline are described below. The terms marked 
 #### Projecting Burst Layer on Transformation Layer
 *under construction*
 #### Text History
-7. Each text version together with a list of *text units* and all details related to the performed transformation is stored as a *TPSF* data structure.
-8. Each *TPSF* is also evaluated for its *morphosyntactic relevance*.
+7. Each text version together with a list of *text units* the results of layer projections is stored as a *TPSF* data structure.
+8. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering of text versions list.
 9. All extracted *TPSFs* constitute *text history*.
 #### Extending Sentence Layer with Sentence Histories
-10. The *text history* builds the basis for another output: *sentence histories*.
+10. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*.
 11. In order to create sentence histories, THEtool analyses all *SPSFs* of each text versions and identifies new, modified, deleted, and unchanged *SPSFs*.
-12. Each new *SPSF* gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
+12. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
 13. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
 14. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
 15. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
