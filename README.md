@@ -1,4 +1,4 @@
-# Text History Extraction Tool (THEtool) <br>A tool for Linguistic Modeling of Written Text Production
+# Text History Extraction Tool (THEtool) <br>A tool for Linguistic Modeling of Writing
 
 An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), extracting intermediate versions of all produced sentences (*sentence histories*), as well as capturing writing bursts (*burst history*, planned for future releases of the application).
 
@@ -6,7 +6,7 @@ The input file processed by the tool is an idfx file in XML format.
 
 #### Main Theoretical Considerations
 
-The foundation for the writing modeling implemented in THEtool is the following consideration: writing bursts, revision episodes, and sentences can be seen as three separate layers of the writing process impacting each other. Writing bursts can be interrupter by a) revision episodes or in an abstract sense b) by final punctuation marks signaling sentence completion. Revisions can be interrupted by a) pauses as well as b) "split" by final punctuation marks and finally, producing a sentence can be interrupted by a) pauses and b) revisions. In our model, the layers are called *Burst Layer*, *Transformation Layer*, and *Sentence Layer* respectively. The information stored in one layer can be mapped on other layers. This allows for gaining new insights into the writing process, such as identifying syntactic structures within bursts and revisions, tracking pausing behavior during sentence production or revisions, as well as detecting revisions consituing writing bursts.
+The foundation for the writing modeling implemented in THEtool is the following consideration: writing bursts, revision episodes, and sentences can be seen as three separate layers of the writing process impacting each other. Writing bursts can be interrupter by a) revision episodes or in an abstract sense b) by final punctuation marks signaling sentence completion. Revisions can be interrupted by a) pauses as well as b) "split" by final punctuation marks and finally, producing a sentence can be interrupted by a) pauses and b) revisions. In our model, the layers are called *Burst Layer*, *Transformation Layer*, and *Sentence Layer* respectively. The information stored in one layer can be mapped on other layers. This allows for gaining new insights into the writing process, such as a.o. identifying syntactic structures within bursts and revisions and tracking pausing and revising behavior during sentence production.
 
 ## Processing Pipeline
 
