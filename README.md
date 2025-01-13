@@ -25,7 +25,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 8. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 9. All extracted *TPSFs* constitute *text history*.
 #### Extending Sentence Layer with Sentence Histories
-10. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole, to the history of producing each single sentence. It allows for tracking sentence version by sentence version for each sentence separately.
+10. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
 11. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
 12. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
 13. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
