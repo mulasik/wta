@@ -1,8 +1,12 @@
 # Text History Extraction Tool (THEtool) <br>A tool for Linguistic Modeling of Written Text Production
 
-An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), and extracting intermediate versions of all produced sentences (*sentence histories*).
+An open-source application implemented in Python for parsing raw keystroke logging data from a writing session, processing it to retrieve all relevant text versions created during this session (*text history*), extracting intermediate versions of all produced sentences (*sentence histories*), as well as capturing writing bursts (*burst history*, planned for future releases of the application).
 
 The input file processed by the tool is an idfx file in XML format.
+
+#### Main Theoretical Considerations
+
+The foundation for our writing modeling implemented in THEtool is the following consideration: writing bursts, revision episodes, and sentences can be seen as three separate layers of the writing process. Writing bursts can be interrupter by a) revision episodes or in an abstract sense b) by final punctuation marks signaling sentence completion. Revisions can be interrupted by a) pauses as well as b) "split" by final punctuation marks, and finally producing a sentence can be interrupted by a) pauses and b) revisions. The three layers are called *Burst Layer*, *Transformation Layer*, and *Sentence Layer* respectively. The information stored in one layer can be mapped on other layers. This way we can gain new insights into the writing process, such as syntactic structures within bursts and revisions, pauses during sentence production or revisions, as well as revision consituing writing bursts.
 
 ## Processing Pipeline
 
@@ -19,7 +23,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
 7. Next, it is identified which *segments* of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
 #### Projecting Burst Layer on Transformation Layer
-*under construction, planned for the next release*
+*under construction, planned for the next THEtool release*
 #### Text History
 8. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
 9. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
@@ -39,9 +43,9 @@ The main steps of the processing pipeline are described below. The terms marked 
 19. The projection of *Transformation Layer* on *Sentence Layer* allows us to identify the *sentence production stage*. THEtool performs the projection for each *SPSF* in each *sentence history*. We distinguish between two productions stages of a sentence: *sentence initial draft* containing *pre-contextual operations* and *sentence revision draft* consisting of *contextual operations*.
 20. Each *sentence history* stores the information about the production stages of all SPSFs, as well as the sentence segment impacted by the transformation (collected already in a processing step 7).
 #### Projecting Burst Layer on Sentence Layer
-*under construction, planned for the next release*
+*under construction, planned for the next THEtool release*
 #### Burst Layer Generation
-*under construction*
+*planned for future releases*
 
 For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
 
