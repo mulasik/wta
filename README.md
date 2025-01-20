@@ -12,23 +12,25 @@ The foundation for the writing modeling implemented in THEtool is the following 
 
 The main steps of the processing pipeline are described below. The terms marked in italics are explained in more detail in the section [Key Terms and Their Definitions](#key-terms-and-their-definitions) and in our papers (see [Related Papers](#related-papers)).
 
-#### Transformation Layer Generation
+#### *Transformation Layer* Generation
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for ech keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
-#### Sentence Layer Initialization
+#### *Sentence Layer* Initialization
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence: *SEN* or an unfinished sentence: *SEC*) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
-#### Projecting Sentence Layer on Transformation Layer
+#### Projecting *Sentence Layer* on *Transformation Layer*
 4. Based on the content of the *transforming sequence*, the new, modified, and deleted *text units* are detected. 
 5. In the further two processing steps (6 and 7 below), the *interspaces* are left out. For the projection of the sentence layer on the transformation layer, only the *SPSFs* (*SENs* or *SECs*) are relevant.
 6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
 7. Next, it is identified which *segments* of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
-#### Projecting Burst Layer on Transformation Layer
+#### *Burst Layer* Initialization
 *under construction, planned for the release v1.3.0*
-#### Text History
+#### Projecting *Burst Layer* on *Transformation Layer*
+*under construction, planned for the release v1.3.0*
+#### *Text History*
 8. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
 9. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 10. All extracted *TPSFs* constitute *text history*.
-#### Extending Sentence Layer with Sentence Histories
+#### Extending *Sentence Layer* with *Sentence Histories*
 11. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
 12. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
 13. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
@@ -39,12 +41,12 @@ The main steps of the processing pipeline are described below. The terms marked 
 18. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
 19. All the collected information on the *SPSF* is stored as an *SPSF* data structure.
 20. All versions of a given sentence (its *SPSFs*) are stored in its *sentence history*. There are as many *sentence histories* as sentences in the text produced in the given writing session. THEtool also outputs *sentence histories* for the deleted sentences.
-#### Projecting Transformation Layer on Sentence Layer
+#### Projecting *Transformation Layer* on *Sentence Layer*
 21. The projection of *Transformation Layer* on *Sentence Layer* allows us to identify the *sentence production stage*. THEtool performs the projection for each *SPSF* in each *sentence history*. We distinguish between two productions stages of a sentence: *sentence initial draft* containing *pre-contextual operations* and *sentence revision draft* consisting of *contextual operations*.
 22. Each *sentence history* stores the information about the production stages of all SPSFs, as well as the sentence segment impacted by the transformation (collected already in a processing step 7).
-#### Projecting Burst Layer on Sentence Layer
+#### Projecting *Burst Layer* on *Sentence Layer*
 *under construction, planned for the release v1.3.0*
-#### Burst Layer Generation
+#### *Burst Layer* Generation
 *planned for the release v1.4.0*
 
 For supplementing the analysis with relevant linguistic annotations, we apply [spaCy](https://spacy.io), an open-source Python software library for advanced natural language processing.  spaCy offers a set of trained pipeline packages for multiple languages.  We used four of them: ```en_core_web_md``` for processing English texts, ```de_core_news_md``` for German, ```fr_core_news_md``` for French, and ```el_core_news_md``` for Greek.
@@ -111,13 +113,16 @@ By default, the tool will create a directory ```wta``` in the user's home direct
 
 Text history:
 * text history in JSON format
+* text history in CSV format
 * all text versions exported to TXT format
 * visualisation of text history in SVG format
 
 Sentence histories:
 * sentence histories in JSON format
+* sentence histories in CSV format
 * sentence histories in TXT format
 * sentence histories visualisation in SVG format
+* visualisation of sentence production stages in SVG format
 
 Sentencehood:
 * a JSON containing the results of sentencehood evaluation for each SPSF in all sentence histories
@@ -126,16 +131,25 @@ Sentencehood:
 In case filtering has been activated in the configuration, THEtool also generates filtered versions of the text history and sentence histories.
 
 Text history:
-* filtered text history in JSON format
-* filtered text versions exported to TXT format
-* visualisation of filtered text history in ECM in SVG format
+* text history in JSON format
+* text history in CSV format
+* all text versions exported to TXT format
+* visualisation of text history in SVG format
 
 Sentence histories:
-* filtered sentence histories in JSON format
-* filtered sentence histories in TXT format
-* filtered sentence histories visualisation in SVG format
+* sentence histories in JSON format
+* sentence histories in CSV format
+* sentence histories in TXT format
+* sentence histories visualisation in SVG format
+* visualisation of sentence production stages in SVG format
 
 ## Key Terms and Their Definitions
+
+**TRANSFORMATION LAYER**
+
+**SENTENCE LAYER**
+
+**BURST LAYER**
 
 **TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs. A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions, (b) continuous deletion of something, (c) continuous insertion of something into existing text.
 
@@ -173,7 +187,37 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 
 **PARAGRAPH INTERSPACE (PIN)**: A PIN is typically comprised of newline characters and possibly indentation signalling the boundary between two paragraphs.
 
+**SCOPE** of the transformation:  The scope relates to the number of sentences impacted by the given transformation. A transformation can have one of the following scopes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*.
+
+**IN-SENTENCE** transformation: The transformation impacts exactly one SPSF. It consists in either producing a SEC (sentence candidate, i.e., only a part of a sentence) or alternatively, revising an existing SEC or an existing SEN (a complete and correct sentence).  
+
+**CROSS-SENTENCE** transformation: The transformation affects parts of exactly two SPSFs.
+
+**MULTI-SENTENCE** transformation: The transformation impacts at least three SPSFs.
+
+**UNI-SENTENCE** transformation: The transformation results in producing a new SEN from scratch.
+
+**SEGMENTS** of *SPSF*: Parts of sentences which were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, and *sentence end*.
+
+**SENTENCE BEGINNING**
+
+**SENTENCE MIDDLE**
+
+**SENTENCE END**
+
 **SENTENCE HISTORY (senhis)**: A sentence history is created for each of the sentences. This also includes sentences that are not part of the final product due to a revision. A single sentence history contains all versions of a particular sentence in chronological order.
+
+**SENTENCE PRODUCTION CYCLE**
+
+**SENTENCE PRODUCTION STAGE**
+
+**SENTENCE INITIAL DRAFT**
+
+**PRE-CONTEXTUAL OPERATIONS**
+
+**SENTENCE REVISION DRAFT**
+
+**CONTEXTUAL OPERATIONS**
 
 **MORPHOSYNTACTIC RELEVANCE**: According to our definition, a TPSF or an SPSF version is morphosyntactically relevant if: 
 * the edit distance between the current and the previous version is larger than 3 (note: it is only relevant if the difference between the versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens),
