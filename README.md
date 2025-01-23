@@ -23,27 +23,27 @@ The main steps of the processing pipeline are described below. The terms marked 
 6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
 7. Next, it is identified which *segments* of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
 #### *Burst Layer* Initialization
-*under construction, planned for the release v1.3.0*
+8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
 #### Projecting *Burst Layer* on *Transformation Layer*
-*under construction, planned for the release v1.3.0*
+9. Each transforming sequence is segmented into bursts. The resulting information on bursts for each transforming sequence is stored in *text history*.
 #### *Text History*
-8. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
-9. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
-10. All extracted *TPSFs* constitute *text history*.
+10. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
+11. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
+12. All extracted *TPSFs* constitute *text history*.
 #### Extending *Sentence Layer* with *Sentence Histories*
-11. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
-12. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
-13. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
-14. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
-15. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
-16. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
-17. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
-18. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
-19. All the collected information on the *SPSF* is stored as an *SPSF* data structure.
-20. All versions of a given sentence (its *SPSFs*) are stored in its *sentence history*. There are as many *sentence histories* as sentences in the text produced in the given writing session. THEtool also outputs *sentence histories* for the deleted sentences.
+13. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
+14. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
+15. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
+16. If an *SPSF* is modified in the subsequent text versions, its modified version is stored in its *sentence history*.
+17. If an *SPSF* gets deleted at any point in time, this information is also stored in its *sentence history*.
+18. If an *SPSF* stays unchanged, this information is also stored in its *sentence history*.
+19. For each *SPSF* in a given *sentence history*, a sentence *TS* is detected. The *TS* is determined based on the content difference between two adjacent *SPSFs* in the *sentence history*.
+20. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
+21. All the collected information on the *SPSF* is stored as an *SPSF* data structure.
+22. All versions of a given sentence (its *SPSFs*) are stored in its *sentence history*. There are as many *sentence histories* as sentences in the text produced in the given writing session. THEtool also outputs *sentence histories* for the deleted sentences.
 #### Projecting *Transformation Layer* on *Sentence Layer*
-21. The projection of *Transformation Layer* on *Sentence Layer* allows us to identify the *sentence production stage*. THEtool performs the projection for each *SPSF* in each *sentence history*. We distinguish between two productions stages of a sentence: *sentence initial draft* containing *pre-contextual operations* and *sentence revision draft* consisting of *contextual operations*.
-22. Each *sentence history* stores the information about the production stages of all SPSFs, as well as the sentence segment impacted by the transformation (collected already in a processing step 7).
+23. The projection of *Transformation Layer* on *Sentence Layer* allows us to identify the *sentence production stage*. THEtool performs the projection for each *SPSF* in each *sentence history*. We distinguish between two productions stages of a sentence: *sentence initial draft* containing *pre-contextual operations* and *sentence revision draft* consisting of *contextual operations*.
+24. Each *sentence history* stores the information about the production stages of all SPSFs, as well as the sentence segment impacted by the transformation (collected already in a processing step 7).
 #### Projecting *Burst Layer* on *Sentence Layer*
 *under construction, planned for the release v1.3.0*
 #### *Burst Layer* Generation
