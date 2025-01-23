@@ -219,7 +219,7 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 
 **SENTENCE REVISION DRAFT**: A sentence revision draft contains any changes applied to a sentence at some time after it achieved SEN status, including its complete deletion. We consider the sentence revision draft a result of contextual revisions.
 
-**CONTEXTUAL OPERATIONS**: Contextual revision might downgrade a SEN into a SEC if the sentence is no longer complete or correct.
+**CONTEXTUAL REVISIONS**: Contextual revision might downgrade a SEN into a SEC if the sentence is no longer complete or correct.
 
 **MORPHOSYNTACTIC RELEVANCE**: According to our definition, a TPSF or an SPSF version is morphosyntactically relevant if: 
 * the edit distance between the current and the previous version is larger than 3 (note: it is only relevant if the difference between the versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens),
