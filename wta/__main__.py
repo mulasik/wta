@@ -30,7 +30,7 @@ from .pipeline.sentence_layer.sentence_histories.sentence_history import Sentenc
 from .pipeline.statistics.statistics_factory import StatsFactory
 from .pipeline.transformation_layer.action_factory import ActionAggregator, ActionFactory
 from .pipeline.transformation_layer.event_factory import EventFactory
-from .pipeline.transformation_layer.tpsf_factory import ECMFactory, PCMFactory, filter_tpsfs
+from .pipeline.transformation_layer.tpsf_factory import PCMFactory, TPSFFactory, filter_tpsfs
 from .pipeline.transformation_layer.ts_factory import TsFactory
 from .settings import Settings
 
@@ -76,7 +76,7 @@ def run() -> None:
             for ts in tss:
                 all_tss.append(ts)
             TssOutputFactory.run(tss, settings)
-            tpsfs = ECMFactory().run(tss, settings)
+            tpsfs = TPSFFactory().run(tss, settings)
             TpsfsOutputFactory.run(tpsfs, settings)
             TexthisOutputFactory.run(tpsfs, settings)  # + texthis_pcm
             tpsfs_fltr = filter_tpsfs(tpsfs)

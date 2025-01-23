@@ -19,7 +19,7 @@ from .tpsf import TpsfECM, TpsfPCM
 from .ts import TransformingSequence
 
 
-class ECMFactory:
+class TPSFFactory:
     """
     A class to retrieve text versions (TPSFs) in Edit Capturing Mode (ECM).
     TPSFs are generated based on transforming sequences (TSs).
