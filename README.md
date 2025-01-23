@@ -145,17 +145,17 @@ Sentence histories:
 
 ## Key Terms and Their Definitions
 
-**TRANSFORMATION LAYER**
+**TRANSFORMATION LAYER**: It allows for tracking transformations the writer performs on the text during a given writing sessions. The *text history* builds the transformation layer.
 
-**SENTENCE LAYER**
+**SENTENCE LAYER**: It allows for tracking sentence production during a given writing sessions. The *sentence histories* build the sentence layer.
 
-**BURST LAYER**
+**BURST LAYER**: It allows for tracking writing bursts during a given writing sessions. The *burst history* build the burst layer (not available in the current THEtool version).
 
 **TPSF (text produced so far)**: The text under production that has been produced up to the given moment in time. THEtool stores a given TPSF version as soon as a change in production mode occurs. A change in production mode is defined as switching between one of the modes (a) continuous writing at the leading edge of the TPSF (i.e., append) ignoring white insertions, (b) continuous deletion of something, (c) continuous insertion of something into existing text.
 
-**TRANSFORMING SEQUENCE (TS)**: The textual material (i.e., product data) combined with the edit operations (i.e., process data) that comprises the difference between two adjacent versions.
+**TRANSFORMING SEQUENCE (TS)**: The textual material (i.e., product data) combined with the edit operations (i.e., process data) that comprises the difference between two adjacent text versions (TPSFs). Applying *transforming sequence* on a text results in creating a new text version.
 
-**TEXT HISTORY (texthis)**: The text history comprises all TPSF versions captured throughout the tracking of the text production process.
+**TEXT HISTORY (texthis)**: The text history comprises all TPSFs produced during a given writing session. It contains detailed information on the content of TPSFs and their *transforming sequences*.
 
 **TEXT UNIT (TU)**: In order to accurately track the content of each TPSF version, we propose the concept of a text unit. We consider that the full content of a given text version can be split into text units in such a way that each character produced, including whitespaces, belongs to one text unit. We distinguish between two main types of text units: SPSFs and interspace.
 
@@ -199,25 +199,27 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 
 **SEGMENTS** of *SPSF*: Parts of sentences which were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, and *sentence end*.
 
-**SENTENCE BEGINNING**
+**SENTENCE BEGINNING**: a sequence of arbitrary length that starts with a sentence start but is not terminated by sentence-final punctuation
 
-**SENTENCE MIDDLE**
+**SENTENCE MIDDLE**: a sequence of arbitrary length that do neither contain a sentence start which contains a sentence start nor a sentence end.
 
-**SENTENCE END**
+**SENTENCE END**: a sequence of arbitrary length that ends with sentence-final punctuation but does not contain a sentence start. 
+
+**COMPLETE SENTENCE**: a sequence containing both *sentence beginning* and *sentence end*.
 
 **SENTENCE HISTORY (senhis)**: A sentence history is created for each of the sentences. This also includes sentences that are not part of the final product due to a revision. A single sentence history contains all versions of a particular sentence in chronological order.
 
-**SENTENCE PRODUCTION CYCLE**
+**SENTENCE PRODUCTION CYCLE**: It is a model representing how individual sentences are produced and revised. It allows for tracking the evolution of an idea into a complete sentence for each sentence in the text. The cycle comprises two stages: *sentence initial draft* and *sentence revision draft*.
 
-**SENTENCE PRODUCTION STAGE**
+**SENTENCE PRODUCTION STAGE**: The *sentence production cycle* is divided into two stages. If the writer is working on a first draft of a sentence (prior to entering final punctuation mark for the first time), it is *sentence initial draft*. If the writer revises a previously accomplished sentence or deletes it, these operations refer to *sentence revision draft*.
 
-**SENTENCE INITIAL DRAFT**
+**SENTENCE INITIAL DRAFT**: Result of producing a first draft of a sentence. It is finished as soon as the writer enters the final punctuation mark at the end of the sentence for the first time. We interpret this as a signal of the writer achieving a sense of completeness and the produced sequence of words achieves the status of a SEN. It is a result of pre-contextual operations.
 
-**PRE-CONTEXTUAL OPERATIONS**
+**PRE-CONTEXTUAL OPERATIONS**: Linear production as well as deletions and insertions performed before a sequence of words achieves the status of a SEN for the first time.
 
-**SENTENCE REVISION DRAFT**
+**SENTENCE REVISION DRAFT**: A sentence revision draft contains any changes applied to a sentence at some time after it achieved SEN status, including its complete deletion. We consider the sentence revision draft a result of contextual revisions.
 
-**CONTEXTUAL OPERATIONS**
+**CONTEXTUAL OPERATIONS**: Contextual revision might downgrade a SEN into a SEC if the sentence is no longer complete or correct.
 
 **MORPHOSYNTACTIC RELEVANCE**: According to our definition, a TPSF or an SPSF version is morphosyntactically relevant if: 
 * the edit distance between the current and the previous version is larger than 3 (note: it is only relevant if the difference between the versions contains one token; the edit distance is NOT taken into account, if the difference between versions contains multiple tokens),
