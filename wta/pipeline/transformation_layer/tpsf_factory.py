@@ -1,8 +1,8 @@
 from tqdm import tqdm
 
+from wta.pipeline.transformation_layer.text_transformation_classifier import TextTransformationClassifier
+
 from ...settings import Settings
-from ..sentence_histories.text_unit import TextUnit
-from ..sentence_histories.text_unit_factory import TextUnitFactory
 from .action import (
     Action,
     Append,
@@ -13,11 +13,13 @@ from .action import (
     Pasting,
     Replacement,
 )
+from .text_unit import TextUnit
+from .text_unit_factory import TextUnitFactory
 from .tpsf import TpsfECM, TpsfPCM
 from .ts import TransformingSequence
 
 
-class ECMFactory:
+class TPSFFactory:
     """
     A class to retrieve text versions (TPSFs) in Edit Capturing Mode (ECM).
     TPSFs are generated based on transforming sequences (TSs).
@@ -48,6 +50,7 @@ class ECMFactory:
         aggregated_tss: tuple[TransformingSequence, ...] = ()
         tss = [ts for ts in tss if ts.label != "navigation"]
         prev_tpsf = None
+        sequence_removed_by_repl = None
         for i, ts in enumerate(tqdm(tss, "Extracting tpsfs")):
             after_end_pos = -1 if ts.endpos is None else ts.endpos + 1
             if ts.label in ["append", "insertion", "pasting"]:
@@ -60,20 +63,23 @@ class ECMFactory:
                 ts.set_text("".join(text))
                 del output[ts.startpos : after_end_pos]
             elif ts.label == "replacement":
+                sequence_removed_by_repl = "".join(output[ts.startpos : after_end_pos])
                 del output[ts.startpos : after_end_pos]
                 startpos = ts.startpos
                 for char in ts.text:
                     output.insert(startpos, char)
                     startpos += 1
-            content = "".join(output)
-            text_units = TextUnitFactory().run(content, i, ts, prev_tpsf, settings)
+            tpsf_text = "".join(output)
+            tus, deleted_tus, impacted_tus_prev = TextUnitFactory().run(tpsf_text, i, ts, prev_tpsf, sequence_removed_by_repl, settings)
+            tpsf_text_prev = "" if not prev_tpsf else prev_tpsf.text
+            transformation = TextTransformationClassifier().run(i, tpsf_text, ts, tus, deleted_tus, impacted_tus_prev, sequence_removed_by_repl, tpsf_text_prev)
             relevance = (
                 ts.relevance
                 if settings.config["enable_spellchecking"] is False
-                else _determine_tpsf_relevance(text_units, settings)
+                else _determine_tpsf_relevance(tus, settings)
             )
             tpsf = TpsfECM(
-                i, content, ts, prev_tpsf, text_units, relevance, aggregated_tss
+                i, tpsf_text, ts, prev_tpsf, tus, relevance, aggregated_tss, transformation.scope, transformation.sentence_segments
             )
             aggregated_tss = () if tpsf.relevance else (*aggregated_tss, ts)
             tpsfs.append(tpsf)
@@ -137,12 +143,12 @@ class PCMFactory:
             # TODO add actions to Tpsf
             if (
                 isinstance(act, KeyboardAction)
-                and act.pause is not None
-                and act.pause >= settings.config["pause_duration"]
+                and act.preceding_pause is not None
+                and act.preceding_pause >= settings.config["pause_duration"]
             ):
                 content = "".join(output[:-1])
                 tpsf_pcm = TpsfPCM(revision_id, content, prev_pause)
                 tpsfs_pcm.append(tpsf_pcm)
                 revision_id += 1
-                prev_pause = act.pause
+                prev_pause = act.preceding_pause
         return tpsfs_pcm

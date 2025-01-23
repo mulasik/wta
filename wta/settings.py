@@ -16,9 +16,11 @@ class Paths:
     texthis_json_dir: Path
     texthis_txt_dir: Path
     texthis_visual_dir: Path
+    texthis_csv_dir: Path
     stats_dir: Path
     senhis_json_dir: Path
     senhis_txt_dir: Path
+    senhis_csv_dir: Path
     senhood_json_dir: Path
     senhood_txt_dir: Path
     senhis_visual_dir: Path
@@ -61,9 +63,11 @@ def _create_paths(output_dir: Path) -> Paths:
         texthis_json_dir=texthis_dir / names.JSON,
         texthis_txt_dir=texthis_dir / names.TXT,
         texthis_visual_dir=texthis_dir / names.VISUAL,
+        texthis_csv_dir=texthis_dir / names.CSV,
         stats_dir=output_dir / names.STATS,
         senhis_json_dir=senhis_dir / names.JSON,
         senhis_txt_dir=senhis_dir / names.TXT,
+        senhis_csv_dir=senhis_dir / names.CSV,
         senhood_json_dir=senhood_dir / names.JSON,
         senhood_txt_dir=senhood_dir / names.TXT,
         senhis_visual_dir=senhis_dir / names.VISUAL,

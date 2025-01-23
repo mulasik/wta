@@ -1,9 +1,10 @@
 from pathlib import Path
 
-from wta.pipeline.sentence_histories.sentencehood_evaluator import Sentencehood
+from wta.output_handler.storage.csv import SenhisCsv, TexthisCsv
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
 
-from ..pipeline.sentence_histories.text_unit import SPSF
-from ..pipeline.sentence_parsing.parsers import TokenProp
+from ..pipeline.sentence_layer.sentence_parsing.parsers import TokenProp
+from ..pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
 from ..pipeline.statistics.statistics import (
     BasicStatistics,
     EventStatistics,
@@ -11,11 +12,11 @@ from ..pipeline.statistics.statistics import (
     SentenceStatistics,
     TSStatistics,
 )
-from ..pipeline.text_history.action import Action
-from ..pipeline.text_history.events.base import BaseEvent
-from ..pipeline.text_history.tpsf import TpsfECM, TpsfPCM
-from ..pipeline.text_history.ts import TransformingSequence
-from ..pipeline.transformation_histories.transformation import Transformation
+from ..pipeline.transformation_layer.action import Action
+from ..pipeline.transformation_layer.events.base import BaseEvent
+from ..pipeline.transformation_layer.text_unit import SPSF
+from ..pipeline.transformation_layer.tpsf import TpsfECM, TpsfPCM
+from ..pipeline.transformation_layer.ts import TransformingSequence
 from ..settings import Settings
 from .storage.json import SenhisJson, SenhoodJson, TexthisJson, TranshisJson
 from .storage.svg import (
@@ -26,6 +27,7 @@ from .storage.svg import (
     InsertionsSvg,
     SenEditSvg,
     SenhisSvg,
+    SenProductionStageSvg,
     SynBarTranshisSvg,
     SynPieTranshisSvg,
     TexthisSvg,
@@ -42,6 +44,7 @@ from .storage.txt import (
     SenhoodhisTxt,
     StatsTxt,
     TexthisTxt,
+    TextTranshisTxt,
     TpsfsPCMTxt,
     TpsfsTxt,
     TssTxt,
@@ -91,6 +94,7 @@ class TexthisOutputFactory:
         # TODO: TexthisJson(texthis_pcm, settings, mode='pcm').to_file()
         TexthisTxt(texthis, settings).to_file()
         TexthisSvg(texthis, settings).to_file()
+        TexthisCsv(texthis, settings).to_file()
 
 
 class TexthisFltrOutputFactory:
@@ -101,6 +105,7 @@ class TexthisFltrOutputFactory:
         TexthisJson(texthis_fltr, settings, filtered=True).to_file()
         TexthisTxt(texthis_fltr, settings, filtered=True).to_file()
         FilteredTexthisSvg(texthis_fltr, settings).to_file()
+        TexthisCsv(texthis_fltr, settings, filtered=True).to_file()
 
 
 class SenhisOutputFactory:
@@ -119,6 +124,10 @@ class SenhisOutputFactory:
         SenhisTxt(senhis_fltr, settings, filtered=True).to_file()
         SenhisSvg(texthis, senhis, settings).to_file()
         SenhisSvg(texthis_fltr, senhis_fltr, settings, filtered=True).to_file()
+        SenhisCsv(senhis, settings).to_file()
+        SenhisCsv(senhis_fltr, settings, filtered=True).to_file()
+        SenProductionStageSvg(senhis, settings).to_file()
+        SenProductionStageSvg(senhis_fltr, settings, filtered=True).to_file()
 
 
 class SenhoodhisOutputFactory:

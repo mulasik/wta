@@ -1,17 +1,18 @@
-from pathlib import Path
 import re
+from pathlib import Path
 from typing import TYPE_CHECKING
 
-from ...pipeline.names import SenLabels, TSLabels
-from ...pipeline.text_history.ts import TransformingSequence
+from wta.utils.other import ensure_path
+
 from ...settings import Settings
 from ...utils.nlp import ends_with_end_punctuation, starts_with_uppercase_letter
 from .. import regular_expressions
+from ..names import SenLabels, TSLabels
 from .text_unit import TextUnit, TextUnitBuilder, TextUnitType
-from wta.utils.other import ensure_path
+from .ts import TransformingSequence
 
 if TYPE_CHECKING:
-    from ..text_history.tpsf import TpsfECM
+    from .tpsf import TpsfECM
 
 
 class TextUnitFactory:
@@ -21,6 +22,7 @@ class TextUnitFactory:
         revision_id: int,
         ts: TransformingSequence,
         prev_tpsf: "TpsfECM | None",
+        sequence_removed_by_repl: str,
         settings: Settings,
     ) -> tuple[TextUnit, ...]:
         """
@@ -39,25 +41,23 @@ class TextUnitFactory:
                 str_to_save += f"\n|{s}|\n"
             f.write(str_to_save)
 
-        print(
-            f"\n\n=============================={revision_id}==============================\n"
-        )
-        print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|\n")
+        # print(
+        #     f"\n\n=============================={revision_id}==============================\n"
+        # )
+        # print(f"TS: {ts.label.upper()} ({ts.startpos}-{ts.endpos}): |{ts.text}|\n")
         after_end_pos = -1 if ts.endpos is None else ts.endpos + 1
-        print(f"Text segment impacted by the TS: |{text[ts.startpos:after_end_pos]}|")
-        print(f"TEXT: {text}")
-        print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
+        # print(f"Text segment impacted by the TS: |{text[ts.startpos:after_end_pos]}|")
+        # print(f"TEXT: {text}")
+        # print(f"\nINITIAL SENTENCE LIST: {sentence_list}\n")
 
         textunit_list = self._split_in_textunits(sentence_list)
 
-        
-
         merged_textunit_list = self._merge_double_textunits(textunit_list)
 
-        print(
-            f"\nINITIAL TEXTUNITS: {[(tu.text, tu.text_unit_type) for tu in textunit_list]}\n"
-        )
-        print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}\n")
+        # print(
+        #     f"\nINITIAL TEXTUNITS: {[(tu.text, tu.text_unit_type) for tu in textunit_list]}\n"
+        # )
+        # print(f"\nTUs after merging: {[tu.text for tu in merged_textunit_list]}\n")
 
         corrected_tus = self._improve_segmentation_with_prev_tus(
             merged_textunit_list, prev_tpsf
@@ -66,13 +66,15 @@ class TextUnitFactory:
         # print(f"\nCorrected TUs: {[tu.text for tu in corrected_tus]}\n")
 
         # collect TU states
-        pre_tus, impacted_tus, post_tus = self._detect_diffs(
-            corrected_tus, ts, prev_tpsf
+        pre_tus, impacted_tus, post_tus, deleted_tus, impacted_tus_from_prev_tpsf = self._detect_diffs(
+            corrected_tus, ts, sequence_removed_by_repl, prev_tpsf
         )
 
         # print(f"\nImpacted TUs: {[tu.text for tu in impacted_tus]}\n")
 
-        self._set_tus_states(pre_tus, impacted_tus, post_tus, ts, prev_tpsf)
+        # print(f"\nImpacted TUs from prev TPSF: {[tu.text for tu in impacted_tus_from_prev_tpsf]}\n")
+
+        self._set_tus_states(pre_tus, impacted_tus, post_tus, deleted_tus, ts, prev_tpsf)
 
         tus = [*pre_tus, *impacted_tus, *post_tus]
 
@@ -89,7 +91,7 @@ class TextUnitFactory:
         # ]
         # print(f"FINAL TU LIST: {final_tu_list}\n")
 
-        return tuple(tu.to_text_unit() for tu in tus)
+        return tuple(tu.to_text_unit() for tu in tus), tuple(tu.to_text_unit() for tu in deleted_tus), tuple(tu.to_text_unit() for tu in impacted_tus_from_prev_tpsf)
 
     def collect_preceding_sins_and_pins(
         self, seq: str, textunit_list: list[TextUnitBuilder]
@@ -124,13 +126,13 @@ class TextUnitFactory:
         if middle_pins == []:
             return seq, textunit_list
         middle_pin = middle_pins.pop(0)
-        print(f"Splitting by the PIN: |{middle_pin}|")
+        # print(f"Splitting by the PIN: |{middle_pin}|")
         split_tus = seq.split(middle_pin, 1)
-        print(f"There are {len(split_tus)} TUs in this sequence split by middle PIN:")
+        # print(f"There are {len(split_tus)} TUs in this sequence split by middle PIN:")
         first_tu = split_tus[0]
         second_tu = "" if len(split_tus) == 1 else split_tus[1]
-        print(f"First TU: |{first_tu}|")
-        print(f"Second TU: |{second_tu}|")
+        # print(f"First TU: |{first_tu}|")
+        # print(f"Second TU: |{second_tu}|")
         _, textunit_list = self.retrieve_sen_or_sec(first_tu, textunit_list)
         pin = TextUnitBuilder(TextUnitType.PIN, middle_pin)
         textunit_list.append(pin)
@@ -221,15 +223,12 @@ class TextUnitFactory:
 
             s, textunit_list = self.collect_preceding_sins_and_pins(s, textunit_list)
             middle_pins = self.find_middle_pins(s)
-            print(f"Found middle pins: {middle_pins} in |{s}|")
+            # print(f"Found middle pins: {middle_pins} in |{s}|")
             s, textunit_list = self.split_tu_by_pins(s, textunit_list, middle_pins)
-            print(f"I am now left with |{s}|")
             if s != "":
                 s, textunit_list = self.retrieve_sen_or_sec(s, textunit_list)
-                print(f"After retrieving SEN or SEC I got: |{s}|")
             if s != "":
                 s, textunit_list = self.collect_trailing_sins_and_pins(s, textunit_list)
-                print(f"After trailing SINs and PINs I got: |{s}|")
 
         return textunit_list
 
@@ -248,10 +247,6 @@ class TextUnitFactory:
         merged_textunits = []
         merged = False
         for i, j in zip(textunit_list, textunit_list[1:]):
-            print("\n\nComparing")
-            print(f"|{i.text}|")
-            print("with")
-            print(f"|{j.text}|")
             if (
                 i.text_unit_type == j.text_unit_type != TextUnitType.SEN
                 and i.text != prev_merged_text
@@ -272,18 +267,11 @@ class TextUnitFactory:
                     )
                 prev_merged_text = j.text
                 merged = True
-                print(f"I have merged: |{merged_tu_text}|")
-                print(f"Merge flag: {merged}")
-                print(f"Prev merged text is: |{prev_merged_text}|")
             elif i.text != prev_merged_text:
                 merged_textunits.append(i)
                 prev_merged_text = ""
                 merged = False
-                print(f"I have NOT merged: |{i.text}|")
-                print(f"Merge flag: {merged}")
-                print(f"Prev merged text is: |{prev_merged_text}|")
         if j.text != prev_merged_text:
-            print(f"I have added |{j.text}| to text units list")
             merged_textunits.append(j)
         return self._merge_double_textunits(merged_textunits)
 
@@ -337,8 +325,10 @@ class TextUnitFactory:
         self,
         textunits: list[TextUnitBuilder],
         ts: TransformingSequence,
+        sequence_removed_by_repl: str,
         prev_tpsf: "TpsfECM | None",
-    ) -> tuple[list[TextUnitBuilder], list[TextUnitBuilder], list[TextUnitBuilder]]:
+    ) -> tuple[list[TextUnitBuilder], list[TextUnitBuilder], list[TextUnitBuilder], list[TextUnitBuilder]]:
+
         prev_textunits: list[TextUnitBuilder] = (
             []
             if prev_tpsf is None
@@ -348,7 +338,12 @@ class TextUnitFactory:
             pre_tus, impacted_tus, post_tus = self._check_what_is_impacted(
                 textunits, prev_textunits, ts
             )
-            # if the edit consists in deleting or reducing sentence interspace
+            impacted_tus_from_prev_tpsf = impacted_tus
+            print(f"These are impacted tus: {[tu.text for tu in impacted_tus]}")
+            deleted_tus = [tu for tu in impacted_tus if tu.text in ts.text] if ts.label != TSLabels.REPL else [tu for tu in impacted_tus if tu.text in sequence_removed_by_repl]
+            if len(deleted_tus) > 0:
+                print(f">>>> These are deleted sentences: {[tu.text for tu in deleted_tus]}")
+            # if the edit consists in deleting or reducing sentence or paragraph interspace
             if (
                 len(impacted_tus) == 1
                 and impacted_tus[0].text_unit_type
@@ -375,7 +370,8 @@ class TextUnitFactory:
             pre_tus, impacted_tus, post_tus = self._check_what_is_impacted(
                 prev_textunits, textunits, ts
             )
-        return pre_tus, impacted_tus, post_tus
+            deleted_tus, impacted_tus_from_prev_tpsf = [], []
+        return pre_tus, impacted_tus, post_tus, deleted_tus, impacted_tus_from_prev_tpsf
 
     def _check_what_is_impacted(
         self,
@@ -391,8 +387,8 @@ class TextUnitFactory:
         for tu in tus_potentially_impacted:
             startpos, endpos = currentpos, currentpos + len(tu.text) - 1
             # print(f"Text unit: |{tu}|")
-            # print(startpos, endpos)
-            # print(ts.startpos, ts.endpos)
+            # print(f"TU position: {startpos, endpos}")
+            # print(f"TS position: {ts.startpos, ts.endpos}")
             if endpos < ts.startpos and tu.text in [
                 tu.text for tu in textunits_to_compare_with
             ]:
@@ -413,6 +409,7 @@ class TextUnitFactory:
         pre_tus: list[TextUnitBuilder],
         impacted_tus: list[TextUnitBuilder],
         post_tus: list[TextUnitBuilder],
+        deleted_tus: list[TextUnitBuilder],
         ts: TransformingSequence,
         prev_tpsf: "TpsfECM | None",
     ) -> None:
@@ -432,6 +429,8 @@ class TextUnitFactory:
             currentpos = currentpos + len(
                 tu.text
             )  # it's the index of the beginning of the next tu
+        for dtu in deleted_tus:
+            dtu.set_state(SenLabels.DEL)
 
     def _retrieve_tu_state(
         self,

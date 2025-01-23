@@ -23,7 +23,7 @@ en-core-web-md = {url = "https://github.com/explosion/spacy-models/releases/down
 fr_core_news_md = {url = "https://github.com/explosion/spacy-models/releases/download/fr_core_news_md-3.5.0/fr_core_news_md-3.5.0-py3-none-any.whl"}
 el-core-news-md = {url = "https://github.com/explosion/spacy-models/releases/download/el_core_news_md-3.5.0/el_core_news_md-3.5.0.tar.gz#egg=el_core_news_md"}
 lxml = "^4.9.2"
-typing-extensions = "^4.5.0"
+typing-extensions = "~4.5.0"
 pandas = "^2.0.0"
 language-tool-python = "^2.7.1"
 diaparser = "^1.1.3"

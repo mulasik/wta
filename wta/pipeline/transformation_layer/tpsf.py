@@ -1,13 +1,11 @@
 import dataclasses
 from typing import Any, Optional, TypedDict
 
+from wta.pipeline.transformation_layer.sentence_segment import SentenceSegment
+
 from ...settings import Settings
-from ..sentence_histories.text_unit import TextUnit, TextUnitDict
+from .text_unit import TextUnit, TextUnitDict
 from .ts import TransformingSequence
-
-
-class EditDict(TypedDict):
-    transforming_sequence: dict[str, Any]
 
 
 class TextUnitsDict(TypedDict):
@@ -19,7 +17,9 @@ class TpsfECMDict(TypedDict):
     revision_id: int
     prev_text_version: str | None
     result_text: str
-    edit: EditDict
+    transforming_sequence: dict[str, Any]
+    transformation_scope: str
+    sentence_segments: list[SentenceSegment]
     textunits: TextUnitsDict
 
 
@@ -32,6 +32,8 @@ class TpsfECM:
     textunits: tuple[TextUnit, ...]
     relevance: bool
     irrelevant_tss_aggregated: tuple[TransformingSequence, ...]
+    transformation_scope: str
+    sentence_segments: list[SentenceSegment]
     final: bool = False
 
     def _determine_tpsf_relevance(self, settings: Settings) -> bool:
@@ -60,6 +62,12 @@ RESULT TEXT:
 TRANSFORMING SEQUENCE:
 {self.ts.label.upper()} *{self.ts.text}*
 
+SCOPE:
+{self.transformation_scope}
+
+SENTENCE SEGMENTS:
+{[ss.to_text() for ss in self.sentence_segments]}
+
 TEXT UNITS:
 {[(tu.state, tu.text) for tu in self.textunits]}
 
@@ -70,9 +78,9 @@ TEXT UNITS:
             "revision_id": self.revision_id,
             "prev_text_version": None if not self.prev_tpsf else self.prev_tpsf.text,
             "result_text": self.text,
-            "edit": {
-                "transforming_sequence": self.ts.__dict__,
-            },
+            "transforming_sequence": self.ts.to_dict(),
+            "transformation_scope": self.transformation_scope,
+            "sentence_segments": [ss.to_dict() for ss in self.sentence_segments],
             "textunits": {
                 "previous_textunits": []
                 if not self.prev_tpsf
@@ -87,6 +95,10 @@ TPSF version {self.revision_id}:
 {self.text}
 TS:
 {(self.ts.text, self.ts.label.upper())}
+SCOPE:
+{self.transformation_scope}
+SENTENCE SEGMENTS:
+{[ss.to_text() for ss in self.sentence_segments]}
 TEXT UNITS:
 {[(tu.state, tu.text) for tu in self.textunits]}
             """

@@ -5,8 +5,7 @@ from typing import cast
 import numpy as np
 from bs4 import BeautifulSoup
 
-from ..sentence_histories.text_unit import SPSF, TextUnitType
-from ..text_history.action import (
+from ..transformation_layer.action import (
     Action,
     Append,
     Deletion,
@@ -14,7 +13,8 @@ from ..text_history.action import (
     Midletion,
     Navigation,
 )
-from ..text_history.tpsf import TpsfECM, TpsfPCM
+from ..transformation_layer.text_unit import SPSF, TextUnitType
+from ..transformation_layer.tpsf import TpsfECM, TpsfPCM
 
 
 class Statistics(ABC):  # noqa: B024
@@ -99,10 +99,10 @@ class PauseStatistics(Statistics):
         for act in actions:
             if (
                 isinstance(act, (Append, Insertion, Deletion, Midletion, Navigation))
-                and act.pause is not None
+                and act.preceding_pause is not None
             ):
-                pauses.append(act.pause)
-                total_pauses_duration += act.pause
+                pauses.append(act.preceding_pause)
+                total_pauses_duration += act.preceding_pause
             else:
                 actions_pause_unknown += 1
         avg_pause_duration = round(total_pauses_duration / len(pauses), 2)

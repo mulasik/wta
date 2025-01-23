@@ -49,9 +49,9 @@ class EventFactory:
             event.set_next_evnt(events[i + 1] if i < len(events) - 1 else None)
             event.set_prev_evnt(events[i - 1] if i >= 1 else None)
             if event.prev_evnt:
-                event.set_pause()
-            if event.next_evnt:
-                event.set_endpos()
+                event.set_preceding_pause()
+            # if event.next_evnt:
+            #     event.set_endpos()
         return events
 
     def extract_events_from_scriptlog_idfx(
@@ -214,8 +214,8 @@ class EventFactory:
                 content = winlog.value.get_text()
                 startpos = int(wordlog.position.get_text())
                 keyname = winlog.key.get_text()
-                starttime = int(winlog.starttime.get_text())
-                endtime = int(winlog.endtime.get_text())
+                starttime = float(winlog.starttime.get_text())/1000
+                endtime = float(winlog.endtime.get_text())/1000
                 textlen = int(wordlog.documentlength.get_text())
                 if keyname in KeyNames.SHIFT_KEYS:
                     return None
@@ -276,6 +276,7 @@ class EventFactory:
                 print(
                     "FAILURE: Keyboard event information not available in the IDFX file."
                 )
+            prev_starttime = starttime
         # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
         elif event["type"] == "replacement":
             if (
@@ -297,13 +298,14 @@ class EventFactory:
                     endpos = orig_startpos + len(content)
                     rplcmt_textlen = orig_endpos - orig_startpos
                     rplcmt_endpos = orig_endpos - 1
-                    return ReplacementEvent(  # noqa: TRY300
+                    return ReplacementEvent(
                         content, orig_startpos, endpos, rplcmt_endpos, rplcmt_textlen
                     )
                 except:
                     print(
                         "FAILURE: Replacement event information not available in the IDFX file."
                     )
+                prev_starttime = None
         # SEQUENCE INSERTION: a text sequence is inserted
         elif event["type"] == "insert":
             if (
@@ -319,15 +321,17 @@ class EventFactory:
                     content = event.part.before.get_text()  # inserted text
                     startpos = int(event.part.position.get_text()) - len(content)
                     endpos = int(event.part.position.get_text()) - 1
-                    return InsertEvent(content, startpos, endpos)  # noqa: TRY300
+                    return InsertEvent(content, startpos, endpos)
                 except:
                     print(
                         "FAILURE: Insert event information not available in the IDFX file."
                     )
+                prev_starttime = None
         elif event["type"] in ["mouse", "focus", "selection", "statistics"]:
-            pass
+            prev_starttime = None
         else:
             print(f'ATTENTION: Encountered a new event type: {event["type"]}')
+            prev_starttime = None
         return None
 
     @staticmethod

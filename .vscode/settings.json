@@ -4,5 +4,8 @@
     "python.linting.ignorePatterns": [
         "**/site-packages/**/*.py"
     ],
-    "python.formatting.provider": "black"
+    "python.formatting.provider": "black",
+    "python.analysis.extraPaths": [
+        "./stubs"
+    ]
 }

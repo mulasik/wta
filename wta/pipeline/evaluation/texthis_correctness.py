@@ -1,7 +1,7 @@
 import re
 from pathlib import Path
 
-from wta.pipeline.text_history.tpsf import TpsfECM
+from wta.pipeline.transformation_layer.tpsf import TpsfECM
 from wta.settings import Settings
 from wta.utils.nlp import retrieve_mismatch_ranges
 

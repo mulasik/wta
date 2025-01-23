@@ -3,7 +3,7 @@ from typing import TypedDict
 import language_tool_python
 from spacy.language import Language
 
-from ..pipeline.sentence_parsing.models import Languages
+from ..pipeline.sentence_layer.sentence_parsing.models import Languages
 from ..utils.nlp import TokensDict, check_edit_distance
 
 

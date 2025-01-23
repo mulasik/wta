@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
 from ...pipeline.names import SenLabels
-from ...pipeline.text_history.tpsf import TpsfECM
+from ...pipeline.transformation_layer.tpsf import TpsfECM
 from ..plots.colors import Colors
 from .base import BasePlot
 

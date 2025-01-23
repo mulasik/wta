@@ -49,8 +49,8 @@ class KeyboardEvent(BaseEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
         char_number_diff: int,
@@ -59,19 +59,19 @@ class KeyboardEvent(BaseEvent):
         self.keyname = keyname
         self.starttime = starttime
         self.endtime = endtime
+        self.preceding_pause = None
         self.textlen = textlen
-        self.pause: float | None = None
         self.settings = settings
         self.char_number_diff = char_number_diff
 
-    def set_pause(self) -> None:
+    def set_preceding_pause(self) -> None:
         if isinstance(self.prev_evnt, KeyboardEvent):
             try:
-                self.pause = (self.starttime - self.prev_evnt.starttime) / 1000
+                self.preceding_pause = round(self.starttime - self.prev_evnt.starttime, 4)
             except TypeError:
-                self.pause = None
+                self.preceding_pause = None
         else:
-            self.pause = None
+            self.preceding_pause = None
 
 
 class ProductionKeyboardEvent(KeyboardEvent):
@@ -81,8 +81,8 @@ class ProductionKeyboardEvent(KeyboardEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
     ) -> None:
@@ -108,7 +108,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
             return None
         # if more than 1 character has been produced at one go, the action is pasting
         if len(self.content) > 1:
-            return Pasting(self.content, self.startpos, self.endpos, cur_textlen)
+            return Pasting(self.content, self.startpos, self.endpos)
         # if position is smaller then text length
         if len(self.content) == 1 and self.startpos < cur_textlen:
             return Insertion(
@@ -118,7 +118,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
                 self.keyname,
                 self.starttime,
                 self.endtime,
-                self.pause,
+                self.preceding_pause,
                 cur_textlen,
             )
         return Append(
@@ -128,7 +128,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
             self.keyname,
             self.starttime,
             self.endtime,
-            self.pause,
+            self.preceding_pause,
             cur_textlen,
         )
 
@@ -140,8 +140,8 @@ class DeletionKeyboardEvent(KeyboardEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
         char_number_diff: int,
@@ -170,7 +170,7 @@ class DeletionKeyboardEvent(KeyboardEvent):
                 self.keyname,
                 self.starttime,
                 self.endtime,
-                self.pause,
+                self.preceding_pause,
                 cur_textlen,
             )
         return Deletion(
@@ -180,7 +180,7 @@ class DeletionKeyboardEvent(KeyboardEvent):
             self.keyname,
             self.starttime,
             self.endtime,
-            self.pause,
+            self.preceding_pause,
             cur_textlen,
         )
 
@@ -192,8 +192,8 @@ class BDeletionKeyboardEvent(DeletionKeyboardEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
     ) -> None:
@@ -217,8 +217,8 @@ class DDeletionKeyboardEvent(DeletionKeyboardEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
     ) -> None:
@@ -242,8 +242,8 @@ class NavigationKeyboardEvent(KeyboardEvent):
         startpos: int,
         endpos: int | None,
         keyname: str,
-        starttime: int,
-        endtime: int,
+        starttime: float,
+        endtime: float,
         textlen: int,
         settings: Settings,
     ) -> None:
@@ -259,11 +259,11 @@ class NavigationKeyboardEvent(KeyboardEvent):
             -1,
         )
 
-    def set_endpos(self) -> None:
-        if self.next_evnt is None:
-            msg = "Next event is not set. Therefore no endpos can be set."
-            raise RuntimeError(msg)
-        self.endpos = self.next_evnt.startpos
+    # def set_endpos(self) -> None:
+    #     if self.next_evnt is None:
+    #         msg = "Next event is not set. Therefore no endpos can be set."
+    #         raise RuntimeError(msg)
+    #     self.endpos = self.next_evnt.startpos
 
     def to_action(self) -> Action:
         return Navigation(
@@ -273,6 +273,6 @@ class NavigationKeyboardEvent(KeyboardEvent):
             self.keyname,
             self.starttime,
             self.endtime,
-            self.pause,
+            self.preceding_pause,
             self.textlen,
         )

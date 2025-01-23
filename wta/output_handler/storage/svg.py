@@ -2,9 +2,11 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 
-from ...pipeline.sentence_histories.text_unit import SPSF
-from ...pipeline.text_history.tpsf import TpsfECM
-from ...pipeline.transformation_histories.transformation import Transformation
+from wta.output_handler.plots.sentransformations_plot import SenProductionStagePlot
+
+from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
+from ...pipeline.transformation_layer.text_unit import SPSF
+from ...pipeline.transformation_layer.tpsf import TpsfECM
 from ...settings import Settings
 from .. import names
 from ..plots.senhis_plot import SenhisPlot
@@ -16,7 +18,7 @@ from ..plots.stats_plot import (
     TsTokensPlot,
 )
 from ..plots.texthis_plot import FilteredTexthisPlot, TexthisPlot
-from ..plots.transhis_plot import (
+from ..plots.texttransformations_plot import (
     ConstTranshisPlot,
     DepTranshisPlot,
     SynBarTranshisPlot,
@@ -239,3 +241,23 @@ class InsertionsSvg(Svg):
         self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
     ) -> None:
         InsertionsPlot(texthis, senhis, settings).run()
+
+
+class SenProductionStageSvg(Svg):
+    def __init__(
+        self,
+        senhis: dict[int, list[SPSF]],
+        settings: Settings,
+        filtered: bool = False
+    ) -> None:
+        self.preprocess_data(senhis, settings)
+        filtered_lbl = "_filtered" if filtered else ""
+        super().__init__(
+            settings.paths.senhis_visual_dir / f"{settings.filename}_{names.SENHIS}_{names.SENHIS_PROD_STAGES}{filtered_lbl}.svg"
+        )
+
+    def preprocess_data(
+        self, senhis: dict[int, list[SPSF]], settings: Settings
+    ) -> None:
+        SenProductionStagePlot(senhis, settings).run()
+
