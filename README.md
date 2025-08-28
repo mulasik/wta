@@ -19,13 +19,13 @@ The main steps of the processing pipeline are described below. The terms marked 
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence: *SEN* or an unfinished sentence: *SEC*) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
 #### Projecting *Sentence Layer* on *Transformation Layer*
 4. Based on the content of the *transforming sequence*, the new, modified, and deleted *text units* are detected. 
-5. In the further two processing steps (6 and 7 below), the *interspaces* are left out. For the projection of the sentence layer on the transformation layer, only the *SPSFs* (*SENs* or *SECs*) are relevant.
-6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of four classes: *in-sentence*, *cross-sentence*, *multi-sentence* and *uni-sentence*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN from scratch. The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs.
-7. Next, it is identified which *segments* of SPSFs were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, and *whole sentence*.
+5. In the next step, THEtool identifies which *text units* or their parts have been impacted by the transformation.
+6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
+7. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
 #### *Burst Layer* Initialization
 8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
 #### Projecting *Burst Layer* on *Transformation Layer*
-9. Each transforming sequence is segmented into bursts. The resulting information on bursts for each transforming sequence is stored in *text history*.
+9. Each transforming sequence is segmented into bursts. Each burst within the *transforming sequence* is stored in a *burst* data structure. We distinguish between *revision bursts* and *pause bursts*.
 #### *Text History*
 10. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
 11. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
@@ -227,6 +227,12 @@ appear in different positions in a TPSF: (a) between the beginning and the edge 
 * the resulting version does not contain any spelling errors.
 
 The definition can be adopted by changing the configuration parameters related to morphosyntacic relevance evaluation (see section Tool Configuration).
+
+**BURST**
+
+**REVISION BURST**
+
+**PAUSE BURST**
 
 ![Visualisation of the key terms](docs/charts/key_terms_visual.png)
 
