@@ -14,16 +14,22 @@ The main steps of the processing pipeline are described below. The terms marked 
 
 #### *Transformation Layer* Generation
 1. First, the keystroke logs stored in the XML file are parsed. During parsing, every time a change in the production mode is detected, the character sequence between the previous and the current production mode change is stored as a *transforming sequence* (TS). A  change  in  production  mode  is  defined  as switching between one of the modes (a) writing at the edge of the text, (b) deleting something, (c) inserting something.
+<br> *Package Preprocessing:* ```class EventFactory, class BaseEvent (subclasses: InsertEvent, KeyboardEvent, ReplacementEvent), class ActionFactory, class Action``` 
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for each keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
+<br> *Package Transformation Layer:* ```class TPSFFactory, class TSFactory, @dataclass TS```
 #### *Sentence Layer* Initialization
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence: *SEN* or an unfinished sentence: *SEC*) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
+<br> *Package Transformation Layer:* ```class TPSFFactory```
+<br> *Package Sentence Layer (sub-package Textunit)*: ```class TextunitFactory, @dataclass Textunit```
 #### Projecting *Sentence Layer* on *Transformation Layer* (*Transformation Layer* Extention)
-4. Based on the content of the *transforming sequence*, the new, modified, and deleted *text units* are detected. 
-5. In the next step, THEtool identifies which *text units* or their parts have been impacted by the transformation.
-6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
-7. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
+4. Based on the content of the *transforming sequence*, the *text units* impacted by the transformation are detected (new, modified, and deleted *text units*).
+<br> Package Sentence Layer (sub-package Textunit): ```class TextunitFactory, @dataclass Textunit```
+5. In the next step, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
+<br> *Package Transformation Layer:* ```class ScopeClassifier```
+6. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
+<br> *Package Transformation Layer:* ```class SegmentFactory, @dataclass Segment```
 #### *Burst Layer* Initialization
-8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
+7. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds (see section [Tool Configuration](#tool-configuration)).
 #### Projecting *Burst Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 9. Each transforming sequence is segmented into bursts. Each burst within the *transforming sequence* is stored in a *burst* data structure. We distinguish between *revision bursts* and *pause bursts*.
 #### Collecting complete *Transformation Layer* data in *Text History*
