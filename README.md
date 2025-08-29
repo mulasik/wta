@@ -26,7 +26,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
 #### Projecting *Burst Layer* on *Transformation Layer*
 9. Each transforming sequence is segmented into bursts. Each burst within the *transforming sequence* is stored in a *burst* data structure. We distinguish between *revision bursts* and *pause bursts*.
-#### *Text History*
+#### *Text History* containing all *Transformation Layer* data
 10. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
 11. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 12. All extracted *TPSFs* constitute *text history*.
