@@ -20,10 +20,10 @@ The main steps of the processing pipeline are described below. The terms marked 
 #### *Sentence Layer* Initialization
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence: *SEN* or an unfinished sentence: *SEC*) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
 <br>```transformation_layer: class TpsfFactory```
-<br>```sentence_layer.textunit: class TextunitFactory, @dataclass Textunit```
+<br>```sentence_layer.textunit: class TextunitFactory, @dataclass Textunit, @dataclass Spsf```
 #### Projecting *Sentence Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 4. Based on the content of the *transforming sequence*, the *text units* impacted by the transformation are detected (new, modified, and deleted *text units*).
-<br>```sentence_layer.textunit: class TextunitFactory, @dataclass Textunit```
+<br>```sentence_layer.textunit: class TextunitFactory, @dataclass Textunit, @dataclass Spsf```
 5. In the next step, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
 <br> ```transformation_layer: class ScopeClassifier```
 6. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
