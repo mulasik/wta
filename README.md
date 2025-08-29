@@ -23,7 +23,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 <br> *Package Sentence Layer (sub-package Textunit)*: ```class TextunitFactory, @dataclass Textunit```
 #### Projecting *Sentence Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 4. Based on the content of the *transforming sequence*, the *text units* impacted by the transformation are detected (new, modified, and deleted *text units*).
-<br> Package Sentence Layer (sub-package Textunit): ```class TextunitFactory, @dataclass Textunit```
+<br> *Package Sentence Layer (sub-package Textunit):* ```class TextunitFactory, @dataclass Textunit```
 5. In the next step, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
 <br> *Package Transformation Layer:* ```class ScopeClassifier```
 6. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
