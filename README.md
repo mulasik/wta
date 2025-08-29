@@ -17,14 +17,14 @@ The main steps of the processing pipeline are described below. The terms marked 
 2. Not only the character sequence but also the information about the production mode, the start and end position of the cursor and further details are stored in the *TS* data structure. It contains all information logged in the XML file for each keystroke. The data collected in a *TS* allows for tracking the whole text production process and extracting all text versions created between production mode changes.
 #### *Sentence Layer* Initialization
 3. As soon as the character sequence building each text version is extracted, it is subsequently split into *text units*. A *text unit* is either a sentence version (a so called *SPSF*; it may be a complete sentence: *SEN* or an unfinished sentence: *SEC*) or an *interspace* between sentences (*SIN*) or paragraphs (*PIN*).
-#### Projecting *Sentence Layer* on *Transformation Layer*
+#### Projecting *Sentence Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 4. Based on the content of the *transforming sequence*, the new, modified, and deleted *text units* are detected. 
 5. In the next step, THEtool identifies which *text units* or their parts have been impacted by the transformation.
 6. First, the *scope* of the transformation with regards to sentences is defined. Depending on the *scope* the transformation is assigned to one of six classes: *in-sentence*, *uni-sentence*, *multi-sentence*, *cross-sentence*, *no-sentence* and *unknown*. An *in-sentence* transformation impacts exactly one SPSF. A *uni-sentence* transformation results in producing a new SEN or SEC from scratch (subcategories *uni-SEN* and *uni-SEC*). The remaining two classes always impact more than one SPSF: *cross-sentence* transformation affects parts of exactly two SPSFs. A *multi-sentence* transformation impacts at least three SPSFs. A *no-sentence" transformation impacts only SINs or PINs.
 7. Next, it is identified which *segments* of textunits were impacted by the transformation. We distinguish between: *sentence beginning*, *sentence middle*, *sentence end*, *whole sentence*, *whole sentence candidate* and *SIN* or *PIN*.
 #### *Burst Layer* Initialization
 8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
-#### Projecting *Burst Layer* on *Transformation Layer*
+#### Projecting *Burst Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 9. Each transforming sequence is segmented into bursts. Each burst within the *transforming sequence* is stored in a *burst* data structure. We distinguish between *revision bursts* and *pause bursts*.
 #### Collecting all *Transformation Layer* data in *Text History*
 10. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
@@ -41,10 +41,10 @@ The main steps of the processing pipeline are described below. The terms marked 
 20. Each SPSF is also checked for its *sentencehood* degree according to five criteria: *mechanical completeness*, *conceptual completeness*, *syntacic completeness*, *mechanical correctness*, and *grammatical correctness*.
 21. All the collected information on the *SPSF* is stored as an *SPSF* data structure.
 22. All versions of a given sentence (its *SPSFs*) are stored in its *sentence history*. There are as many *sentence histories* as sentences in the text produced in the given writing session. THEtool also outputs *sentence histories* for the deleted sentences.
-#### Projecting *Transformation Layer* on *Sentence Layer*
+#### Projecting *Transformation Layer* on *Sentence Layer* (*Sentence Layer* Extention)
 23. The projection of *Transformation Layer* on *Sentence Layer* allows us to identify the *sentence production stage*. THEtool performs the projection for each *SPSF* in each *sentence history*. We distinguish between two productions stages of a sentence: *sentence initial draft* containing *pre-contextual operations* and *sentence revision draft* consisting of *contextual operations*.
 24. Each *sentence history* stores the information about the production stages of all SPSFs, as well as the sentence segment impacted by the transformation (collected already in a processing step 7).
-#### Projecting *Burst Layer* on *Sentence Layer*
+#### Projecting *Burst Layer* on *Sentence Layer* (*Sentence Layer* Extention)
 *under construction, planned for the release v1.3.0*
 #### *Burst Layer* Generation
 *planned for the release v1.4.0*
