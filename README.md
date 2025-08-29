@@ -26,11 +26,11 @@ The main steps of the processing pipeline are described below. The terms marked 
 8. The burst layer is created from information on pause duration preceding each transforming sequence and within that transforming sequence. The duration of a pause considered relevant for bursts depends on the purpose of the respective analysis, hence our implementation allows for setting different thresholds.
 #### Projecting *Burst Layer* on *Transformation Layer* (*Transformation Layer* Extention)
 9. Each transforming sequence is segmented into bursts. Each burst within the *transforming sequence* is stored in a *burst* data structure. We distinguish between *revision bursts* and *pause bursts*.
-#### Collecting all *Transformation Layer* data in *Text History*
+#### Collecting complete *Transformation Layer* data in *Text History*
 10. Each text version together with a list of *text units* and the results of projecting sentence layer on the transformation layer is stored as a *TPSF* data structure.
 11. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 12. All extracted *TPSFs* constitute *text history*.
-#### Collecting all *Sentence Layer* data in *Sentence Histories*
+#### Collecting initial *Sentence Layer* data in *Sentence Histories*
 13. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
 14. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
 15. Each *SPSF* identified as **new** gets a unique sentence ID and triggers a creation of a new *sentence history*. The new *sentence history* has the ID of the new sentence.
