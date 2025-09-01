@@ -40,7 +40,7 @@ The main steps of the processing pipeline are described below. The terms marked 
 10. Each *TPSF* is addinitally evaluated for its *morphosyntactic relevance* to enable filtering.
 11. All extracted *TPSFs* constitute *text history*.
 #### Collecting initial *Sentence Layer* data in *Sentence Histories*
-```sentence_layer.sentence_histories: class SentenceHistoryGenerator```<br>
+```sentence_layer.sentence_histories: class SentenceHistoryFactory, @dataclass SentenceHistory```<br>
 
 12. The *text history* with extracted *text units* of each text version builds the basis for *sentence histories*. This is a perspective switch from the history of producing the text as a whole ("horizontal view"), to the history of producing a single sentence for all sentences in the text ("vertical view").
 13. In order to create sentence histories, THEtool analyses all *SPSFs*: new, modified, deleted, as well as unchanged *SPSFs*.
