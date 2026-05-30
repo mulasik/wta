@@ -1,34 +1,32 @@
-from ..transformation_layer.text_unit import SPSF
-from .models import Parsers
-from .parsers import BaseParserAdapter, DiaParser, TokenProp
 
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+
+from .models import Parsers
+from .parsers import BaseParserAdapter, Spacy, TokenProp
+
+PARSER_LST = {
+    Parsers.SPACY: Spacy
+}
 
 class ParsingFacade:
-    def __init__(
-        self,
-        senhis: dict[int, list[SPSF]],
-        parser_name: str,
-        lang: str,
-        grammar: str,
-    ) -> None:
-        self.parser_lst = {
-            Parsers.DIAPARSER: DiaParser,
-        }
-        self.senhis = senhis
-        self.grammar = grammar
-        self.parser = self._create_parser(parser_name, lang)
-        self.senhis_parses: dict[int, list[list[TokenProp] | None]] | None = None
 
-    def _create_parser(self, parser_name: str, lang: str) -> BaseParserAdapter:
-        return self.parser_lst[parser_name](lang, self.grammar)
+    def _create_parser(self, parser_name: str, lang: str, grammar: str) -> BaseParserAdapter:
+        print(f"Creating parser {PARSER_LST[parser_name]}")
+        return PARSER_LST[parser_name](lang, grammar)
 
-    def run(self) -> None:
-        print(f"Running {self.grammar} parsing on {len(self.senhis)} sentences...")
-        senhis_sentexts = self._extract_sentexts()
-        self.senhis_parses = self.parser.predict(senhis_sentexts)
+    def run(
+            self,
+            senhis: list[SentenceHistory],
+            parser_name: str,
+            lang: str,
+            grammar: str) -> dict[int, list[list[TokenProp]]]:
+        parser = self._create_parser(parser_name, lang, grammar)
+        print(f"Running {grammar} parsing on {len(senhis)} sentences...")
+        senhis_sentexts = self._extract_sentexts(senhis)
+        return parser.predict(senhis_sentexts)
 
-    def _extract_sentexts(self) -> dict[int, list[str]]:
+    def _extract_sentexts(self, senhis: list[SentenceHistory]) -> dict[int, list[str]]:
         senhist_sentexts = {}
-        for sen_id, single_senhis in self.senhis.items():
-            senhist_sentexts[sen_id] = [sen.text for sen in single_senhis if sen.text]
+        for sh in senhis:
+            senhist_sentexts[sh.sen_id] = [sen.text for sen in sh.senversions if sen.text]
         return senhist_sentexts

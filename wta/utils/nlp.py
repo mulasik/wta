@@ -56,9 +56,17 @@ def retrieve_match_range(seq1: str, seq2: str) -> list[difflib.Match]:
     return seq_match.get_matching_blocks()
 
 
+def retrieve_single_mismatch_range(seq1: str, seq2: str) -> tuple[int, int]:
+    seq_match = difflib.SequenceMatcher(None, seq1, seq2)
+    comparison_res = seq_match.get_matching_blocks()
+    mismatch_startpos = comparison_res[0][-1]
+    mismatch_endpos = comparison_res[-1][0]
+    return mismatch_startpos, mismatch_endpos
+
+
 def retrieve_mismatch_ranges(
     seq1: str, seq2: str
-) -> list[tuple[str, int, int, int, int]]:
+) -> list[tuple[Literal["replace", "delete", "insert", "equal"], int, int, int, int]]:
     seq_match = difflib.SequenceMatcher(None, seq1, seq2)
     return seq_match.get_opcodes()
 
@@ -196,32 +204,32 @@ def check_edit_distance(tokens: TokensDict) -> int:
     return nltk.edit_distance(prev_tok, cur_tok)
 
 
-def retrieve_mismatch_range_for_sentence_pair(
-    prev_sen: str, cur_sen: str
-) -> tuple[str | None, list[range], str]:
-    seq_match = difflib.SequenceMatcher(None, prev_sen, cur_sen)
-    prev_cur_match = seq_match.get_opcodes()
-    mismatch_range = []
-    edit = None
-    relevant = ""
-    # there is always one mismatch range, as TPSF capturing happens upon each edit,
-    # two separate edits on the same TPSF are not possible
-    # TODO make it more generic
-    for m in prev_cur_match:
-        if m[0] == "delete":
-            edit = m[0]
-            mismatch_range.append(range(m[1], m[2] + 1))
-            relevant = "prev"
-        elif m[0] == "insert":
-            edit = m[0]
-            mismatch_range.append(range(m[3], m[4] + 1))
-            relevant = "cur"
-        elif m[0] == "replace":
-            edit = m[0]
-            mismatch_range.append(range(max(m[1], m[3]), max(m[2] + 1, m[4] + 1)))
-            relevant = (
-                "prev"
-                if m[1] in mismatch_range[0] and m[2] in mismatch_range[-1]
-                else "cur"
-            )
-    return edit, mismatch_range, relevant
+# def retrieve_mismatch_range_for_sentence_pair(
+#     prev_sen: str, cur_sen: str
+# ) -> tuple[str | None, list[range], str]:
+#     seq_match = difflib.SequenceMatcher(None, prev_sen, cur_sen)
+#     prev_cur_match = seq_match.get_opcodes()
+#     mismatch_range = []
+#     edit = None
+#     relevant = ""
+#     # there is always one mismatch range, as TPSF capturing happens upon each edit,
+#     # two separate edits on the same TPSF are not possible
+#     # TODO make it more generic
+#     for m in prev_cur_match:
+#         if m[0] == "delete":
+#             edit = m[0]
+#             mismatch_range.append(range(m[1], m[2] + 1))
+#             relevant = "prev"
+#         elif m[0] == "insert":
+#             edit = m[0]
+#             mismatch_range.append(range(m[3], m[4] + 1))
+#             relevant = "cur"
+#         elif m[0] == "replace":
+#             edit = m[0]
+#             mismatch_range.append(range(max(m[1], m[3]), max(m[2] + 1, m[4] + 1)))
+#             relevant = (
+#                 "prev"
+#                 if m[1] in mismatch_range[0] and m[2] in mismatch_range[-1]
+#                 else "cur"
+#             )
+#     return edit, mismatch_range, relevant

@@ -1,14 +1,14 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from ...pipeline.names import SenLabels
-from ...pipeline.transformation_layer.tpsf import TpsfECM
+from ...pipeline.names import TUState
+from ...pipeline.transformation_layer.tpsf import Tpsf
 from ..plots.colors import Colors
 from .base import BasePlot
 
 
 class TexthisPlot(BasePlot):
-    def __init__(self, texthis: list[TpsfECM]) -> None:
+    def __init__(self, texthis: list[Tpsf]) -> None:
         self.texthis = texthis
         self.sen_lengths = self.preprocess_data()
         self.filtered = ""
@@ -17,17 +17,17 @@ class TexthisPlot(BasePlot):
         sentences_lengths = {}
         for tpsf in self.texthis:
             sentences_lens = []
-            for tu in tpsf.textunits:
-                if tu.state == SenLabels.MOD:
+            for tu in tpsf.tus:
+                if tu.state == TUState.MOD:
                     label = f"modified through {tpsf.ts.label}"
-                elif tu.state == SenLabels.NEW and tpsf.ts.label == "pasting":
+                elif tu.state == TUState.NEW and tpsf.ts.label == "pasting":
                     label = f"created through {tpsf.ts.label}"
-                elif tu.state in [SenLabels.UNC_POST, SenLabels.UNC_PRE]:
+                elif tu.state in [TUState.UNC_POST, TUState.UNC_PRE]:
                     label = "unchanged"
                 else:
                     label = tu.state
                 sentences_lens.append((label, len(tu.text)))
-            sentences_lengths.update({tpsf.revision_id: sentences_lens})
+            sentences_lengths.update({tpsf.id: sentences_lens})
         return sentences_lengths
 
     def create_figure(self) -> tuple[Axes, Axes]:
@@ -89,7 +89,7 @@ class TexthisPlot(BasePlot):
                 tpsf.ts.text
             )  # tpsf.ts.rplcmt_textlen if tpsf.ts.label == 'replacement'
             ax2.barh(
-                str(tpsf.revision_id),
+                str(tpsf.id),
                 ts_text_len,
                 left=0,
                 height=1,
@@ -124,7 +124,7 @@ class TexthisPlot(BasePlot):
 
 
 class FilteredTexthisPlot(TexthisPlot):
-    def __init__(self, texthis: list[TpsfECM]) -> None:
+    def __init__(self, texthis: list[Tpsf]) -> None:
         super().__init__(texthis)
         self.filtered = "_filtered"
 
@@ -217,7 +217,7 @@ class FilteredTexthisPlot(TexthisPlot):
                     )
                 ts_len = 2
                 ax2.barh(
-                    str(tpsf.revision_id),
+                    str(tpsf.id),
                     ts_len,
                     left=starts,
                     height=1,

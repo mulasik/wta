@@ -1,6 +1,8 @@
 from matplotlib import colors as pltc
 
-from ...pipeline.transformation_layer.text_unit import SPSF
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+
+from ...pipeline.sentence_layer.sentence_histories.spsf import Spsf
 
 
 class Colors:
@@ -9,6 +11,7 @@ class Colors:
         "unchanged_post": "mistyrose",
         "unchanged": "mistyrose",
         "split": "rosybrown",
+        "merged": "mediumvioletred",
         "new": "darkslategrey",
         "deleted": "seashell",
         "modified through deletion": "lightcoral",
@@ -77,7 +80,7 @@ class Colors:
     BOOL_COLORS = {True: "indianred", False: "teal"}
 
     @classmethod
-    def assign_colors_to_sens(cls, senhis: dict[int, list[SPSF]]) -> dict[int, str]:
+    def assign_colors_to_sens(cls, senhiss: list[SentenceHistory]) -> dict[int, str]:
         """
         Assigns colors to sentences in sentence history.
         Each sentence has a unique color.
@@ -85,8 +88,8 @@ class Colors:
             The mapping of colors to sentences.
         """
         sen_colors = {}
-        for i, sen_id in enumerate(list(senhis.keys())):
-            sen_colors.update({sen_id: cls.AVAILABLE_COLORS[i]})
+        for i, senhis in enumerate(senhiss):
+            sen_colors.update({senhis.sen_id: cls.AVAILABLE_COLORS[i]})
         return sen_colors
 
     @classmethod

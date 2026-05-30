@@ -12,7 +12,7 @@ class ReplacementEvent(BaseEvent):
         - first comes the key used for replacing (e.g. delete, backspace or character key)
         - then comes the replacement event.
 
-    Example with delete:
+    Example of replacement with an empty sequence:
 
     <event id="43" type="keyboard">
         <part type="wordlog">
@@ -62,6 +62,10 @@ class ReplacementEvent(BaseEvent):
             <newtext>i</newtext>
         </part>
     </event>
+
+    > The sequence slice [25:40] is marked and removed with the use of BACKSPACE at position 25.
+    > The position of the last character in the marked sequence is 39.
+
     """
 
     def __init__(
@@ -81,6 +85,9 @@ class ReplacementEvent(BaseEvent):
             self.content,
             self.startpos,
             self.endpos,
+            None,
+            None,
+            None,
             self.rplcmt_endpos,
             self.rplcmt_textlen,
         )

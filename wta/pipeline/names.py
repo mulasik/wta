@@ -1,12 +1,21 @@
+from typing import ClassVar
+
+# PREPROCESSING:
+
 class KeyNames:
+    RETURN = "VK_RETURN"
+    TAB = "VK_TAB"
+    QUOTE = "VK_OEM_7"
+    CAPITAL = "VK_CAPITAL"
     BACKSPACE = "VK_BACK"
     DELETE = "VK_DELETE"
-    DELETION_KEYS = [BACKSPACE, DELETE]
+    DELETION_KEYS: ClassVar[list[str]] = [BACKSPACE, DELETE]
     END = "VK_END"
-    ARROW_KEYS = ["VK_LEFT", "VK_RIGHT", "VK_UP", "VK_DOWN"]
-    SHIFT_KEYS = ["VK_SHIFT", "VK_LSHIFT", "VK_RSHIFT"]
-    NAVIGATION_KEYS = [END, *ARROW_KEYS]
-    NON_PRODUCTION_KEYS = [*NAVIGATION_KEYS, *DELETION_KEYS, *SHIFT_KEYS]
+    ARROW_KEYS: ClassVar[list[str]] = ["VK_LEFT", "VK_RIGHT", "VK_UP", "VK_DOWN"]
+    SHIFT_KEYS: ClassVar[list[str]] = ["VK_SHIFT", "VK_LSHIFT", "VK_RSHIFT"]
+    NAVIGATION_KEYS: ClassVar[list[str]] = [END, *ARROW_KEYS]
+    NON_PRODUCTION_KEYS: ClassVar[list[str]] = [*NAVIGATION_KEYS, *DELETION_KEYS, *SHIFT_KEYS]
+    ERRONEOUS = "VK_ERR"
 
 
 class EventTypes:
@@ -17,18 +26,16 @@ class EventTypes:
     RE = "ReplacementEvent"
     IE = "InsertEvent"
 
+class ActionTypes:
+    APP = "Append"
+    INS = "Insertion"
+    NAV = "Navigation"
+    DEL = "Deletion"
+    MID = "Midletion"
+    REPL = "Replacement"
+    PAST = "Pasting"
 
-class EventCategories:
-    PRE_DEL = "before deletion"
-    POST_DEL = "after deletion"
-    PRE_INS = "before insertion"
-    POST_INS = "after insertion"
-    PRE_REPL = "before replacement"
-    POST_REPL = "after replacement"
-    END = "navigating to end"
-    NAV = "navigating without editing"
-    FINAL = "final text revision"
-
+# TRANSFORMATION LAYER & PROJECTION
 
 class TSLabels:
     APP = "append"
@@ -40,37 +47,45 @@ class TSLabels:
     PAST = "pasting"
 
 
-class SenLabels:
+class TUTypes:
+    SIN = "sentence interspace"
+    SEC = "sentence candidate"
+    SEN = "sentence"
+    PIN = "paragraph interspace"
+
+# SENTENCE LAYER & PROJECTION
+
+class TUState:
     MOD = "modified"
     DEL = "deleted"
     NEW = "new"
     UNC_PRE = "unchanged_pre"
     UNC_POST = "unchanged_post"
     SPLIT = "split"
+    MER = "merged"
+    IMP: ClassVar[list[str]] = [NEW, MOD, DEL]
 
 
-class TextTransScope:
-    IN_SEN = "in-sentence transformation"
-    SEN = "full sentence transformation"
-    CROSS_SEN = "cross-sentence transformation"
-    MULTI_SEN = "multi-sentence transformation"
+class SScope:
+    IN_SEN = "in-sentence"
+    SEN = "uni-SEN"
+    SEC = "uni-SEC"
+    CROSS_SEN = "cross-sentence"
+    MULTI_SEN = "multi-sentence"
     NO_SEN = "no-sentence"
-    UNK = "unknown_text_trans_scope"
+    UNK = "unknown sentence scope"
 
 
-class SenSegmentTypes:
-    SEN_BEG = "sentence_beginning"
-    SEN_MID = "sentence_middle"
-    SEN_END = "sentence_end"
-    SEN = "full_sentence"
-    UNK = "unknown_segment_type"
-    PIN = "paragraph_interspace"
-    SIN = "sentence_interspace"
-
-
-class PointOfInscription:
-    END = "text_end"
-    MID = "text_middle"
+class SegmentTypes:
+    SEN_BEG = "sentence beginning"
+    SEN_MID = "sentence middle"
+    SEN_END = "sentence end"
+    SEN = "whole sentence"
+    SEC = "whole sentence candidate"
+    UNK = "unknown segment type"
+    NF = "not found"
+    PIN = "pin"
+    SIN = "sin"
 
 
 class ProductionStages:
@@ -78,11 +93,38 @@ class ProductionStages:
     CON = "contextual"
 
 
-class SenTransformationTypes:
+class OperationTypes:
     PROD = "production"
     PRECON_DEL = "pre-contextual_deletion"
     PRECON_INS = "pre-contextual_insertion"
-    PRECON_REV = "pre-contextual_revision"
+    PRECON_REPL = "pre-contextual_replacement"
     CON_DEL = "contextual_deletion"
     CON_INS = "contextual_insertion"
-    CON_REV = "contextual_revision"
+    CON_REPL = "contextual_replacement"
+    NON = "no-operation"
+
+# BURST LAYER & PROJECTION
+
+class BScope:
+    # burst is a pause burst
+    IN_PBURST = "in-pburst"
+    UNI_PBURST = "uni-pburst"
+    CROSS_PBURST = "cross-pburst"
+    MULTI_PBURST = "multi-pburst"
+    NO_PBURST = "no pburst"
+    UNK = "unknown burst scope"
+
+
+class BurstTypes:
+    PP_BURST = "PP-burst"
+    PR_BURST = "PR-burst"
+    RP_BURST = "RP-burst"
+    RR_BURST = "RR-burst"
+    UNK = "unknown burst type"
+
+# OTHER
+
+class PointOfInscription:
+    END = "text_end"
+    MID = "text_middle"
+

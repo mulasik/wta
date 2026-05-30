@@ -4,8 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from wta.output_handler.plots.base import BasePlot
-from wta.pipeline.names import SenTransformationTypes
-from wta.pipeline.transformation_layer.text_unit import SPSF
+from wta.pipeline.names import OperationTypes
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+from wta.pipeline.sentence_layer.sentence_histories.spsf import Spsf
 from wta.settings import Settings
 
 from .colors import Colors
@@ -14,9 +15,9 @@ _T = TypeVar("_T")
 
 class SenTransformationsPlot(BasePlot, Generic[_T]):
     def __init__(
-        self, senhis: dict[int, list[SPSF]], settings: Settings
+        self, senhiss: list[SentenceHistory], settings: Settings
     ) -> None:
-        self.senhis = senhis
+        self.senhiss = senhiss
         self.settings = settings
         self.data = self.preprocess_data()
 
@@ -45,23 +46,22 @@ class SenProductionStagePlot(SenTransformationsPlot[tuple[list[str], dict[str, l
             "initial_draft": [],
             "revision_draft": []
         }
-        for senvers in self.senhis.values():
+        for i, senhis in enumerate(self.senhiss):
             sen_ids.append(str(i))
             initial_draft_versions = [
-                sv for sv in senvers if sv.operation in [
-                    SenTransformationTypes.PROD, SenTransformationTypes.PRECON_DEL, SenTransformationTypes.PRECON_INS, SenTransformationTypes.PRECON_REV
+                sv for sv in senhis.senversions if sv.operation in [
+                    OperationTypes.PROD, OperationTypes.PRECON_DEL, OperationTypes.PRECON_INS, OperationTypes.PRECON_REPL
                     ]
                 ]
             revision_draft_versions = [
-                sv for sv in senvers if sv.operation in [
-                    SenTransformationTypes.CON_DEL, SenTransformationTypes.CON_INS, SenTransformationTypes.CON_REV
+                sv for sv in senhis.senversions if sv.operation in [
+                    OperationTypes.CON_DEL, OperationTypes.CON_INS, OperationTypes.CON_REPL
                     ]
                 ]
             no_in_ver = len(initial_draft_versions)
             no_rev_ver = len(revision_draft_versions)
             number_senversions["initial_draft"].append(no_in_ver)
             number_senversions["revision_draft"].append(no_rev_ver)
-            i += 1
         return sen_ids, number_senversions
 
     def create_figure(self) -> None:

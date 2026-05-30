@@ -1,8 +1,10 @@
 from pathlib import Path
 
-from ..transformation_layer.action import Action
-from ..transformation_layer.text_unit import SPSF
-from ..transformation_layer.tpsf import TpsfECM, TpsfPCM
+from wta.pipeline.preprocessing.action import Action
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+from wta.pipeline.sentence_layer.sentence_histories.spsf import Spsf
+from wta.pipeline.transformation_layer.tpsf import Tpsf, TpsfPCM
+
 from .statistics import (
     BasicStatistics,
     EventStatistics,
@@ -16,11 +18,11 @@ class StatsFactory:
     @staticmethod
     def run(
         idfx: Path,
-        texthis: list[TpsfECM],
-        texthis_filtered: list[TpsfECM],
+        texthis: list[Tpsf],
+        texthis_filtered: list[Tpsf],
         texthis_pcm: list[TpsfPCM],
         actions: list[Action],
-        senhis: dict[int, list[SPSF]],
+        senhis: list[SentenceHistory],
     ) -> tuple[
         BasicStatistics,
         EventStatistics,

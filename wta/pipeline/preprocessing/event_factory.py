@@ -2,7 +2,8 @@ import csv
 from collections.abc import Iterable
 from pathlib import Path
 
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
+from bs4.element import Tag
 from tqdm import tqdm
 
 from wta.settings import Settings
@@ -41,8 +42,10 @@ class EventFactory:
         Returns:
             list of Event objects
         """
-        if settings.config["ksl_source_format"] in ["scriptlog_idfx", "inputlog_idfx"]:
+        if settings.config["ksl_source_format"] == "scriptlog_idfx":
             events = self.extract_events_from_scriptlog_idfx(ksl_file, settings)
+        elif settings.config["ksl_source_format"] == "inputlog_idfx":
+            events = self.extract_events_from_inputlog_idfx(ksl_file, settings)
         elif settings.config["ksl_source_format"] == "protext_csv":
             events = self.extract_events_from_protext_csv(ksl_file, settings)
         for i, event in enumerate(events):
@@ -60,12 +63,45 @@ class EventFactory:
         with idfx.open() as fp:
             soup = BeautifulSoup(fp, features="lxml")
             idfx_events: Iterable[Tag] = soup.find_all("event")
-        idfx_events = tqdm(idfx_events, "Processing keylogs")
+        idfx_events_progress = tqdm(idfx_events, desc="Processing keylogs")
         return [
             event_obj
             for event_obj in (
-                self.create_event_from_scriptlog_idfx(event, settings)
-                for event in idfx_events
+                self.create_event_from_idfx(cur_event, settings)
+                for cur_event in idfx_events_progress
+            )
+            if event_obj is not None
+        ]
+
+    def extract_events_from_inputlog_idfx(
+        self, idfx: Path, settings: Settings
+    ) -> list[BaseEvent]:
+        idfx_events = []
+        with idfx.open() as fp:
+            soup = BeautifulSoup(fp, features="lxml")
+            idfx_events_original: list[Tag] = soup.find_all("event")
+        for cur_event in idfx_events_original:
+            if cur_event["type"] == "keyboard":
+                parts = cur_event.find_all("part")
+                try:
+                    wordlog = parts[0]
+                    winlog = parts[1]
+                    startpos = int(wordlog.position.get_text())
+                    keyname = winlog.key.get_text()
+                    if startpos == 0 and keyname in KeyNames.SHIFT_KEYS:
+                        # skip shift key events at position 0 as they do not change the text
+                        continue
+                    # print(f"Processing event: {cur_event}")
+                except IndexError:
+                    print("FAILURE: Keyboard event information not available in the IDFX file.")
+            idfx_events.append(cur_event)
+            # print(f"Total events: {len(idfx_events)}")
+        idfx_events_progress = tqdm(idfx_events, desc="Processing keylogs")
+        return [
+            event_obj
+            for event_obj in (
+                self.create_event_from_idfx(cur_event, settings, position_diff=1)
+                for cur_event in idfx_events_progress
             )
             if event_obj is not None
         ]
@@ -134,9 +170,8 @@ class EventFactory:
                     events.append(event)
         return events
 
-    @staticmethod
-    def create_event_from_scriptlog_idfx(
-        event: Tag, settings: Settings
+    def create_event_from_idfx(
+        self, cur_event: Tag, settings: Settings, position_diff: int = 0
     ) -> BaseEvent | None:
         """
         Collects event attributes and creates an object of type Event.
@@ -206,18 +241,33 @@ class EventFactory:
                 </event>
         """
         # CHARACTER PRODUCTION: characters are typed or deleted one by one OR writer navigates without editing
-        if event["type"] == "keyboard":
-            parts = event.find_all("part")
+        if cur_event["type"] == "keyboard":
+            parts = cur_event.find_all("part")
+            # print(f"Processing keyboard event: {cur_event}")
             try:
                 wordlog = parts[0]
                 winlog = parts[1]
                 content = winlog.value.get_text()
                 startpos = int(wordlog.position.get_text())
+                startpos = 0 if startpos == 0 else startpos - position_diff
                 keyname = winlog.key.get_text()
+                # print(f"Processing keyboard event at position {startpos} with key {keyname} and content '{content}'")
+                if settings.config["ksl_source_format"] == "inputlog_idfx":
+                    if keyname == KeyNames.RETURN and content == "":
+                        content = "\n"
+                    if keyname == KeyNames.TAB and content == "":
+                        content = "\t"
+                    if keyname == KeyNames.QUOTE and content == "":
+                        content = '"'
+                # special handling for scriptlog backspace representation:
+                # <key>VK_BACK</key>
+                # <value>^</value>
+                if settings.config["ksl_source_format"] == "scriptlog_idfx" and keyname == KeyNames.BACKSPACE and content == "^":
+                    keyname = KeyNames.ERRONEOUS
                 starttime = float(winlog.starttime.get_text())/1000
                 endtime = float(winlog.endtime.get_text())/1000
                 textlen = int(wordlog.documentlength.get_text())
-                if keyname in KeyNames.SHIFT_KEYS:
+                if settings.config["ksl_source_format"] == "inputlog_idfx" and keyname in [*KeyNames.SHIFT_KEYS, KeyNames.CAPITAL]:
                     return None
                 if keyname in KeyNames.NAVIGATION_KEYS:
                     endpos = None
@@ -233,9 +283,10 @@ class EventFactory:
                     )
                 if keyname in KeyNames.DELETION_KEYS:
                     if keyname == KeyNames.BACKSPACE:
-                        startpos = (
-                            startpos - 1 if startpos > 0 else 0
-                        )  # if backspace is pressed at the beginning of the document
+                        if settings.config["ksl_source_format"] == "inputlog_idfx":
+                            startpos = startpos + 1 if startpos != 0 else 0
+                        elif settings.config["ksl_source_format"] == "scriptlog_idfx":
+                            startpos = startpos - 1 if startpos != 0 else 0
                         endpos = startpos
                         return BDeletionKeyboardEvent(
                             content,
@@ -278,12 +329,13 @@ class EventFactory:
                 )
             prev_starttime = starttime
         # SEQUENCE REPLACEMENT: a sequence is marked and replaced with a char or empty string
-        elif event["type"] == "replacement":
+        elif cur_event["type"] == "replacement":
+
             if (
-                event.part is None
-                or event.part.newtext is None
-                or event.part.start is None
-                or event.part.end is None
+                cur_event.part is None
+                or cur_event.part.newtext is None
+                or cur_event.part.start is None
+                or cur_event.part.end is None
             ):
                 print(
                     "FAILURE: Replacement event information not available in the IDFX file."
@@ -291,10 +343,10 @@ class EventFactory:
             else:
                 try:
                     content = (
-                        event.part.newtext.get_text()
+                        cur_event.part.newtext.get_text()
                     )  # character to replace marked sequence
-                    orig_startpos = int(event.part.start.get_text())
-                    orig_endpos = int(event.part.end.get_text())
+                    orig_startpos = int(cur_event.part.start.get_text())
+                    orig_endpos = int(cur_event.part.end.get_text())
                     endpos = orig_startpos + len(content)
                     rplcmt_textlen = orig_endpos - orig_startpos
                     rplcmt_endpos = orig_endpos - 1
@@ -307,36 +359,34 @@ class EventFactory:
                     )
                 prev_starttime = None
         # SEQUENCE INSERTION: a text sequence is inserted
-        elif event["type"] == "insert":
+        elif cur_event["type"] == "insert":
             if (
-                event.part is None
-                or event.part.before is None
-                or event.part.position is None
+                cur_event.part is None
+                or cur_event.part.before is None
+                or cur_event.part.position is None
             ):
                 print(
                     "FAILURE: Insert event information not available in the IDFX file."
                 )
             else:
                 try:
-                    content = event.part.before.get_text()  # inserted text
-                    startpos = int(event.part.position.get_text()) - len(content)
-                    endpos = int(event.part.position.get_text()) - 1
+                    content = cur_event.part.before.get_text()  # inserted text
+                    startpos = int(cur_event.part.position.get_text())-position_diff - len(content)
+                    endpos = int(cur_event.part.position.get_text())-position_diff - 1
                     return InsertEvent(content, startpos, endpos)
                 except:
                     print(
                         "FAILURE: Insert event information not available in the IDFX file."
                     )
-                prev_starttime = None
-        elif event["type"] in ["mouse", "focus", "selection", "statistics"]:
-            prev_starttime = None
+                prev_starttime = None  # noqa: F841
+        elif cur_event["type"] in ["mouse", "focus", "selection", "statistics"]:
+            pass
         else:
-            print(f'ATTENTION: Encountered a new event type: {event["type"]}')
-            prev_starttime = None
+            print(f'ATTENTION: Encountered a new event type: {cur_event["type"]}')
         return None
 
-    @staticmethod
     def create_event_from_protext_ks_log(
-        event: dict[str, int | str], settings: Settings
+        self, event: dict[str, int | str], settings: Settings
     ) -> BaseEvent | None:
         # TODO extend the mappings!
         symbol_content_mapping = {
@@ -357,9 +407,7 @@ class EventFactory:
         event_type = str(event["type_op"])
         event_content = str(event["event"])
         content = str(
-            event_content
-            if event_content not in symbol_content_mapping
-            else symbol_content_mapping[event_content]
+            symbol_content_mapping.get(event_content, event_content)
         )
         startpos = int(event["pos"])
         keyname = str(

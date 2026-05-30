@@ -1,22 +1,25 @@
+from collections.abc import Iterable
 from pathlib import Path
 
-from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
-from wta.pipeline.transformation_layer.text_transformation import TextTransformation
+from bs4 import Tag
 
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
+
+# from wta.pipeline.SL2TL_projection.tssegmenter import TSSegmenter
+from ...pipeline.preprocessing.action import Action
+from ...pipeline.preprocessing.events.base import BaseEvent
 from ...pipeline.sentence_layer.sentence_parsing.parsers import TokenProp
-from ...pipeline.statistics.statistics import (
+from ...pipeline.transformation_layer.tpsf import Tpsf, TpsfPCM
+from ...pipeline.transformation_layer.ts import TSBuilder
+from ...settings import Settings
+from ...statistics.statistics import (
     BasicStatistics,
     EventStatistics,
     PauseStatistics,
     SentenceStatistics,
     TSStatistics,
 )
-from ...pipeline.transformation_layer.action import Action
-from ...pipeline.transformation_layer.events.base import BaseEvent
-from ...pipeline.transformation_layer.text_unit import SPSF
-from ...pipeline.transformation_layer.tpsf import TpsfECM, TpsfPCM
-from ...pipeline.transformation_layer.ts import TransformingSequence
-from ...settings import Settings
 from ...utils.other import ensure_path
 from .. import names
 from .base import BaseStorage
@@ -31,6 +34,45 @@ class Txt(BaseStorage):
         self.filepath.write_text(self.output_str)
 
 
+class IdfxTxt(Txt):
+    def __init__(self, data: Iterable[Tag], settings: Settings) -> None:
+        txt_file = f"{settings.filename}_{names.IDFX_EVENTS}.txt"
+        super().__init__(
+            settings.paths.idfx_events_dir / txt_file, self.preprocess_data(data)
+        )
+
+    def preprocess_data(self, events: Iterable[Tag]) -> str:
+        output_str = ""
+        for i, event in enumerate(events):
+            event_type = event["type"]
+            parts = event.find_all("part")
+            if event_type == "replacement":
+                wordlog = parts[0]
+                startpos = int(wordlog.start.get_text())
+                endpos = int(wordlog.end.get_text())
+                text = wordlog.newtext.get_text()
+                output_str += f"{event['type']}: *{text}* startpos: {startpos} - endpos: {endpos}\n\n"
+            elif event_type == "selection":
+                wordlog = parts[0]
+                startpos = int(wordlog.start.get_text())
+                endpos = int(wordlog.end.get_text())
+                output_str += f"{event['type']}: startpos: {startpos} - endpos: {endpos}\n\n"
+            elif event_type == "keyboard":
+                wordlog = parts[0]
+                winlog = parts[1]
+                keyname = winlog.key.get_text()
+                content = winlog.value.get_text()
+                startpos = int(wordlog.position.get_text())
+                starttime = float(winlog.starttime.get_text())/1000
+                endtime = float(winlog.endtime.get_text())/1000
+                # textlen = int(wordlog.documentlength.get_text())
+                output_str += f"{i}: {event['type']} ({keyname}): *{content}* startpos: {startpos} ({starttime}-{endtime})\n\n"
+                # print(starttime)
+            else:
+                output_str += f"{i}: Unknown event type: {event_type}\n\n"
+        return output_str
+
+
 class EventsTxt(Txt):
     def __init__(self, data: list[BaseEvent], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.EVENTS}.txt"
@@ -41,7 +83,9 @@ class EventsTxt(Txt):
     def preprocess_data(self, events: list[BaseEvent]) -> str:
         output_str = ""
         for event in events:
-            if type(event).__name__ == "ProductionKeyboardEvent":
+            if type(event).__name__ in ["ProductionKeyboardEvent", "DDeletionKeyboardEvent", "BDeletionKeyboardEvent"]:
+                # if event.__dict__["preceding_pause"] is not None and event.__dict__["preceding_pause"] > 2.0:
+                #     print(i, event.__dict__["preceding_pause"])
                 output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]} {event.__dict__["starttime"]}-{event.__dict__["endtime"]} (pause before: {event.__dict__["preceding_pause"]})\n\n'
             else:
                 output_str += f'{type(event).__name__}: *{event.__dict__["content"]}* {event.__dict__["startpos"]} {event.__dict__["endpos"]} {"Unknown"}-{"Unknown"} (pause before: {"Unknown"})\n\n'
@@ -58,14 +102,17 @@ class ActionsTxt(Txt):
     def preprocess_data(self, actions: list[Action]) -> str:
         output_str = ""
         for a in actions:
-            if type(a).__name__ not in ["Replacement", "Pasting"]:
-                output_str += (
-                f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| {a.starttime}-{a.endtime} (pause before: {a.preceding_pause}))\n\n"
+            starttime = None if not hasattr(a, "starttime") else a.starttime
+            endtime = None if not hasattr(a, "endtime") else a.endtime
+            preceding_pause = None if not hasattr(a, "preceding_pause") else a.preceding_pause
+            # if type(a).__name__ not in ["Replacement", "Pasting"]:
+            output_str += (
+                f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| {starttime}-{endtime} (pause before: {preceding_pause}))\n\n"
             )
-            else:
-                output_str += (
-                    f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| Unknown-Unknown (pause before: Unknown))\n\n"
-                )
+            # else:
+            #     output_str += (
+            #         f"{type(a).__name__} ({a.startpos}:{a.endpos}) |{a.content}| Unknown-Unknown (pause before: Unknown))\n\n"
+            #     )
         return output_str
 
 
@@ -79,38 +126,44 @@ class ActionGroupsTxt(Txt):
     def preprocess_data(self, action_groups: dict[str, list[Action]]) -> str:
         output_str = ""
         for at, aa in action_groups.items():
-            output_str += f'{at} * len {len(aa)} * ({aa[0].startpos}:{aa[-1].endpos}) \n*{"".join([a.__dict__["content"] for a in aa])}*\n\n'
+            startpos = aa[0].startpos
+            endpos = aa[-1].endpos
+            starttime = getattr(aa[0], "starttime", None)
+            endtime = getattr(aa[-1], "starttime", None)
+            preceding_pause = getattr(aa[0], "preceding_pause", None)
+            output_str += f'{at} * len {len(aa)} * ({startpos}:{endpos}) ({starttime}-{endtime}) (Pred pause: {preceding_pause})) \n*{"".join([a.__dict__["content"] for a in aa])}*\n\n'
         return output_str
 
 
 class TssTxt(Txt):
-    def __init__(self, data: list[TransformingSequence], settings: Settings) -> None:
+    def __init__(self, data: list[TSBuilder], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.TSS}.txt"
         super().__init__(settings.paths.tss_dir / txt_file, self.preprocess_data(data))
 
-    def preprocess_data(self, tss: list[TransformingSequence]) -> str:
+    def preprocess_data(self, tss: list[TSBuilder]) -> str:
         output_str = ""
         for ts in tss:
-            output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}, dur: {ts.duration}, writing speed per min: {ts.writing_speed_per_min}, avg pause duration: {ts.avg_pause_duration}, preceding pause: {ts.preceding_pause}): "{ts.text}"\n\n'
+            preceding_pause = None if len(ts.pauses) == 0 else ts.pauses[0]
+            output_str += f'{ts.label} (pos: {ts.startpos}-{ts.endpos}) (time: {ts.starttime}-{ts.endtime}) preceding pause: {preceding_pause} following pause: {ts.following_pause}: "{ts.text}"\n\n'
         return output_str
 
 
 class TpsfsTxt(Txt):
-    def __init__(self, data: list[TpsfECM], settings: Settings) -> None:
+    def __init__(self, data: list[Tpsf], settings: Settings) -> None:
         txt_file = f"{settings.filename}_{names.TPSFS}.txt"
         super().__init__(
             settings.paths.tpsfs_dir / txt_file, self.preprocess_data(data)
         )
 
-    def preprocess_data(self, tpsfs: list[TpsfECM]) -> str:
+    def preprocess_data(self, tpsfs: list[Tpsf]) -> str:
         output_str = ""
         for tpsf in tpsfs:
             tpsf_tus = (
                 []
-                if not tpsf.textunits
+                if not tpsf.tus
                 else [
-                    f"({tu.state}) {tu.text_unit_type.name}:   |{tu.text}|\n"
-                    for tu in tpsf.textunits
+                    f"({tu.state}) {tu.type}:   |{tu.text}|\n"
+                    for tu in tpsf.tus
                 ]
             )
             tus_str = ""
@@ -120,7 +173,7 @@ class TpsfsTxt(Txt):
             # ts_str_no_change = 'Point of inscription unchanged.\n\n'
             # f'{ts_str if tpsf.ts_diff != 0 else ts_str_no_change}' \
             output_str += (
-                f"======================{tpsf.revision_id}====================\n\n"
+                f"======================{tpsf.id}====================\n\n"
                 f"----------------TRANSFORMING SEQUENCE----------------\n\n"
                 f"{tpsf.ts.label.upper()} ({tpsf.ts.startpos}-{tpsf.ts.endpos}):\n|{tpsf.ts.text}|\n"
                 f"------------------------TEXT-------------------------\n\n"
@@ -152,7 +205,7 @@ class TpsfsPCMTxt(Txt):
 class TexthisTxt(Txt):
     def __init__(
         self,
-        data: list[TpsfECM],
+        data: list[Tpsf],
         settings: Settings,
         mode: str = "ecm",
         filtered: bool = False,
@@ -163,35 +216,35 @@ class TexthisTxt(Txt):
             settings.paths.texthis_txt_dir / txt_file, self.preprocess_data(data)
         )
 
-    def preprocess_data(self, texthis: list[TpsfECM]) -> str:
+    def preprocess_data(self, texthis: list[Tpsf]) -> str:
         output_str = ""
         for tpsf in texthis:
-            output_str += f"{tpsf.to_text()}\n"
+            output_str += f"{tpsf!s}\n"
         return output_str
 
 
-class TextTranshisTxt(Txt):
-    def __init__(
-        self,
-        data: list[TextTransformation],
-        settings: Settings,
-    ) -> None:
-        txt_file = f"{settings.filename}_{names.TEXT_TRANSHIS}.txt"
-        super().__init__(
-            settings.paths.text_transhis_txt_dir / txt_file, self.preprocess_data(data)
-        )
+# class TextTranshisTxt(Txt):
+#     def __init__(
+#         self,
+#         data: list[TSSegmenter],
+#         settings: Settings,
+#     ) -> None:
+#         txt_file = f"{settings.filename}_{names.TEXT_TRANSHIS}.txt"
+#         super().__init__(
+#             settings.paths.text_transhis_txt_dir / txt_file, self.preprocess_data(data)
+#         )
 
-    def preprocess_data(self, text_transhis: list[TextTransformation]) -> str:
-        output_str = ""
-        for tt in text_transhis:
-            output_str += f"{tt.to_text()}\n"
-        return output_str
+#     def preprocess_data(self, text_transhis: list[TSSegmenter]) -> str:
+#         output_str = ""
+#         for tt in text_transhis:
+#             output_str += f"{tt!s}\n"
+#         return output_str
 
 
 class SenhisTxt(Txt):
     def __init__(
         self,
-        data: dict[int, list[SPSF]],
+        data: list[SentenceHistory],
         settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,
@@ -206,12 +259,12 @@ class SenhisTxt(Txt):
             self.preprocess_data(data),
         )
 
-    def preprocess_data(self, senhis: dict[int, list[SPSF]]) -> str:
+    def preprocess_data(self, senhiss: list[SentenceHistory]) -> str:
         output_str = ""
-        for key, sens in senhis.items():
-            output_str += f"\n******* {key} *******\n"
-            for s in sens:
-                output_str += f"{s.to_text()}\n\n"
+        for senhis in senhiss:
+            output_str += f"\n******* {senhis.sen_id} *******\n"
+            for s in senhis.senversions:
+                output_str += f"{s!s}\n\n"
         return output_str
 
 
@@ -316,25 +369,27 @@ SOURCE FILE: {source_file}
 
 class ParsesTxt(Txt):
     def __init__(
-        self, data: dict[int, list[list[TokenProp]]], output_dir: Path
+        self, file_id: str, data: dict[int, list[list[TokenProp]]], output_dir: Path
     ) -> None:
         self.output_dir = output_dir
-        self.output = self.preprocess_data(data)
+        self.output = self.preprocess_data(file_id, data)
 
     def preprocess_data(
-        self, senhis_parses: dict[int, list[list[TokenProp]]]
+        self, file_id: str, senhis_parses: dict[int, list[list[TokenProp]]]
     ) -> list[tuple[Path, str]]:
         output = []
+        complete_output_str = ""
         for sen_id, sgl_senhis_parses in senhis_parses.items():
-            output_path = self.output_dir / str(sen_id)
-            ensure_path(output_path)
             for senver_id, parsed_sen in enumerate(sgl_senhis_parses):
-                output_filepath = output_path / f"{senver_id}.txt"
-                output_str = self.generate_str(parsed_sen)
-                output.append((output_filepath, output_str))
+                output_dir = self.output_dir / file_id
+                ensure_path(output_dir)
+                output_filepath = self.output_dir / file_id / f"{sen_id}.txt"
+                single_output_str = self.generate_str(senver_id, parsed_sen)
+                complete_output_str += single_output_str
+                output.append((output_filepath, complete_output_str))
         return output
 
-    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
+    def generate_str(self, senver_id: int, parsed_sen: list[TokenProp]) -> str:
         raise NotImplementedError
 
     def to_file(self) -> None:
@@ -344,22 +399,23 @@ class ParsesTxt(Txt):
 
 class DepParsesTxt(ParsesTxt):
     def __init__(
-        self, data: dict[int, list[list[TokenProp]]], settings: Settings
+        self, file_id: str, data: dict[int, list[list[TokenProp]]], settings: Settings
     ) -> None:
-        super().__init__(data, settings.paths.dependency_senhis_parses_dir)
+        super().__init__(file_id, data, settings.paths.dependency_senhis_parses_dir)
 
-    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
-        output_str = ""
+    def generate_str(self, senver_id: int, parsed_sen: list[TokenProp]) -> str:
+        output_str = f"{senver_id}\n"
         for tok in parsed_sen:
             output_str += f'{tok["id"]}\t{tok["word"]}\t{tok["pos"]}\t{tok["head"]}\t{tok["dep_rel"]}\n'
+        output_str += "\n=====\n"
         return output_str
 
 
 class ConstParsesTxt(ParsesTxt):
     def __init__(
-        self, data: dict[int, list[list[TokenProp]]], settings: Settings
+        self, file_id: str, data: dict[int, list[list[TokenProp]]], settings: Settings
     ) -> None:
-        super().__init__(data, settings.paths.constituency_senhis_parses_dir)
+        super().__init__(file_id, data, settings.paths.constituency_senhis_parses_dir)
 
-    def generate_str(self, parsed_sen: list[TokenProp]) -> str:
-        return f"{str(parsed_sen)}\n"
+    def generate_str(self, senver_id: int, parsed_sen: list[TokenProp]) -> str:
+        return f"{parsed_sen!s}\n"

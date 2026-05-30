@@ -5,7 +5,10 @@ from typing import cast
 import numpy as np
 from bs4 import BeautifulSoup
 
-from ..transformation_layer.action import (
+from wta.pipeline.names import TUTypes
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+
+from ..pipeline.preprocessing.action import (
     Action,
     Append,
     Deletion,
@@ -13,8 +16,8 @@ from ..transformation_layer.action import (
     Midletion,
     Navigation,
 )
-from ..transformation_layer.text_unit import SPSF, TextUnitType
-from ..transformation_layer.tpsf import TpsfECM, TpsfPCM
+from ..pipeline.sentence_layer.sentence_histories.spsf import Spsf
+from ..pipeline.transformation_layer.tpsf import Tpsf, TpsfPCM
 
 
 class Statistics(ABC):  # noqa: B024
@@ -47,8 +50,8 @@ class Statistics(ABC):  # noqa: B024
 class BasicStatistics(Statistics):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        texthis_filtered: list[TpsfECM],
+        texthis: list[Tpsf],
+        texthis_filtered: list[Tpsf],
     ) -> None:
         self.texthis = texthis
         self.texthis_filtered = texthis_filtered
@@ -116,7 +119,7 @@ class PauseStatistics(Statistics):
 
 
 class TSStatistics(Statistics):
-    def __init__(self, texthis: list[TpsfECM]) -> None:
+    def __init__(self, texthis: list[Tpsf]) -> None:
         self.texthis = texthis
         self.data = self.retrieve_stats()
 
@@ -155,35 +158,36 @@ class TSStatistics(Statistics):
 
 
 class SentenceStatistics(Statistics):
-    def __init__(self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]) -> None:
+    def __init__(self, texthis: list[Tpsf], senhiss: list[SentenceHistory]) -> None:
         self.texthis = texthis
-        self.senhis = senhis
+        self.senhiss = senhiss
         self.data = self.retrieve_stats()
 
     def retrieve_stats(self) -> dict[str, int | float | str]:
-        detected_sens = len(self.senhis)
+        detected_sens = len(self.senhiss)
         num_unchanged_sens = 0
         num_sen_versions = []
         max_num_sen_versions = 0
         num_potentially_erroneous_sens = 0
         sen_with_most_versions = ""
-        for sh in self.senhis.values():
-            if len(sh) == 1:
+        for senhis in self.senhiss:
+            if len(senhis.senversions) == 1:
                 num_unchanged_sens += 1
-            if len(sh) == 2:
+            if len(senhis.senversions) == 2:
                 num_potentially_erroneous_sens += 1
-            if len(sh) > max_num_sen_versions:
-                max_num_sen_versions = len(sh)
-                sen_with_most_versions = sh[-1].text
-            num_sen_versions.append(len(sh))
+            if len(senhis.senversions) > max_num_sen_versions:
+                max_num_sen_versions = len(senhis.senversions)
+                sen_with_most_versions = senhis.senversions[-1].text
+            num_sen_versions.append(len(senhis.senversions))
         mean_num_sentence_versions = cast(float, round(np.mean(num_sen_versions), 2))
         final_num_sentences = len(
             [
                 tu
-                for tu in self.texthis[-1].textunits
-                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
+                for tu in self.texthis[-1].tus
+                if tu.type in (TUTypes.SEN, TUTypes.SEC)
             ]
         )
+
         return {
             "detected_sens": detected_sens,
             "final_num_sentences": final_num_sentences,

@@ -1,24 +1,25 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-from wta.pipeline.names import SenLabels
-from wta.pipeline.transformation_layer.text_unit import SPSF, TextUnitType
-from wta.pipeline.transformation_layer.tpsf import TpsfECM
+from wta.pipeline.names import TUState, TUTypes
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+from wta.pipeline.sentence_layer.sentence_histories.spsf import Spsf
+from wta.pipeline.transformation_layer.tpsf import Tpsf
 
 from .base import BasePlot
 from .colors import Colors
 
 
 class SenhisPlot(BasePlot):
-    def __init__(self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]) -> None:
+    def __init__(self, texthis: list[Tpsf], senhis: list[SentenceHistory]) -> None:
         texthis = [
             tpsf
             for tpsf in texthis
             if len(
                 [
                     tu
-                    for tu in tpsf.textunits
-                    if tu.state not in [SenLabels.UNC_PRE, SenLabels.UNC_POST]
+                    for tu in tpsf.tus
+                    if tu.state not in [TUState.UNC_PRE, TUState.UNC_POST]
                 ]
             )
             > 0
@@ -29,7 +30,7 @@ class SenhisPlot(BasePlot):
         self.data = self.preprocess_data(texthis, senhis)
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
+        self, texthis: list[Tpsf], senhiss: list[SentenceHistory]
     ) -> dict[int, list[tuple[int, str, str]]]:
         """
         Collects sentence versions for each tpsf (its text and length)
@@ -43,19 +44,19 @@ class SenhisPlot(BasePlot):
             tpsf_sens: list[tuple[int, str, str]] = []
             for sen in [
                 tu
-                for tu in tpsf.textunits
-                if tu.text_unit_type in (TextUnitType.SEN, TextUnitType.SEC)
+                for tu in tpsf.tus
+                if tu.type in (TUTypes.SEN, TUTypes.SEC)
             ]:
-                for sen_id, sen_list in senhis.items():
+                for senhis in senhiss:
                     if sen.text.strip() in [
-                        s.text for s in sen_list
+                        s.text for s in senhis.senversions
                     ] and sen.text.strip() not in [s[2] for s in tpsf_sens]:
                         tpsf_sens.append(
-                            (len(sen.text), self.sen_colors[sen_id], sen.text)
+                            (len(sen.text), self.sen_colors[senhis.sen_id], sen.text)
                         )
                 if sen.text.strip() not in [s[2] for s in tpsf_sens]:
                     tpsf_sens.append((len(sen.text), "beige", sen.text))
-            tpsf_sentences.update({tpsf.revision_id: tpsf_sens})
+            tpsf_sentences.update({tpsf.id: tpsf_sens})
         return tpsf_sentences
 
     def create_figure(self) -> tuple[Axes, Axes]:

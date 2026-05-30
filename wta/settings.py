@@ -9,6 +9,7 @@ from .utils.other import ensure_path
 
 @dataclasses.dataclass(frozen=True)
 class Paths:
+    idfx_events_dir: Path
     events_dir: Path
     actions_dir: Path
     tss_dir: Path
@@ -17,6 +18,7 @@ class Paths:
     texthis_txt_dir: Path
     texthis_visual_dir: Path
     texthis_csv_dir: Path
+    burstlist_csv_dir: Path
     stats_dir: Path
     senhis_json_dir: Path
     senhis_txt_dir: Path
@@ -51,11 +53,13 @@ def _create_paths(output_dir: Path) -> Paths:
     preprocessing_dir = output_dir / names.PREPROCESSING
     texthis_dir = output_dir / names.TEXTHIS
     transhis_dir = output_dir / names.TRANSHIS
+    burstlist_dir = output_dir / names.BURSTLIST
     senhis_dir = output_dir / names.SENHIS
     senhood_dir = output_dir / names.SENHOOD
     senhis_parses_dir = senhis_dir / names.SENPAR
 
     paths = Paths(
+        idfx_events_dir=preprocessing_dir / names.IDFX_EVENTS,
         events_dir=preprocessing_dir / names.EVENTS,
         actions_dir=preprocessing_dir / names.ACTIONS,
         tss_dir=preprocessing_dir / names.TSS,
@@ -64,6 +68,7 @@ def _create_paths(output_dir: Path) -> Paths:
         texthis_txt_dir=texthis_dir / names.TXT,
         texthis_visual_dir=texthis_dir / names.VISUAL,
         texthis_csv_dir=texthis_dir / names.CSV,
+        burstlist_csv_dir=burstlist_dir / names.CSV,
         stats_dir=output_dir / names.STATS,
         senhis_json_dir=senhis_dir / names.JSON,
         senhis_txt_dir=senhis_dir / names.TXT,

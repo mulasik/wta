@@ -3,10 +3,11 @@ from typing import Generic, TypeVar
 
 import matplotlib.pyplot as plt
 
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
 from wta.settings import Settings
 
-from ...pipeline.transformation_layer.text_unit import SPSF
-from ...pipeline.transformation_layer.tpsf import TpsfECM
+from ...pipeline.sentence_layer.sentence_histories.spsf import Spsf
+from ...pipeline.transformation_layer.tpsf import Tpsf
 from .base import BasePlot
 from .colors import Colors
 
@@ -15,10 +16,10 @@ _T = TypeVar("_T")
 
 class StatsPlot(BasePlot, Generic[_T]):
     def __init__(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhiss: list[SentenceHistory], settings: Settings
     ) -> None:
         self.texthis = texthis
-        self.senhis = senhis
+        self.senhiss = senhiss
         self.settings = settings
         self.data = self.preprocess_data()
 
@@ -45,10 +46,9 @@ class SenEditPlot(StatsPlot[tuple[list[str], list[int]]]):
         sen_ids = []
         i = 0
         number_versions = []
-        for sens in self.senhis.values():
+        for i, senhis in enumerate(self.senhiss):
             sen_ids.append(str(i))
-            number_versions.append(len(sens))
-            i += 1
+            number_versions.append(len(senhis.senversions))
         return sen_ids, number_versions
 
     def create_figure(self) -> None:
@@ -114,7 +114,7 @@ class TsTokensPlot(StatsPlot[tuple[list[int], list[int]]]):
         tpsf_ids, ts_tokens = [], []
         for tpsf in self.texthis:
             if tpsf.ts.text:
-                tpsf_ids.append(tpsf.revision_id)
+                tpsf_ids.append(tpsf.id)
                 no_edited_tokens = len(tpsf.ts.text.strip().split(" "))
                 if tpsf.ts.label in ["deletion", "midletion"]:
                     no_edited_tokens = no_edited_tokens * -1

@@ -1,23 +1,28 @@
+from collections.abc import Iterable
 from pathlib import Path
 
-from wta.output_handler.storage.csv import SenhisCsv, TexthisCsv
+from bs4 import BeautifulSoup, Tag
+
+from wta.output_handler.storage.csv import BurstlistCsv, SenhisCsv, TexthisCsv
+from wta.pipeline.BL2TL_projection.burst import Burst
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
 from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import Sentencehood
 
+from ..pipeline.preprocessing.action import Action
+from ..pipeline.preprocessing.events.base import BaseEvent
+from ..pipeline.sentence_layer.sentence_histories.spsf import Spsf
 from ..pipeline.sentence_layer.sentence_parsing.parsers import TokenProp
-from ..pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
-from ..pipeline.statistics.statistics import (
+from ..pipeline.sentence_layer.syntactic_transformations.transformation import Transformation
+from ..pipeline.transformation_layer.tpsf import Tpsf, TpsfPCM
+from ..pipeline.transformation_layer.ts import TSBuilder
+from ..settings import Settings
+from ..statistics.statistics import (
     BasicStatistics,
     EventStatistics,
     PauseStatistics,
     SentenceStatistics,
     TSStatistics,
 )
-from ..pipeline.transformation_layer.action import Action
-from ..pipeline.transformation_layer.events.base import BaseEvent
-from ..pipeline.transformation_layer.text_unit import SPSF
-from ..pipeline.transformation_layer.tpsf import TpsfECM, TpsfPCM
-from ..pipeline.transformation_layer.ts import TransformingSequence
-from ..settings import Settings
 from .storage.json import SenhisJson, SenhoodJson, TexthisJson, TranshisJson
 from .storage.svg import (
     ConstTranshisSvg,
@@ -40,6 +45,7 @@ from .storage.txt import (
     ConstParsesTxt,
     DepParsesTxt,
     EventsTxt,
+    IdfxTxt,
     SenhisTxt,
     SenhoodhisTxt,
     StatsTxt,
@@ -49,6 +55,15 @@ from .storage.txt import (
     TpsfsTxt,
     TssTxt,
 )
+
+
+class IdfxEventsOutputFactory:
+    @classmethod
+    def run(cls, logfile: Path, settings: Settings) -> None:
+        with logfile.open() as fp:
+            soup = BeautifulSoup(fp, features="lxml")
+            idfx_events: Iterable[Tag] = soup.find_all("event")
+        IdfxTxt(idfx_events, settings).to_file()
 
 
 class EventsOutputFactory:
@@ -71,13 +86,13 @@ class ActionGroupsOutputFactory:
 
 class TssOutputFactory:
     @classmethod
-    def run(cls, tss: list[TransformingSequence], settings: Settings) -> None:
+    def run(cls, tss: list[TSBuilder], settings: Settings) -> None:
         TssTxt(tss, settings).to_file()
 
 
 class TpsfsOutputFactory:
     @classmethod
-    def run(cls, tpsfs: list[TpsfECM], settings: Settings) -> None:
+    def run(cls, tpsfs: list[Tpsf], settings: Settings) -> None:
         TpsfsTxt(tpsfs, settings).to_file()
 
 
@@ -89,7 +104,7 @@ class TpsfsPCMOutputFactory:
 
 class TexthisOutputFactory:
     @classmethod
-    def run(cls, texthis: list[TpsfECM], settings: Settings) -> None:  # + texthis_pcm
+    def run(cls, texthis: list[Tpsf], settings: Settings) -> None:  # + texthis_pcm
         TexthisJson(texthis, settings).to_file()
         # TODO: TexthisJson(texthis_pcm, settings, mode='pcm').to_file()
         TexthisTxt(texthis, settings).to_file()
@@ -100,7 +115,7 @@ class TexthisOutputFactory:
 class TexthisFltrOutputFactory:
     @classmethod
     def run(
-        cls, texthis_fltr: list[TpsfECM], settings: Settings
+        cls, texthis_fltr: list[Tpsf], settings: Settings
     ) -> None:  # + texthis_pcm
         TexthisJson(texthis_fltr, settings, filtered=True).to_file()
         TexthisTxt(texthis_fltr, settings, filtered=True).to_file()
@@ -108,14 +123,22 @@ class TexthisFltrOutputFactory:
         TexthisCsv(texthis_fltr, settings, filtered=True).to_file()
 
 
+class BurstListOutputFactory:
+    @classmethod
+    def run(
+        cls, burstlist: list[Burst], settings: Settings
+    ) -> None:  # + texthis_pcm
+        BurstlistCsv(burstlist, settings).to_file()
+
+
 class SenhisOutputFactory:
     @classmethod
     def run(
         cls,
-        texthis: list[TpsfECM],
-        texthis_fltr: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
-        senhis_fltr: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        texthis_fltr: list[Tpsf],
+        senhis: list[SentenceHistory],
+        senhis_fltr: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         SenhisJson(senhis, settings).to_file()
@@ -145,12 +168,13 @@ class ParseOutputFactory:
     @classmethod
     def run(
         cls,
+        file_id: str,
         dep_senhis_parses: dict[int, list[list[TokenProp]]],
-        const_senhis_parses: dict[int, list[list[TokenProp]]],
+        # const_senhis_parses: dict[int, list[list[TokenProp]]],
         settings: Settings,
     ) -> None:
-        DepParsesTxt(dep_senhis_parses, settings).to_file()
-        ConstParsesTxt(const_senhis_parses, settings).to_file()
+        DepParsesTxt(file_id, dep_senhis_parses, settings).to_file()
+        # ConstParsesTxt(const_senhis_parses, settings).to_file()
 
 
 class TranshisOutputFactory:
@@ -158,15 +182,15 @@ class TranshisOutputFactory:
     def run(
         cls,
         dep_transhis: dict[int, list[Transformation]],
-        const_transhis: dict[int, list[Transformation]],
+        # const_transhis: dict[int, list[Transformation]],
         settings: Settings,
     ) -> None:
         TranshisJson(dep_transhis, settings, "dependency").to_file()
-        TranshisJson(const_transhis, settings, "constituency").to_file()
+        # TranshisJson(const_transhis, settings, "constituency").to_file()
         DepTranshisSvg(dep_transhis, settings).to_file()
-        ConstTranshisSvg(const_transhis, settings).to_file()
-        SynBarTranshisSvg(dep_transhis, const_transhis, settings).to_file()
-        SynPieTranshisSvg(dep_transhis, const_transhis, settings).to_file()
+        # ConstTranshisSvg(const_transhis, settings).to_file()
+        # SynBarTranshisSvg(dep_transhis, const_transhis, settings).to_file()
+        # SynPieTranshisSvg(dep_transhis, const_transhis, settings).to_file()
 
 
 class StatsOutputFactory:
@@ -179,8 +203,8 @@ class StatsOutputFactory:
         ts_stats: TSStatistics,
         sen_stats: SentenceStatistics,
         idfx: Path,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         StatsTxt(
