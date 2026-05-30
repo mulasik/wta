@@ -3,10 +3,11 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 
 from wta.output_handler.plots.sentransformations_plot import SenProductionStagePlot
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
 
-from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
-from ...pipeline.transformation_layer.text_unit import SPSF
-from ...pipeline.transformation_layer.tpsf import TpsfECM
+from ...pipeline.sentence_layer.sentence_histories.spsf import Spsf
+from ...pipeline.sentence_layer.syntactic_transformations.transformation import Transformation
+from ...pipeline.transformation_layer.tpsf import Tpsf
 from ...settings import Settings
 from .. import names
 from ..plots.senhis_plot import SenhisPlot
@@ -37,34 +38,34 @@ class Svg(BaseStorage):
 
 
 class TexthisSvg(Svg):
-    def __init__(self, texthis: list[TpsfECM], settings: Settings) -> None:
+    def __init__(self, texthis: list[Tpsf], settings: Settings) -> None:
         self.preprocess_data(texthis)
         super().__init__(
             settings.paths.texthis_visual_dir
             / f"{settings.filename}_{names.TEXTHIS}_{names.VISUAL}.svg"
         )
 
-    def preprocess_data(self, texthis: list[TpsfECM]) -> None:
+    def preprocess_data(self, texthis: list[Tpsf]) -> None:
         TexthisPlot(texthis).run()
 
 
 class FilteredTexthisSvg(Svg):
-    def __init__(self, texthis_fltr: list[TpsfECM], settings: Settings) -> None:
+    def __init__(self, texthis_fltr: list[Tpsf], settings: Settings) -> None:
         self.preprocess_data(texthis_fltr)
         super().__init__(
             settings.paths.texthis_visual_dir
             / f"{settings.filename}_{names.TEXTHIS}_{names.VISUAL}_filtered.svg"
         )
 
-    def preprocess_data(self, texthis_fltr: list[TpsfECM]) -> None:
+    def preprocess_data(self, texthis_fltr: list[Tpsf]) -> None:
         FilteredTexthisPlot(texthis_fltr).run()
 
 
 class SenhisSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
         filtered: bool = False,
     ) -> None:
@@ -76,7 +77,7 @@ class SenhisSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]]
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory]
     ) -> None:
         SenhisPlot(texthis, senhis).run()
 
@@ -156,8 +157,8 @@ class SynPieTranshisSvg(Svg):
 class SenEditSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -166,7 +167,7 @@ class SenEditSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         SenEditPlot(texthis, senhis, settings).run()
 
@@ -174,8 +175,8 @@ class SenEditSvg(Svg):
 class TsLabelsSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -184,7 +185,7 @@ class TsLabelsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         TsLabelsPlot(texthis, senhis, settings).run()
 
@@ -192,8 +193,8 @@ class TsLabelsSvg(Svg):
 class TsTokensSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -202,7 +203,7 @@ class TsTokensSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         TsTokensPlot(texthis, senhis, settings).run()
 
@@ -210,8 +211,8 @@ class TsTokensSvg(Svg):
 class DeletionsSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -220,7 +221,7 @@ class DeletionsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         DeletionsPlot(texthis, senhis, settings).run()
 
@@ -228,8 +229,8 @@ class DeletionsSvg(Svg):
 class InsertionsSvg(Svg):
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[SPSF]],
+        texthis: list[Tpsf],
+        senhis: list[SentenceHistory],
         settings: Settings,
     ) -> None:
         self.preprocess_data(texthis, senhis, settings)
@@ -238,7 +239,7 @@ class InsertionsSvg(Svg):
         )
 
     def preprocess_data(
-        self, texthis: list[TpsfECM], senhis: dict[int, list[SPSF]], settings: Settings
+        self, texthis: list[Tpsf], senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         InsertionsPlot(texthis, senhis, settings).run()
 
@@ -246,7 +247,7 @@ class InsertionsSvg(Svg):
 class SenProductionStageSvg(Svg):
     def __init__(
         self,
-        senhis: dict[int, list[SPSF]],
+        senhis: list[SentenceHistory],
         settings: Settings,
         filtered: bool = False
     ) -> None:
@@ -257,7 +258,7 @@ class SenProductionStageSvg(Svg):
         )
 
     def preprocess_data(
-        self, senhis: dict[int, list[SPSF]], settings: Settings
+        self, senhis: list[SentenceHistory], settings: Settings
     ) -> None:
         SenProductionStagePlot(senhis, settings).run()
 

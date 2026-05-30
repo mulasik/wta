@@ -1,14 +1,14 @@
 import json
 
-from ..pipeline.transformation_layer.text_unit import TextUnit
-from ..pipeline.transformation_layer.tpsf import TpsfECM
+from ..pipeline.sentence_layer.textunits.textunit import Textunit
+from ..pipeline.transformation_layer.tpsf import Tpsf
 
 
 class Console:
     def __init__(
         self,
-        texthis: list[TpsfECM],
-        senhis: dict[int, list[TextUnit]],
+        texthis: list[Tpsf],
+        senhis: dict[int, list[Textunit]],
         mode: str,
         filtered: bool,
     ) -> None:

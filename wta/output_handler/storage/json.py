@@ -2,18 +2,19 @@ import json
 from pathlib import Path
 from typing import Any, Generic, TypeAlias, TypeVar
 
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory, SentenceHistoryDict
 from wta.pipeline.sentence_layer.sentence_histories.sentencehood_evaluator import (
     SenhoodDict,
     Sentencehood,
 )
-from wta.pipeline.transformation_layer.text_transformation import TextTransformation, TextTransformationDict
+from wta.pipeline.SL2TL_projection.tssegmenter import TSSegmenter, TSSegmenterDict
 
-from ...pipeline.sentence_layer.sentence_syntactic_transformation_histories.transformation import Transformation
-from ...pipeline.transformation_layer.text_unit import (
-    SPSF,
-    SPSFDict,
+from ...pipeline.sentence_layer.sentence_histories.spsf import (
+    Spsf,
+    SpsfDict,
 )
-from ...pipeline.transformation_layer.tpsf import TpsfECM, TpsfECMDict
+from ...pipeline.sentence_layer.syntactic_transformations.transformation import Transformation
+from ...pipeline.transformation_layer.tpsf import Tpsf, TpsfDict
 from ...settings import Settings
 from .. import names
 from .base import BaseStorage
@@ -34,10 +35,10 @@ class Json(BaseStorage, Generic[_T]):
             json.dump(self.data, f)
 
 
-class TexthisJson(Json[list[TpsfECMDict]]):
+class TexthisJson(Json[list[TpsfDict]]):
     def __init__(
         self,
-        data: list[TpsfECM],
+        data: list[Tpsf],
         settings: Settings,
         mode: str = "ecm",
         filtered: bool = False,
@@ -51,14 +52,14 @@ class TexthisJson(Json[list[TpsfECMDict]]):
             settings.paths.texthis_json_dir / json_file, self.preprocess_data(data)
         )
 
-    def preprocess_data(self, texthis: list[TpsfECM]) -> list[TpsfECMDict]:
+    def preprocess_data(self, texthis: list[Tpsf]) -> list[TpsfDict]:
         return [tpsf.to_dict() for tpsf in texthis]
 
 
-class SenhisJson(Json[dict[int, list[SPSFDict]]]):
+class SenhisJson(Json[dict[int, list[SpsfDict]]]):
     def __init__(
         self,
-        data: dict[int, list[SPSF]],
+        data: list[SentenceHistory],
         settings: Settings,
         view_mode: str = "normal",
         filtered: bool = False,
@@ -72,12 +73,9 @@ class SenhisJson(Json[dict[int, list[SPSFDict]]]):
         self.filepath = settings.paths.senhis_json_dir / json_file
 
     def preprocess_data(
-        self, senhis: dict[int, list[SPSF]]
-    ) -> dict[int, list[SPSFDict]]:
-        _senhis = {}
-        for key, sens in senhis.items():
-            _senhis[key] = [s.to_dict() for s in sens]
-        return _senhis
+        self, senhiss: list[SentenceHistory]
+    ) -> list[SentenceHistoryDict]:
+        return [senhis.to_dict() for senhis in senhiss]
 
 
 class SenhoodJson(Json[dict[int, list[SenhoodDict]]]):

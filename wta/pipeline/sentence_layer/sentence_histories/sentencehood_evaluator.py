@@ -2,7 +2,9 @@ import dataclasses
 from typing import TypedDict
 
 from wta.language_models.spacy import SpacyModel
-from wta.pipeline.transformation_layer.text_unit import SPSF, TextUnitType
+from wta.pipeline.names import TUTypes
+from wta.pipeline.sentence_layer.sentence_histories.sentence_history import SentenceHistory
+from wta.pipeline.sentence_layer.sentence_histories.spsf import Spsf
 from wta.settings import Settings
 
 _GRAMMAR = {
@@ -26,7 +28,7 @@ _MECHANICS = {
 
 class SenhoodDict(TypedDict):
     text: str
-    syntactic_data: list
+    syntactic_data: list[tuple[str, str]]
     mech_completeness: bool
     con_completeness: bool
     syn_completeness: bool
@@ -46,7 +48,7 @@ class Sentencehood:
     """
 
     text: str
-    syntactic_data: list
+    syntactic_data: list[tuple[str, str]]
     mech_completeness: bool
     con_completeness: bool
     syn_completeness: bool
@@ -68,20 +70,20 @@ class Sentencehood:
 class SentencehoodEvaluator:
     def run(
         self,
-        sentence_history: dict[int, list[SPSF]],
+        sentence_history: list[SentenceHistory],
         nlp_model: SpacyModel,
         settings: Settings,
     ) -> tuple[dict[int, list[Sentencehood]], dict[str, set[str]]]:
         sentencehood_history: dict[int, list[Sentencehood]] = {}
         error_details: dict[str, set[str]] = {}
-        for sen_id, spsf_list in sentence_history.items():
+        for sh in sentence_history:
             spsf_sentencehood_list = []
-            for i, spsf in enumerate(spsf_list):
-                mech_completeness = spsf.text_unit_type == TextUnitType.SEN
+            for i, spsf in enumerate(sh.senversions):
+                mech_completeness = spsf.tu_type == TUTypes.SEN
                 con_completeness = (
                     True
-                    if i == len(spsf_list) - 1
-                    else spsf_list[i + 1].tpsf_id > spsf.tpsf_id + 1
+                    if i == len(sh.senversions) - 1
+                    else sh.senversions[i + 1].tpsf_id > spsf.tpsf_id + 1
                 )
                 tagged_spsf = nlp_model.nlp(spsf.text)
                 syn_data: list[tuple[str, str]] = []
@@ -123,5 +125,5 @@ class SentencehoodEvaluator:
                     gram_correctness=gramm_correctness,
                 )
                 spsf_sentencehood_list.append(sentencehood)
-            sentencehood_history[sen_id] = spsf_sentencehood_list
+            sentencehood_history[sh.sen_id] = spsf_sentencehood_list
         return sentencehood_history, error_details

@@ -19,6 +19,16 @@ class Action:
         self.startpos = startpos
         self.endpos = endpos
 
+    def to_dict(self) -> dict[str, str | int | float | None]:
+        return {
+            "content": self.content,
+            "startpos": self.startpos,
+            "endpos": self.endpos,
+            "starttime": getattr(self, "starttime", None),
+            "endtime": getattr(self, "endtime", None),
+            "preceding_pause": getattr(self, "preceding_pause", None)
+        }
+
 
 class KeyboardAction(Action):
     def __init__(
@@ -29,7 +39,7 @@ class KeyboardAction(Action):
         keyname: str,
         starttime: float,
         endtime: float,
-        preceding_pause: float,
+        preceding_pause: float|None,
         textlen: int,
     ) -> None:
         super().__init__(content, startpos, endpos)
@@ -39,6 +49,8 @@ class KeyboardAction(Action):
         self.endtime = endtime
         self.preceding_pause = preceding_pause
 
+    def set_preceding_pause(self, preceding_pause: float) -> None:
+        self.preceding_pause = preceding_pause
 
 class Append(KeyboardAction):
     pass
@@ -66,10 +78,16 @@ class Replacement(Action):
         content: str,
         startpos: int,
         endpos: int | None,
-        rplcmt_endpos: int,
-        rplcmt_textlen: int,
+        starttime: float | None,
+        endtime: float | None,
+        preceding_pause: float | None,
+        rplcmt_endpos: int | None,
+        rplcmt_textlen: int | None,
     ) -> None:
         super().__init__(content, startpos, endpos)
+        self.starttime = starttime
+        self.endtime = endtime
+        self.preceding_pause = preceding_pause
         self.rplcmt_textlen = rplcmt_textlen
         self.rplcmt_endpos = rplcmt_endpos
 

@@ -7,7 +7,7 @@ usr_home = Path.home()
 _VIDEO_DATA_DIR = Path(usr_home, "thetool", "input_data", "DE", "video")
 _VIDEO_OUTPUT_DATA_DIR = Path(usr_home, "thetool", "output_data", "DE", "video")
 
-DEFAULT_PAUSE_DURATION = 2
+DEFAULT_PAUSE_DURATION_ms = 2
 DEFAULT_MIN_EDIT_DISTANCE = 3
 DEFAULT_TS_MIN_TOKENS_NUMBER = 2
 EDIT_DIST_COMBINED_WITH_TOK_NUMBER_DEFAULT = False
@@ -25,7 +25,7 @@ VIDEO: ConfigData = {
     "ksl_files": _VIDEO_IDFX_FILES,
     "output_dir": _VIDEO_OUTPUT_DATA_DIR / "default_setting",
     "final_txt": _VIDEO_DATA_DIR / "txt",
-    "pause_duration": DEFAULT_PAUSE_DURATION,
+    "pause_duration": DEFAULT_PAUSE_DURATION_ms,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
     "combine_edit_distance_with_tok_number": EDIT_DIST_COMBINED_WITH_TOK_NUMBER_DEFAULT,
@@ -39,7 +39,7 @@ VIDEO_CONF1: ConfigData = {
     "ksl_files": _VIDEO_IDFX_FILES,
     "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf1",
     "final_txt": _VIDEO_DATA_DIR / "txt",
-    "pause_duration": DEFAULT_PAUSE_DURATION,
+    "pause_duration": DEFAULT_PAUSE_DURATION_ms,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
     "combine_edit_distance_with_tok_number": EDIT_DIST_COMBINED_WITH_TOK_NUMBER_DEFAULT,
@@ -53,7 +53,7 @@ VIDEO_CONF2: ConfigData = {
     "ksl_files": _VIDEO_IDFX_FILES,
     "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf2",
     "final_txt": _VIDEO_DATA_DIR / "txt",
-    "pause_duration": DEFAULT_PAUSE_DURATION,
+    "pause_duration": DEFAULT_PAUSE_DURATION_ms,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
     "edit_dist_combined_with_tok_number": True,
@@ -67,7 +67,7 @@ VIDEO_CONF3: ConfigData = {
     "ksl_files": tuple(f for f in _VIDEO_IDFX_FILES if f.name.startswith("R")),
     "output_dir": _VIDEO_OUTPUT_DATA_DIR / "conf3",
     "final_txt": _VIDEO_DATA_DIR / "txt",
-    "pause_duration": DEFAULT_PAUSE_DURATION,
+    "pause_duration": DEFAULT_PAUSE_DURATION_ms,
     "min_edit_distance": DEFAULT_MIN_EDIT_DISTANCE,
     "ts_min_tokens_number": DEFAULT_TS_MIN_TOKENS_NUMBER,
     "edit_dist_combined_with_tok_number": True,

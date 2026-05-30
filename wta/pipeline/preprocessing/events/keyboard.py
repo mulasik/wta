@@ -59,17 +59,18 @@ class KeyboardEvent(BaseEvent):
         self.keyname = keyname
         self.starttime = starttime
         self.endtime = endtime
-        self.preceding_pause = None
+        self.preceding_pause: float|None = None
         self.textlen = textlen
         self.settings = settings
         self.char_number_diff = char_number_diff
 
     def set_preceding_pause(self) -> None:
         if isinstance(self.prev_evnt, KeyboardEvent):
-            try:
-                self.preceding_pause = round(self.starttime - self.prev_evnt.starttime, 4)
-            except TypeError:
-                self.preceding_pause = None
+            if self.prev_evnt.starttime is not None:
+                # Key press marks the initiation of a writing action,
+                # key release duration varies with typing style,
+                # press-to-press intervals are more stable for cognitive timing analysis.
+                self.preceding_pause = round(self.starttime - self.prev_evnt.starttime, 4) #starttime provided in secs
         else:
             self.preceding_pause = None
 
@@ -104,7 +105,7 @@ class ProductionKeyboardEvent(KeyboardEvent):
     def to_action(self) -> Action | None:
         cur_textlen = self.textlen - self.char_number_diff
         # if the next event is a replacement, the keyboard event is part of the replacement
-        if type(self.next_evnt).__name__ == EventTypes.RE:
+        if self.settings.config["ksl_source_format"] == "scriptlog_idfx" and type(self.next_evnt).__name__ == EventTypes.RE:
             return None
         # if more than 1 character has been produced at one go, the action is pasting
         if len(self.content) > 1:
@@ -160,7 +161,7 @@ class DeletionKeyboardEvent(KeyboardEvent):
 
     def to_action(self) -> Action | None:
         cur_textlen = self.textlen - self.char_number_diff
-        if type(self.next_evnt).__name__ == EventTypes.RE:
+        if self.settings.config["ksl_source_format"] == "scriptlog_idfx" and type(self.next_evnt).__name__ == EventTypes.RE:
             return None
         if self.startpos < cur_textlen:
             return Midletion(
@@ -197,6 +198,7 @@ class BDeletionKeyboardEvent(DeletionKeyboardEvent):
         textlen: int,
         settings: Settings,
     ) -> None:
+        content = content.replace("&#x8;", "")
         super().__init__(
             content,
             startpos,

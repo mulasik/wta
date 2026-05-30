@@ -31,14 +31,14 @@ class SpacyModel:
 
             self.nlp = German()
             print("Loading Spacy model for German...")
-            self.nlp = spacy.load("de_core_news_md")
+            self.nlp = spacy.load("de_dep_news_trf")
             self.tool = language_tool_python.LanguageTool("de-DE")
         elif lang == Languages.EN:
             from spacy.lang.en import English
 
             self.nlp = English()
             print("Loading Spacy model for English...")
-            self.nlp = spacy.load("en_core_web_md")
+            self.nlp = spacy.load("en_core_web_trf")
             self.tool = language_tool_python.LanguageTool("en-US")
         elif lang == Languages.GR:
             from spacy.lang.el import Greek
@@ -52,7 +52,7 @@ class SpacyModel:
 
             self.nlp = French()
             print("Loading Spacy model for French...")
-            self.nlp = spacy.load("fr_core_news_md")
+            self.nlp = spacy.load("fr_dep_news_trf")
             self.tool = language_tool_python.LanguageTool("fr-FR")
         else:
             print("FAILURE: Could not recognize the language.")
